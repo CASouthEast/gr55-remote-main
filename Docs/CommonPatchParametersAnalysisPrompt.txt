@@ -1,0 +1,21 @@
+The understanding and calculation of offset of Common Patch Parameters fields has been really hard to pinpoint. 
+If one would assume that the offset is pure byte oriented then one is really off track of reality. 
+I ve added an example of the complete (and i want to stress that it IS complete) common patch parameter message in hex code. 
+Its 347 bytes long including the trailing end byte of F7 . 
+This indicates (as an example) that the Normal PU Mute on/off parameter offset of 0x0232 would be way outside the message, but it aint. 
+Its actually within the last byte before the ending F7 . 
+That 2nd last byte also includes Normal PU Level info . 
+The on/off parameter only occypies 1 bit of the byte (have checked). 
+In the example , the Level is 50 % and Mute is on. 
+If Mute would be off, the 2nd last byte would be 1F instead of 20.
+
+Please dont specualte on that I would be missinformed regarding the actual length and accuracy of where Normal PU Level and Mute are placed.
+Also, dont speculate on the fact that the offset allways translates into pure byte consistent addressing. It simply dont. Accept that.
+It seems like there are LSB and MSB parts of the same byte even though the documentaed offset claims like 0x232 and 0x233.
+
+Please analyze and enhance documentation of the address mapping for common parameters . 
+keep the existing info in COMMON_PATCH_PARAMETERS.md , but add how to properly calculate how the pieces of info are to be retreived. 
+The app sems to have different types of fields, bolean 1 bit, 2 bit,4 bit, and 7 bit (sometimes doubble when values could be interpreted to 200 decimal) .
+
+As said, this is an analyze and report task. 
+no coding (but the target is to do this in Swift 6.2 so putting example code in the md doc is permitted).
