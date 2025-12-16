@@ -1,12 +1,13 @@
 import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useCallback, useContext } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
 import { RefreshControl } from "./RefreshControl";
 import { RemoteFieldPicker } from "./RemoteFieldPicker";
 import { RemoteFieldSegmentedSwitch } from "./RemoteFieldSegmentedSwitch";
 import { RemoteFieldSlider } from "./RemoteFieldSlider";
+import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
 import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
@@ -24,6 +25,44 @@ export function PatchEffectsModScreen({
     GR55.temporaryPatch.ampModNs.modType
   );
 
+  // modSwitch is controlled by RemoteFieldSwitch inside the switched section
+
+  // Get the appropriate level field based on the current effect type
+  const getCurrentLevelField = useCallback(() => {
+    switch (modType) {
+      case "OD/DS":
+        return GR55.temporaryPatch.ampModNs.odDsLevel;
+      case "WAH":
+        return GR55.temporaryPatch.ampModNs.wahLevel;
+      case "COMP":
+        return GR55.temporaryPatch.ampModNs.compLevel;
+      case "LIMITER":
+        return GR55.temporaryPatch.ampModNs.limiterLevel;
+      case "PHASER":
+        return GR55.temporaryPatch.ampModNs.phaserLevel;
+      case "FLANGER":
+        return GR55.temporaryPatch.ampModNs.flangerLevel;
+      case "TREMOLO":
+        return GR55.temporaryPatch.ampModNs.tremoloLevel;
+      case "ROTARY":
+        return GR55.temporaryPatch.ampModNs.rotaryLevel;
+      case "UNI-V":
+        return GR55.temporaryPatch.ampModNs.uniVLevel;
+      case "PAN":
+        return GR55.temporaryPatch.ampModNs.panLevel;
+      case "DELAY":
+        return GR55.temporaryPatch.ampModNs.delayEffectLevel;
+      case "CHORUS":
+        return GR55.temporaryPatch.ampModNs.chorusEffectLevel;
+      case "EQ":
+        return GR55.temporaryPatch.ampModNs.eqLevel;
+      default:
+        return GR55.temporaryPatch.ampModNs.odDsLevel; // fallback
+    }
+  }, [modType]);
+
+  const [modLevel, setModLevel] = useRemoteField(PATCH, getCurrentLevelField());
+
   const handleModTypeChange = useCallback(
     (value: typeof modType) => {
       setModType(value);
@@ -34,30 +73,10 @@ export function PatchEffectsModScreen({
 
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
 
-  return (
-    <PopoverAwareScrollView
-      refreshControl={
-        <RefreshControl refreshing={false} onRefresh={reloadData} />
-      }
-      style={[styles.container]}
-      contentContainerStyle={safeAreaStyle}
-    >
-      {/* "The PAN parameter is valid even if SWITCH is OFF." - GR-55 Owner's Manual */}
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.modPan}
-      />
-      <RemoteFieldSwitchedSection
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.modSwitch}
-      >
-        <RemoteFieldPicker
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.modType}
-          value={modType}
-          onValueChange={handleModTypeChange}
-        />
-        {modType === "OD/DS" && (
+  const renderEffectParameters = (effectType: typeof modType) => {
+    switch (effectType) {
+      case "OD/DS":
+        return (
           <>
             <RemoteFieldPicker
               page={PATCH}
@@ -76,9 +95,11 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.odDsLevel}
             />
           </>
-        )}
-        {modType === "WAH" && <WahSection />}
-        {modType === "COMP" && (
+        );
+      case "WAH":
+        return <WahSection />;
+      case "COMP":
+        return (
           <>
             <RemoteFieldSlider
               page={PATCH}
@@ -93,8 +114,9 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.compLevel}
             />
           </>
-        )}
-        {modType === "LIMITER" && (
+        );
+      case "LIMITER":
+        return (
           <>
             <RemoteFieldSlider
               page={PATCH}
@@ -109,8 +131,9 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.limiterLevel}
             />
           </>
-        )}
-        {modType === "OCTAVE" && (
+        );
+      case "OCTAVE":
+        return (
           <>
             <RemoteFieldSlider
               page={PATCH}
@@ -121,14 +144,14 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.octaveDryLevel}
             />
           </>
-        )}
-        {modType === "PHASER" && (
+        );
+      case "PHASER":
+        return (
           <>
             <RemoteFieldPicker
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.phaserType}
             />
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.phaserRate}
@@ -146,10 +169,10 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.phaserLevel}
             />
           </>
-        )}
-        {modType === "FLANGER" && (
+        );
+      case "FLANGER":
+        return (
           <>
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.flangerRate}
@@ -171,10 +194,10 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.flangerLevel}
             />
           </>
-        )}
-        {modType === "TREMOLO" && (
+        );
+      case "TREMOLO":
+        return (
           <>
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.tremoloRate}
@@ -183,7 +206,6 @@ export function PatchEffectsModScreen({
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.tremoloDepth}
             />
-            {/* TODO: Render wave shape? */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.tremoloWaveShape}
@@ -193,15 +215,14 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.tremoloLevel}
             />
           </>
-        )}
-        {modType === "ROTARY" && (
+        );
+      case "ROTARY":
+        return (
           <>
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.rotaryRateSlow}
             />
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.rotaryRateFast}
@@ -219,10 +240,10 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.rotaryLevel}
             />
           </>
-        )}
-        {modType === "UNI-V" && (
+        );
+      case "UNI-V":
+        return (
           <>
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.uniVRate}
@@ -236,10 +257,10 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.uniVLevel}
             />
           </>
-        )}
-        {modType === "PAN" && (
+        );
+      case "PAN":
+        return (
           <>
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.panRate}
@@ -248,7 +269,6 @@ export function PatchEffectsModScreen({
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.panDepth}
             />
-            {/* TODO: Render wave shape? */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.panWaveShape}
@@ -258,14 +278,14 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.panLevel}
             />
           </>
-        )}
-        {modType === "DELAY" && (
+        );
+      case "DELAY":
+        return (
           <>
             <RemoteFieldPicker
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.delayType}
             />
-            {/* TODO: Time field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.delayTime}
@@ -279,14 +299,14 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.delayEffectLevel}
             />
           </>
-        )}
-        {modType === "CHORUS" && (
+        );
+      case "CHORUS":
+        return (
           <>
             <RemoteFieldPicker
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.chorusType}
             />
-            {/* TODO: Rate field has labels at the end of the range */}
             <RemoteFieldSlider
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.chorusRate}
@@ -300,9 +320,9 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.chorusEffectLevel}
             />
           </>
-        )}
-        {modType === "EQ" && (
-          /* TODO: Graphical EQ! */
+        );
+      case "EQ":
+        return (
           <>
             <RemoteFieldPicker
               page={PATCH}
@@ -316,7 +336,6 @@ export function PatchEffectsModScreen({
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.eqLowMidCutoffFreq}
             />
-            {/* TODO: Slider with nonlinear stops */}
             <RemoteFieldPicker
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.eqLowMidQ}
@@ -329,7 +348,6 @@ export function PatchEffectsModScreen({
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.eqHighMidCutoffFreq}
             />
-            {/* TODO: Slider with nonlinear stops */}
             <RemoteFieldPicker
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.eqHighMidQ}
@@ -351,34 +369,160 @@ export function PatchEffectsModScreen({
               field={GR55.temporaryPatch.ampModNs.eqLevel}
             />
           </>
-        )}
-      </RemoteFieldSwitchedSection>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <PopoverAwareScrollView
+      refreshControl={
+        <RefreshControl refreshing={false} onRefresh={reloadData} />
+      }
+      style={safeAreaStyle}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <View style={styles.card}>
+        {/* Header with title, effect type badge, and switch */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.title}>MOD</Text>
+            <View style={styles.effectTypeBadge}>
+              <Text style={styles.effectTypeText}>{modType}</Text>
+            </View>
+          </View>
+          <View style={styles.headerRight}>
+            <Text style={styles.switchLabel}>ON</Text>
+            <RemoteFieldSwitch
+              page={PATCH}
+              field={GR55.temporaryPatch.ampModNs.modSwitch}
+            />
+          </View>
+        </View>
+
+        {/* Level section with slider and numeric input */}
+        <View style={styles.section}>
+          <View style={styles.levelHeader}>
+            <Text style={styles.fieldLabel}>Level</Text>
+            <View style={styles.levelValueContainer}>
+              <Text style={styles.levelInput}>
+                {typeof modLevel === "number"
+                  ? String(modLevel)
+                  : String(modLevel ?? "")}
+              </Text>
+              <TouchableOpacity style={styles.resetButton}>
+                <Text style={styles.resetButtonText}>↻</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <RemoteFieldSlider page={PATCH} field={getCurrentLevelField()} />
+        </View>
+
+        {/* Effect Type Picker */}
+        <View style={styles.section}>
+          <Text style={styles.fieldLabel}>Effect Type</Text>
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.modType}
+            value={modType}
+            onValueChange={handleModTypeChange}
+          />
+        </View>
+
+        {/* Parameters section - dynamic based on effect type */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Parameters</Text>
+          {renderEffectParameters(modType)}
+        </View>
+
+        {/* Pan control */}
+        <View style={styles.section}>
+          <View style={styles.levelHeader}>
+            <Text style={styles.fieldLabel}>Pan</Text>
+            <Text style={styles.parameterValue}>50</Text>
+          </View>
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.modPan}
+          />
+        </View>
+
+        {/* Reset to Original button */}
+        <TouchableOpacity style={styles.resetToOriginalButton}>
+          <Text style={styles.resetToOriginalText}>↻ Reset to Original</Text>
+        </TouchableOpacity>
+
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.quickActionsContainer}>
+            <TouchableOpacity style={styles.copyButton}>
+              <Text style={styles.copyButtonText}>📋 Copy</Text>
+            </TouchableOpacity>
+            {[25, 50, 75, 100].map((v) => (
+              <TouchableOpacity
+                key={v}
+                style={[
+                  styles.quickButton,
+                  v === 25 && styles.quickButton25,
+                  v === 50 && styles.quickButton50,
+                  v === 75 && styles.quickButton75,
+                  v === 100 && styles.quickButton100,
+                ]}
+                onPress={() => setModLevel(v)}
+              >
+                <Text
+                  style={[
+                    styles.quickButtonText,
+                    v === 25 && styles.quickButtonText25,
+                    v === 50 && styles.quickButtonText50,
+                    v === 75 && styles.quickButtonText75,
+                    v === 100 && styles.quickButtonText100,
+                  ]}
+                >
+                  {v}%
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {/* Noise Suppressor section */}
       <RemoteFieldSwitchedSection
         page={PATCH}
         field={GR55.temporaryPatch.ampModNs.nsSwitch}
       >
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.nsThreshold}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.nsReleaseTime}
-        />
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Noise Suppressor</Text>
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.nsThreshold}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.nsReleaseTime}
+          />
+        </View>
       </RemoteFieldSwitchedSection>
-      {/* TODO: Should these be greyed out when the effect is off, or do the sends happen anyway? */}
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.modDelaySendLevel}
-      />
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.modReverbSendLevel}
-      />
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.modChorusSendLevel}
-      />
+
+      {/* Send Levels */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Send Levels</Text>
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.ampModNs.modDelaySendLevel}
+        />
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.ampModNs.modReverbSendLevel}
+        />
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.ampModNs.modChorusSendLevel}
+        />
+      </View>
     </PopoverAwareScrollView>
   );
 }
@@ -432,7 +576,179 @@ function WahSection() {
   );
 }
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
+  scrollContent: {
+    padding: 16,
+    alignItems: "center",
+  },
+  card: {
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    maxWidth: 600,
+    width: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
+  },
+  effectTypeBadge: {
+    backgroundColor: "#FFF5EB",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  effectTypeText: {
+    color: "#FF8A00",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#FFF5EB",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  switchLabel: {
+    fontSize: 12,
+    color: "#FF8A00",
+    fontWeight: "600",
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 12,
+  },
+  levelHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  levelValueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  levelInput: {
+    backgroundColor: "#FFF5EB",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FF8A00",
+    minWidth: 50,
+    borderWidth: 1,
+    borderColor: "#FF8A00",
+  },
+  resetButton: {
+    backgroundColor: "#FFF5EB",
+    borderRadius: 6,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: "#FF8A00",
+  },
+  resetButtonText: {
+    fontSize: 16,
+    color: "#FF8A00",
+  },
+  fieldLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+  },
+  parameterValue: {
+    fontSize: 14,
+    color: "#FF8A00",
+    fontWeight: "600",
+  },
+  resetToOriginalButton: {
+    backgroundColor: "#FFF5EB",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  resetToOriginalText: {
+    color: "#FF8A00",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  quickActionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  copyButton: {
+    backgroundColor: "#E3F2FD",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  copyButtonText: {
+    color: "#2196F3",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  quickButton: {
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  quickButton25: {
+    backgroundColor: "#E3F2FD",
+  },
+  quickButton50: {
+    backgroundColor: "#E8F5E8",
+  },
+  quickButton75: {
+    backgroundColor: "#FFF3E0",
+  },
+  quickButton100: {
+    backgroundColor: "#FFEBEE",
+  },
+  quickButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  quickButtonText25: {
+    color: "#2196F3",
+  },
+  quickButtonText50: {
+    color: "#4CAF50",
+  },
+  quickButtonText75: {
+    color: "#FF9800",
+  },
+  quickButtonText100: {
+    color: "#F44336",
   },
 });
