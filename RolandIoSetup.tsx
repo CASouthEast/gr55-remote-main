@@ -34,7 +34,7 @@ function useRolandIoSetupImpl() {
       identity: RolandSysExProtocol.DeviceIdentity,
       isFake?: boolean
     ) => {
-      let deviceDescriptor: DeviceDescriptor | void;
+      let deviceDescriptor: DeviceDescriptor | undefined = undefined;
       const deviceKey = [
         identity.manufacturerId.toString(16),
         identity.deviceFamily.toString(16),
