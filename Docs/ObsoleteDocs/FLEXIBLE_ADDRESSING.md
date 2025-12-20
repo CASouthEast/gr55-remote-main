@@ -78,7 +78,10 @@ export class AssignsMap {
     assignDef: T,
     patch: AtomReference
   ): T {
-    if (patch.address === this.basePatch.address || !(assignDef instanceof FieldAssignDefinition)) {
+    if (
+      patch.address === this.basePatch.address ||
+      !(assignDef instanceof FieldAssignDefinition)
+    ) {
       return assignDef;
     }
     // ... caching logic ...
@@ -96,10 +99,10 @@ Here's how it works:
 1.  An `AssignsMap` is created with a default base address (e.g., for the temporary patch area).
 2.  When data for a different patch needs to be accessed, the `rebaseAssign` method is called with a new `patch` object containing a different base address.
 3.  `rebaseAssign` calculates the difference between the new and old base addresses.
-4.  It then calls `withAddressOffset` on the `AssignDefinition`, which creates a *new* definition with the address of the parameter recalculated relative to the new base.
+4.  It then calls `withAddressOffset` on the `AssignDefinition`, which creates a _new_ definition with the address of the parameter recalculated relative to the new base.
 
 This dynamic recalculation of addresses at runtime allows the same parameter definitions to be used for different memory locations, making the system highly flexible.
 
 ## Conclusion
 
-The combination of conditional parameter sets and address rebasing results in a system where the structure of patch data is not fixed. The full address map defines all *possible* parameters, but for any given patch, only a subset of those parameters might be active and included in SysEx messages. This explains the discrepancy between the large potential size of the address map and the smaller, more efficient size of the data being transmitted.
+The combination of conditional parameter sets and address rebasing results in a system where the structure of patch data is not fixed. The full address map defines all _possible_ parameters, but for any given patch, only a subset of those parameters might be active and included in SysEx messages. This explains the discrepancy between the large potential size of the address map and the smaller, more efficient size of the data being transmitted.

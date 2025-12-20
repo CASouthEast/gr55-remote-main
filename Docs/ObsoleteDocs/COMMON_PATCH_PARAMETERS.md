@@ -1,4 +1,3 @@
-
 # Common Patch Parameters
 
 This document provides a detailed list of the "Common" patch parameters for the Roland GR-55. These parameters are part of every patch and control the overall behavior of the patch, including its name, controller assignments, and master settings.
@@ -36,10 +35,12 @@ Where `baseAddr` is the DT1 message's base address and `index` is the byte offse
 Once you have the `index`, decode based on the field type. Note that fields sharing the same byte index must be extracted using bit masks:
 
 **Single-byte fields (when index is unique):**
+
 - `BooleanField`: one byte at `valueBytes[index]`, value = `valueBytes[index] & 0x01` (0 or 1).
 - `UByteField`: one 7-bit byte at `valueBytes[index]`, value = `valueBytes[index] & 0x7F` (0..127).
 
 **Multi-byte fields:**
+
 - `USplit8Field`: two bytes; use the low 4 bits of each byte:
   - low = `valueBytes[index] & 0x0F`
   - high = `valueBytes[index+1] & 0x0F`
@@ -69,6 +70,7 @@ The `normalPuMute` (offset `0x0232`) and `normalPuLevel` (offset `0x0233`) both 
 The difference of 1 indicates the Mute field uses bit 0. The Level field uses the remaining 7 bits (bits 1-7 or bits 0-6, depending on encoding).
 
 **Decoding pattern:**
+
 ```swift
 let byte = valueBytes[index]
 let mute = (byte & 0x01) != 0  // Bit 0
@@ -239,6 +241,7 @@ Since Roland's documentation doesn't specify bit layouts for packed fields, you 
 3. **Address sizes vary**: Address sizes vary (3 vs 4 bytes) — use the addressing length consistent with the message/map you are handling.
 
 4. **Field size vs. storage size**: A field's logical size (as defined in the address map) does not necessarily equal its storage size. For example:
+
    - A `BooleanField` logically uses 1 bit, but may be stored in a byte with other fields
    - A `UByteField` logically uses 7 bits, but may share a byte with a 1-bit boolean
    - Multiple fields can share the same byte using bit-level packing
@@ -251,17 +254,20 @@ Given the hex message ending with `... 00 00 00 00 00 00 20 F7`:
 
 1. **Message structure**: The message is 347 bytes total (including `F7`). The `valueBytes` array excludes the SysEx header, address bytes, checksum, and `F7` terminator.
 
-2. **Address calculation**: 
+2. **Address calculation**:
+
    - `normalPuMute` has offset `0x0232`
    - `normalPuLevel` has offset `0x0233`
    - Both map to the same byte index (the second-to-last byte in valueBytes)
 
 3. **Byte value analysis**:
+
    - When Level=50, Mute=ON: byte = `0x20` = `00100000` binary
    - When Level=50, Mute=OFF: byte = `0x1F` = `00011111` binary
    - The difference of 1 indicates Mute uses bit 0
 
 4. **Extraction** (example - actual bit positions need verification):
+
    ```swift
    let byte = valueBytes[index]  // The shared byte
    let mute = (byte & 0x01) != 0  // Extract bit 0
@@ -271,14 +277,16 @@ Given the hex message ending with `... 00 00 00 00 00 00 20 F7`:
 5. **Verification needed**: The exact bit positions and encoding for Level must be verified by testing different Level values (0, 50, 100) and observing the byte changes.
 
 **Note on encoding discrepancy**: In the example, Level=50 but the byte shows `0x20` (32 decimal) or `0x1F` (31 decimal). This suggests the Level value may be:
+
 - Encoded with an offset (e.g., Level = (byte_value >> 1) + offset)
 - Stored in a different bit range than expected
 - Using a non-linear encoding (e.g., logarithmic scale)
 - The Level value of 50 might actually be stored as a different representation
 
 To resolve this, test with known values:
+
 - Set Level=0, Mute=OFF → observe byte value
-- Set Level=0, Mute=ON → observe byte value  
+- Set Level=0, Mute=ON → observe byte value
 - Set Level=100, Mute=OFF → observe byte value
 - Set Level=100, Mute=ON → observe byte value
 - Set Level=50, Mute=OFF → observe byte value (should be 0x1F based on example)
@@ -301,6 +309,7 @@ When multiple fields share a byte, their bit positions must be determined empiri
 ## Parameter List
 
 ### `patchAttribute`
+
 - **Description**: Patch Attribute
 - **Address Offset**: `0x0000`
 - **Data Type**: `BooleanField`
@@ -309,6 +318,7 @@ When multiple fields share a byte, their bit positions must be determined empiri
   - `1`: BASS
 
 ### `patchName`
+
 - **Description**: Patch Name
 - **Address Offset**: `0x0001`
 - **Data Type**: `AsciiStringField(16)`
@@ -317,91 +327,95 @@ When multiple fields share a byte, their bit positions must be determined empiri
 ---
 
 ### `ctl` Struct (CTL Pedal Settings)
+
 - **Base Address Offset**: `0x0011`
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-|---|---|---|---|---|
-| `status` | CTL Status | `0x0000` | `BooleanField` | "OFF" / "ON" |
-| `function` | CTL Function | `0x0001` | `EnumField` | The function assigned to the CTL pedal (e.g., "HOLD", "TAP TEMPO", "TONE SW"). |
-| `holdType` | CTL Hold Type | `0x0002` | `EnumField` | Type of hold ("1", "2", "3", "4"). |
-| `holdSwitchMode` | CTL Hold Switch Mode | `0x0003` | `EnumField` | "LATCH" or "MOMENT" |
-| `holdPcmTone1` | CTL Hold PCM Tone1 | `0x0004` | `BooleanField` | "OFF" / "ON" |
-| `holdPcmTone2` | CTL Hold PCM Tone2 | `0x0005` | `BooleanField` | "OFF" / "ON" |
-| `offPcmTone1Switch` | CTL=OFF PCM Tone1 Switch | `0x0006` | `BooleanField` | "OFF" / "ON" |
-| `offPcmTone2Switch` | CTL=OFF PCM Tone2 Switch | `0x0007` | `BooleanField` | "OFF" / "ON" |
-| `offModelingToneSwitch`| CTL=OFF Modeling Tone Switch | `0x0008` | `BooleanField` | "OFF" / "ON" |
-| `offNormalPuSwitch` | CTL=OFF Normal PU Switch | `0x0009` | `BooleanField` | "OFF" / "ON" |
-| `onPcmTone1Switch` | CTL=ON PCM Tone1 Switch | `0x000A` | `BooleanField` | "OFF" / "ON" |
-| `onPcmTone2Switch` | CTL=ON PCM Tone2 Switch | `0x000B` | `BooleanField` | "OFF" / "ON" |
-| `onModelingToneSwitch`| CTL=ON Modeling Tone Switch | `0x000C` | `BooleanField` | "OFF" / "ON" |
-| `onNormalPuSwitch` | CTL=ON Normal PU Switch | `0x000D` | `BooleanField` | "OFF" / "ON" |
+| Parameter               | Description                  | Address Offset | Data Type      | Logic                                                                          |
+| ----------------------- | ---------------------------- | -------------- | -------------- | ------------------------------------------------------------------------------ |
+| `status`                | CTL Status                   | `0x0000`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `function`              | CTL Function                 | `0x0001`       | `EnumField`    | The function assigned to the CTL pedal (e.g., "HOLD", "TAP TEMPO", "TONE SW"). |
+| `holdType`              | CTL Hold Type                | `0x0002`       | `EnumField`    | Type of hold ("1", "2", "3", "4").                                             |
+| `holdSwitchMode`        | CTL Hold Switch Mode         | `0x0003`       | `EnumField`    | "LATCH" or "MOMENT"                                                            |
+| `holdPcmTone1`          | CTL Hold PCM Tone1           | `0x0004`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `holdPcmTone2`          | CTL Hold PCM Tone2           | `0x0005`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `offPcmTone1Switch`     | CTL=OFF PCM Tone1 Switch     | `0x0006`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `offPcmTone2Switch`     | CTL=OFF PCM Tone2 Switch     | `0x0007`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `offModelingToneSwitch` | CTL=OFF Modeling Tone Switch | `0x0008`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `offNormalPuSwitch`     | CTL=OFF Normal PU Switch     | `0x0009`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `onPcmTone1Switch`      | CTL=ON PCM Tone1 Switch      | `0x000A`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `onPcmTone2Switch`      | CTL=ON PCM Tone2 Switch      | `0x000B`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `onModelingToneSwitch`  | CTL=ON Modeling Tone Switch  | `0x000C`       | `BooleanField` | "OFF" / "ON"                                                                   |
+| `onNormalPuSwitch`      | CTL=ON Normal PU Switch      | `0x000D`       | `BooleanField` | "OFF" / "ON"                                                                   |
 
 ---
 
 ### `expPdlOff` / `expPdlOn` / `gkVol` Structs (Expression Pedal & GK Volume Settings)
+
 - **Base Address Offsets**: `0x001f` (EXP PDL OFF), `0x0036` (EXP PDL ON), `0x005b` (GK VOL)
 - These three structs share the same internal structure to define the behavior of the expression pedal (when the EXP SW is off or on) and the GK volume knob.
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-|---|---|---|---|---|
-| `function` | Function | `0x0000` | `EnumField` | The function assigned (e.g., "PATCH VOLUME", "PITCH BEND", "MODULATION"). |
-| `volumeSwitch...` | Volume Switch ... | `+0x0001` to `+0x0004` | `BooleanField` | Individual on/off switches for each tone source when the function is "TONE VOLUME". |
-| `bendRange` | Bend Range | `+0x0005` | `UByteField` | The pitch bend range from -12 to +12 semitones. |
-| `bendSwitch...` | Bend Switch ... | `+0x0006` to `+0x0008` | `BooleanField` | Individual on/off switches for each tone source when the function is "PITCH BEND". |
-| `modulationMin` / `Max` | Modulation Min / Max | `+0x0009`, `+0x000A` | `C127Field` | Min/max values for the modulation depth. |
-| `modulationSwitch...` | Modulation Switch ... | `+0x000B`, `+0x000C` | `BooleanField` | Individual on/off switches for PCM tones when the function is "MODULATION". |
-| `xfadePolarity...` | X-Fade Polarity ... | `+0x000D` to `+0x0010` | `EnumField` | The crossfade polarity ("OFF", "TOE", "HEEL") for each tone source. |
-| `delayLevelMin` / `Max` | Delay Level Min / Max | `+0x0011`, `+0x0012` | `UByteField` | Min/max values for the delay level. |
-| `reverbLevelMin` / `Max` | Reverb Level Min / Max | `+0x0013`, `+0x0014` | `UByteField` | Min/max values for the reverb level. |
-| `chorusLevelMin` / `Max` | Chorus Level Min / Max | `+0x0015`, `+0x0016` | `UByteField` | Min/max values for the chorus level. |
+| Parameter                | Description            | Address Offset         | Data Type      | Logic                                                                               |
+| ------------------------ | ---------------------- | ---------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| `function`               | Function               | `0x0000`               | `EnumField`    | The function assigned (e.g., "PATCH VOLUME", "PITCH BEND", "MODULATION").           |
+| `volumeSwitch...`        | Volume Switch ...      | `+0x0001` to `+0x0004` | `BooleanField` | Individual on/off switches for each tone source when the function is "TONE VOLUME". |
+| `bendRange`              | Bend Range             | `+0x0005`              | `UByteField`   | The pitch bend range from -12 to +12 semitones.                                     |
+| `bendSwitch...`          | Bend Switch ...        | `+0x0006` to `+0x0008` | `BooleanField` | Individual on/off switches for each tone source when the function is "PITCH BEND".  |
+| `modulationMin` / `Max`  | Modulation Min / Max   | `+0x0009`, `+0x000A`   | `C127Field`    | Min/max values for the modulation depth.                                            |
+| `modulationSwitch...`    | Modulation Switch ...  | `+0x000B`, `+0x000C`   | `BooleanField` | Individual on/off switches for PCM tones when the function is "MODULATION".         |
+| `xfadePolarity...`       | X-Fade Polarity ...    | `+0x000D` to `+0x0010` | `EnumField`    | The crossfade polarity ("OFF", "TOE", "HEEL") for each tone source.                 |
+| `delayLevelMin` / `Max`  | Delay Level Min / Max  | `+0x0011`, `+0x0012`   | `UByteField`   | Min/max values for the delay level.                                                 |
+| `reverbLevelMin` / `Max` | Reverb Level Min / Max | `+0x0013`, `+0x0014`   | `UByteField`   | Min/max values for the reverb level.                                                |
+| `chorusLevelMin` / `Max` | Chorus Level Min / Max | `+0x0015`, `+0x0016`   | `UByteField`   | Min/max values for the chorus level.                                                |
 
 ---
 
 ### `expSw`, `gkS1`, `gkS2` Structs (EXP, GK S1/S2 Switch Settings)
+
 - **Base Address Offsets**: `0x004d` (EXP SW), `0x0072` (GK S1), `0x007f` (GK S2)
 - These structs define the behavior of the EXP, GK S1, and GK S2 switches.
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-|---|---|---|---|---|
-| `status` | Status | `0x0000` | `BooleanField` | "OFF" / "ON" (EXP SW only) |
-| `function` | Function | `+0x0001` | `EnumField` | The function assigned to the switch (e.g., "TAP TEMPO", "TONE SW", "AMP SW"). |
-| `off...Switch` | OFF ... Switch | `+0x0006` to `+0x0009` | `BooleanField` | Which tone sources are active when the switch is OFF. |
-| `on...Switch` | ON ... Switch | `+0x000A` to `+0x000D` | `BooleanField` | Which tone sources are active when the switch is ON. |
+| Parameter      | Description    | Address Offset         | Data Type      | Logic                                                                         |
+| -------------- | -------------- | ---------------------- | -------------- | ----------------------------------------------------------------------------- |
+| `status`       | Status         | `0x0000`               | `BooleanField` | "OFF" / "ON" (EXP SW only)                                                    |
+| `function`     | Function       | `+0x0001`              | `EnumField`    | The function assigned to the switch (e.g., "TAP TEMPO", "TONE SW", "AMP SW"). |
+| `off...Switch` | OFF ... Switch | `+0x0006` to `+0x0009` | `BooleanField` | Which tone sources are active when the switch is OFF.                         |
+| `on...Switch`  | ON ... Switch  | `+0x000A` to `+0x000D` | `BooleanField` | Which tone sources are active when the switch is ON.                          |
 
 ---
 
 ### `assign` Structs (Assignable Controller Settings)
+
 - **Base Address Offsets**: `0x010c` to `0x0211` (8 assign slots)
 - These 8 structs define the 8 user-assignable controllers.
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-|---|---|---|---|---|
-| `switch` | ASSIGN Switch | `0x0000` | `BooleanField` | "OFF" / "ON" |
-| `target` | ASSIGN Target | `+0x0001` | `USplit12Field` | The parameter that this assign will control. This is a number that is mapped to a human-readable name by the `AssignsMap`. |
-| `targetMin` / `Max` | ASSIGN Target Min / Max | `+0x0004`, `+0x0007` | `USplit12Field` | The minimum and maximum values of the target parameter. |
-| `source` | ASSIGN Source | `+0x000A` | `EnumField` | The controller that will be used (e.g., "CTL", "EXP PEDAL", "WAVE PDL", "CC1"). |
-| `sourceMode` | ASSIGN Source Mode | `+0x000B` | `EnumField` | "MOMENT" or "TOGGLE" |
-| `activeRangeLo` / `Hi` | ASSIGN Active Range Lo / Hi | `+0x000C`, `+0x000D` | `UByteField` | The active range of the source controller. |
-| ... | ... | ... | ... | ... |
+| Parameter              | Description                 | Address Offset       | Data Type       | Logic                                                                                                                      |
+| ---------------------- | --------------------------- | -------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `switch`               | ASSIGN Switch               | `0x0000`             | `BooleanField`  | "OFF" / "ON"                                                                                                               |
+| `target`               | ASSIGN Target               | `+0x0001`            | `USplit12Field` | The parameter that this assign will control. This is a number that is mapped to a human-readable name by the `AssignsMap`. |
+| `targetMin` / `Max`    | ASSIGN Target Min / Max     | `+0x0004`, `+0x0007` | `USplit12Field` | The minimum and maximum values of the target parameter.                                                                    |
+| `source`               | ASSIGN Source               | `+0x000A`            | `EnumField`     | The controller that will be used (e.g., "CTL", "EXP PEDAL", "WAVE PDL", "CC1").                                            |
+| `sourceMode`           | ASSIGN Source Mode          | `+0x000B`            | `EnumField`     | "MOMENT" or "TOGGLE"                                                                                                       |
+| `activeRangeLo` / `Hi` | ASSIGN Active Range Lo / Hi | `+0x000C`, `+0x000D` | `UByteField`    | The active range of the source controller.                                                                                 |
+| ...                    | ...                         | ...                  | ...             | ...                                                                                                                        |
 
 ---
 
 ### Other Common Parameters
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-|---|---|---|---|---|
-| `gkSet` | GK SET | `0x0224` | `EnumField` | Selects which of the 10 GK Sets to use ("SYSTEM" or "1"-"10"). |
-| `guitarOutSource` | Guitar Out Source | `0x0225` | `EnumField` | The source for the guitar output ("NORMAL PU", "MODELING", "BOTH", "OFF"). |
-| ... | V-LINK Parameters | `0x0226` to `0x022b`| `...` | V-LINK settings for video control. |
-| `effectStructure` | EFFECT Structure | `0x022c` | `EnumField` | The signal chain structure ("1" or "2"). |
-| `lineSelectModel` | Line Select Model | `0x022d` | `EnumField` | The output for the modeling tone ("BYPS", "AMP", "MFX"). |
-| `lineSelectNormalPU` | Line Select Normal PU | `0x022e` | `EnumField` | The output for the normal pickup ("BYPS", "AMP", "MFX"). |
-| `patchLevel` | Patch Level | `0x0230` | `USplit8Field` | The master level for the patch (0-100). |
-| `normalPuMute` | Normal PU Mute | `0x0232` | `BooleanField` | Mutes the normal pickup signal. |
-| `normalPuLevel` | Normal PU Level | `0x0233` | `UByteField` | The level of the normal pickup (0-100). |
-| `altTuneSwitch` | Alt Tune Switch | `0x0234` | `BooleanField` | Enables or disables alternate tuning. |
-| `altTuneType` | Alt Tune Type | `0x0235` | `EnumField` | The type of alternate tuning (e.g., "OPEN-D", "DROP-D", "USER"). |
-| ... | User Tune Shift String 1-6 | `0x0236` to `0x023b` | `UByteField` | Pitch shift for each string in user tuning mode. |
-| `patchTempo` | Patch Tempo | `0x023c` | `USplit8Field` | The tempo for the patch (20-250 bpm). |
-| ... | Send Levels | `0x023e` to `0x0240` | `UByteField` | Send levels to chorus, delay, and reverb from the bypass signal. |
-| ... | MOD CONTROL Min/Max | `0x0242` to `0x0247` | `UByteField` | Min/max values for the "MOD CONTROL" function of the expression pedals. |
+| Parameter            | Description                | Address Offset       | Data Type      | Logic                                                                      |
+| -------------------- | -------------------------- | -------------------- | -------------- | -------------------------------------------------------------------------- |
+| `gkSet`              | GK SET                     | `0x0224`             | `EnumField`    | Selects which of the 10 GK Sets to use ("SYSTEM" or "1"-"10").             |
+| `guitarOutSource`    | Guitar Out Source          | `0x0225`             | `EnumField`    | The source for the guitar output ("NORMAL PU", "MODELING", "BOTH", "OFF"). |
+| ...                  | V-LINK Parameters          | `0x0226` to `0x022b` | `...`          | V-LINK settings for video control.                                         |
+| `effectStructure`    | EFFECT Structure           | `0x022c`             | `EnumField`    | The signal chain structure ("1" or "2").                                   |
+| `lineSelectModel`    | Line Select Model          | `0x022d`             | `EnumField`    | The output for the modeling tone ("BYPS", "AMP", "MFX").                   |
+| `lineSelectNormalPU` | Line Select Normal PU      | `0x022e`             | `EnumField`    | The output for the normal pickup ("BYPS", "AMP", "MFX").                   |
+| `patchLevel`         | Patch Level                | `0x0230`             | `USplit8Field` | The master level for the patch (0-100).                                    |
+| `normalPuMute`       | Normal PU Mute             | `0x0232`             | `BooleanField` | Mutes the normal pickup signal.                                            |
+| `normalPuLevel`      | Normal PU Level            | `0x0233`             | `UByteField`   | The level of the normal pickup (0-100).                                    |
+| `altTuneSwitch`      | Alt Tune Switch            | `0x0234`             | `BooleanField` | Enables or disables alternate tuning.                                      |
+| `altTuneType`        | Alt Tune Type              | `0x0235`             | `EnumField`    | The type of alternate tuning (e.g., "OPEN-D", "DROP-D", "USER").           |
+| ...                  | User Tune Shift String 1-6 | `0x0236` to `0x023b` | `UByteField`   | Pitch shift for each string in user tuning mode.                           |
+| `patchTempo`         | Patch Tempo                | `0x023c`             | `USplit8Field` | The tempo for the patch (20-250 bpm).                                      |
+| ...                  | Send Levels                | `0x023e` to `0x0240` | `UByteField`   | Send levels to chorus, delay, and reverb from the bypass signal.           |
+| ...                  | MOD CONTROL Min/Max        | `0x0242` to `0x0247` | `UByteField`   | Min/max values for the "MOD CONTROL" function of the expression pedals.    |

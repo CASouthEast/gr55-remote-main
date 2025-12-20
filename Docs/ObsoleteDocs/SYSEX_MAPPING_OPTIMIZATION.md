@@ -8,10 +8,10 @@ The current architecture for handling SysEx data is centered around the `RolandG
 
 While this approach works, it has several significant drawbacks:
 
-*   **High Maintenance Overhead:** The address map is massive and highly repetitive. Adding, removing, or changing a parameter requires manually editing this large file, which is error-prone and time-consuming.
-*   **Boilerplate UI Code:** The UI screens are tightly coupled to the address map. Each screen consists of a list of `RemoteField...` components, each one manually bound to a specific field in the address map. This leads to a large amount of boilerplate code. For example, the `PatchEffectsAmpScreen.tsx` is almost entirely a list of these components.
-*   **Hardcoded Logic:** Relationships between fields are hardcoded in the UI components. For example, the `ampBright` switch in the `PatchEffectsAmpScreen.tsx` is only shown when the `ampType` has a specific value. This logic is duplicated wherever these fields are used.
-*   **Lack of Abstraction:** The current system lacks abstraction. The concepts of a "field", its data type, its UI representation, and its relationship to other fields are all intertwined in the address map and the UI components.
+- **High Maintenance Overhead:** The address map is massive and highly repetitive. Adding, removing, or changing a parameter requires manually editing this large file, which is error-prone and time-consuming.
+- **Boilerplate UI Code:** The UI screens are tightly coupled to the address map. Each screen consists of a list of `RemoteField...` components, each one manually bound to a specific field in the address map. This leads to a large amount of boilerplate code. For example, the `PatchEffectsAmpScreen.tsx` is almost entirely a list of these components.
+- **Hardcoded Logic:** Relationships between fields are hardcoded in the UI components. For example, the `ampBright` switch in the `PatchEffectsAmpScreen.tsx` is only shown when the `ampType` has a specific value. This logic is duplicated wherever these fields are used.
+- **Lack of Abstraction:** The current system lacks abstraction. The concepts of a "field", its data type, its UI representation, and its relationship to other fields are all intertwined in the address map and the UI components.
 
 ## 2. Proposed Architecture: A Data-Driven Approach
 
@@ -99,19 +99,19 @@ Each JSON file will contain an array of field definitions. Here is an example of
 
 ### JSON Schema Definition
 
-*   **`name`**: A unique identifier for the field, used as the key in the application's state.
-*   **`label`**: The human-readable label to be displayed in the UI.
-*   **`address`**: The hexadecimal SysEx address for the parameter.
-*   **`type`**: The data type. Can be `"boolean"`, `"integer"`, `"enum"`, or `"string"`.
-*   **`encoding`**: (Optional) Specifies how the data is encoded. Examples: `"ubyte"` (unsigned byte), `"sbyte"` (signed byte with offset), `"split12"` (12-bit value split across bytes), `"ascii"`. The code generator will use this to create the correct `FieldType` instance.
-*   **`size`**: (Optional) The size of the field in bytes (e.g., for strings).
-*   **`ui`**: An object that describes the UI representation of the field.
-    *   **`control`**: The type of UI control, e.g., `"switch"`, `"picker"`, `"slider"`, `"textInput"`.
-    *   **`options`**: (For `picker`) An array of strings for the available values.
-    *   **`min`**, **`max`**: (For `slider`) The minimum and maximum values.
-    *   **`showWhen`**: (Optional) A string containing a logical expression. This expression will be evaluated at runtime to determine if the UI control should be visible. This replaces the hardcoded conditional logic in the current UI components.
-*   **`items`**: (Optional) For struct-like containers, this would contain a nested array of field definitions.
-*   **`count`**: (Optional) For repeated blocks (like assigns), this specifies how many times the `items` structure is repeated.
+- **`name`**: A unique identifier for the field, used as the key in the application's state.
+- **`label`**: The human-readable label to be displayed in the UI.
+- **`address`**: The hexadecimal SysEx address for the parameter.
+- **`type`**: The data type. Can be `"boolean"`, `"integer"`, `"enum"`, or `"string"`.
+- **`encoding`**: (Optional) Specifies how the data is encoded. Examples: `"ubyte"` (unsigned byte), `"sbyte"` (signed byte with offset), `"split12"` (12-bit value split across bytes), `"ascii"`. The code generator will use this to create the correct `FieldType` instance.
+- **`size`**: (Optional) The size of the field in bytes (e.g., for strings).
+- **`ui`**: An object that describes the UI representation of the field.
+  - **`control`**: The type of UI control, e.g., `"switch"`, `"picker"`, `"slider"`, `"textInput"`.
+  - **`options`**: (For `picker`) An array of strings for the available values.
+  - **`min`**, **`max`**: (For `slider`) The minimum and maximum values.
+  - **`showWhen`**: (Optional) A string containing a logical expression. This expression will be evaluated at runtime to determine if the UI control should be visible. This replaces the hardcoded conditional logic in the current UI components.
+- **`items`**: (Optional) For struct-like containers, this would contain a nested array of field definitions.
+- **`count`**: (Optional) For repeated blocks (like assigns), this specifies how many times the `items` structure is repeated.
 
 ## 4. Code Generation
 
@@ -153,11 +153,8 @@ The transition to the new architecture can be done incrementally:
 
 This new architecture offers several key advantages:
 
-*   **Maintainability:** Adding or modifying parameters becomes as simple as editing a JSON file. The risk of introducing errors is significantly reduced.
-*   **Scalability:** The system can easily be extended to support other SysEx-controllable devices by creating new sets of JSON configuration files.
-*   **Reduced Boilerplate:** The amount of repetitive UI code will be drastically reduced, leading to a smaller, cleaner, and more manageable codebase.
-*   **Single Source of Truth:** The JSON files become the single source of truth for the SysEx data model, ensuring consistency between the data definition, the application logic, and the UI.
-*   **Rapid Development:** New UI screens for different sections of the device can be created very quickly, often just by creating a new JSON file.
-
-
-
+- **Maintainability:** Adding or modifying parameters becomes as simple as editing a JSON file. The risk of introducing errors is significantly reduced.
+- **Scalability:** The system can easily be extended to support other SysEx-controllable devices by creating new sets of JSON configuration files.
+- **Reduced Boilerplate:** The amount of repetitive UI code will be drastically reduced, leading to a smaller, cleaner, and more manageable codebase.
+- **Single Source of Truth:** The JSON files become the single source of truth for the SysEx data model, ensuring consistency between the data definition, the application logic, and the UI.
+- **Rapid Development:** New UI screens for different sections of the device can be created very quickly, often just by creating a new JSON file.

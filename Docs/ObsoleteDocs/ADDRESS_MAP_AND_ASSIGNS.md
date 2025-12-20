@@ -17,11 +17,11 @@ The address map is built using a few core building blocks:
 - **`StructDefinition`**: Represents a collection of `AtomDefinition`s. This allows for creating a hierarchical structure that mirrors the logical organization of the device's parameters. For example, the `PatchStruct` contains a `common` struct, a `modelingTone` struct, two `patchPCMTone` structs, and so on.
 
 - **`FieldType`**: An interface that defines how to encode a value into a byte array for sending to the GR-55, and how to decode a byte array received from the GR-55 into a meaningful value. There are several implementations of this interface for different data types:
-    - **`NumericField`**: For numeric values. This is a base class for more specific types like `UByteField` (unsigned byte), `UWordField` (unsigned 14-bit word), etc. It supports remapping values, which is useful when the range of a parameter displayed to the user is different from the range of the value sent in the SysEx message.
-    - **`AsciiStringField`**: For string values, such as the patch name.
-    - **`BooleanField`**: For boolean (on/off) values.
-    - **`EnumField`**: For enumerated values, where a number corresponds to a string label (e.g., a list of effect types).
-    - **`USplit8Field` and `USplit12Field`**: The GR-55's SysEx implementation frequently uses a technique where a value is split into 4-bit "nibbles" and sent as separate bytes. These `FieldType`s handle the logic for encoding and decoding these split values.
+  - **`NumericField`**: For numeric values. This is a base class for more specific types like `UByteField` (unsigned byte), `UWordField` (unsigned 14-bit word), etc. It supports remapping values, which is useful when the range of a parameter displayed to the user is different from the range of the value sent in the SysEx message.
+  - **`AsciiStringField`**: For string values, such as the patch name.
+  - **`BooleanField`**: For boolean (on/off) values.
+  - **`EnumField`**: For enumerated values, where a number corresponds to a string label (e.g., a list of effect types).
+  - **`USplit8Field` and `USplit12Field`**: The GR-55's SysEx implementation frequently uses a technique where a value is split into 4-bit "nibbles" and sent as separate bytes. These `FieldType`s handle the logic for encoding and decoding these split values.
 
 ### The GR-55 Address Map (`RolandGR55AddressMap.ts`)
 
@@ -36,14 +36,15 @@ In a Roland SysEx message, the memory address of a parameter is specified as a 4
 Here is a list of the first-byte values and their corresponding memory sections, as defined in this application's address map:
 
 - **`0x00` - `0x0F`**: **Patch Data**. These addresses are for parameters within a patch. The exact section depends on the address. For example:
-    - **`0x00`**: Common patch parameters
-    - **`0x01`**: PCM Tone 1
-    - **`0x02`**: PCM Tone 2
-    - **`0x03`**: Modeling Tone
-    - **`0x04`**: Amp / Modulation / Noise Suppressor
-    - **`0x05`**: Multi-Effects (MFX)
-    - **`0x06`**: Sends & EQ
-    - **`0x07`**: Patch Master settings
+
+  - **`0x00`**: Common patch parameters
+  - **`0x01`**: PCM Tone 1
+  - **`0x02`**: PCM Tone 2
+  - **`0x03`**: Modeling Tone
+  - **`0x04`**: Amp / Modulation / Noise Suppressor
+  - **`0x05`**: Multi-Effects (MFX)
+  - **`0x06`**: Sends & EQ
+  - **`0x07`**: Patch Master settings
 
 - **`0x10`**: **System Parameters**. These are global settings that affect the entire device, such as master tuning, output levels, and GK pickup settings.
 
@@ -64,9 +65,10 @@ The value `0x31` is not used in this application's address map.
 - **`AssignDefinition`**: The base interface for an assign. It has a `description` which is displayed to the user in the list of available assign targets.
 
 - **Types of `AssignDefinition`**:
-    - **`FieldAssignDefinition`**: The most common type of assign. It maps directly to a single `FieldDefinition` in the address map.
-    - **`VirtualFieldAssignDefinition`**: For assigns that don't map to a single field. For example, "PCM1 Tone1 Bend" is a virtual assign that likely controls multiple pitch-related parameters at once.
-    - **`MultiFieldAssignDefinition`**: For assigns that control multiple, non-contiguous fields. For example, many of the MFX (multi-effects) rate parameters are `MultiFieldAssignDefinition`s because they control the rate value, a "sync to tempo" switch, and a note value (e.g., quarter note, eighth note) simultaneously.
+
+  - **`FieldAssignDefinition`**: The most common type of assign. It maps directly to a single `FieldDefinition` in the address map.
+  - **`VirtualFieldAssignDefinition`**: For assigns that don't map to a single field. For example, "PCM1 Tone1 Bend" is a virtual assign that likely controls multiple pitch-related parameters at once.
+  - **`MultiFieldAssignDefinition`**: For assigns that control multiple, non-contiguous fields. For example, many of the MFX (multi-effects) rate parameters are `MultiFieldAssignDefinition`s because they control the rate value, a "sync to tempo" switch, and a note value (e.g., quarter note, eighth note) simultaneously.
 
 - **`AssignsMap`**: A class that manages a collection of `AssignDefinition`s. It provides methods for getting an assign by its index and for getting the index of an assign by the field it controls. This is crucial for linking the "target" of an assign (which is just a number in the SysEx) to the actual parameter it controls.
 

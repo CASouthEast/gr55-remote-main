@@ -1,4 +1,3 @@
-
 # Project Structure and Data Flow
 
 This document provides an in-depth analysis of the project's structure, with a focus on how MIDI SysEx data is interpreted and displayed as UI elements.

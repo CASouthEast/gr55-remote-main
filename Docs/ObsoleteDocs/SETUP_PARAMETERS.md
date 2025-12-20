@@ -8,7 +8,7 @@ The following parameters are located under `SetupStruct` at base address `0x0100
 
 ## Setup Parameters
 
-| Parameter | Description | Address Offset | Data Type | Logic |
-| --- | --- | --- | --- | --- |
-| `patchBsMsb` | Patch Bank Select MSB (CC #0) | `0x0000` | `UByteField` | `0-127` |
-| `patchPc` | Patch Program Change (PC) | `0x0001` | `UByteField` | `0-127` |
+| Parameter    | Description                   | Address Offset | Data Type    | Logic   |
+| ------------ | ----------------------------- | -------------- | ------------ | ------- |
+| `patchBsMsb` | Patch Bank Select MSB (CC #0) | `0x0000`       | `UByteField` | `0-127` |
+| `patchPc`    | Patch Program Change (PC)     | `0x0001`       | `UByteField` | `0-127` |
