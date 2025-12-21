@@ -19,7 +19,7 @@ import {
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchEffectsTabParamList } from "./navigation";
+import { PatchEffectsTabParamList } from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
 
 const { mfx } = GR55.temporaryPatch;

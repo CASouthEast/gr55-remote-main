@@ -18,7 +18,7 @@ import { useRolandGR55RemotePatchDescriptions } from "../RolandGR55RemotePatchDe
 import { useRolandRemotePatchSelection } from "../RolandRemotePatchSelection";
 import { useMainScrollViewSafeAreaStyle } from "../SafeAreaUtils";
 import { ThemedSearchBar } from "../ThemedSearchBar";
-import { RootTabParamList } from "../navigation";
+import { RootTabParamList } from "../navigation/navigation";
 
 export function LibraryPatchListScreen({
   navigation,

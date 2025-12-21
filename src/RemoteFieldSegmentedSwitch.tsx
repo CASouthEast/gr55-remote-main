@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from "react";
 
-import { FieldStyles } from "./FieldStyles";
 import { RemoteFieldRow } from "./RemoteFieldRow";
 import { BooleanField, FieldReference } from "./RolandAddressMap";
 import { RolandRemotePageContext } from "./RolandRemotePageContext";
 import { SegmentedPicker } from "./SegmentedPicker";
+import { FieldStyles } from "./styles/FieldStyles";
 import { useMaybeControlledRemoteField } from "./useRemoteField";
 
 export function RemoteFieldSegmentedSwitch({

@@ -2,7 +2,6 @@ import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useContext } from "react";
 import { StyleSheet } from "react-native";
 
-import { FieldPlaceholder } from "./FieldPlaceholder";
 import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
 import { RefreshControl } from "./RefreshControl";
 import { RemoteFieldPicker } from "./RemoteFieldPicker";
@@ -19,7 +18,8 @@ import {
   RolandRemotePatchContext as PATCH,
 } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchToneTabParamList } from "./navigation";
+import { FieldPlaceholder } from "./components/FieldPlaceholder";
+import { PatchToneTabParamList } from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
 
 const { modelingTone } = GR55.temporaryPatch;

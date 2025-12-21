@@ -26,12 +26,12 @@ import {
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
+import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
 import {
   PatchMasterPedalGkCtlTabParamList,
   PatchStackParamList,
-} from "./navigation";
+} from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
-import { useTopTabNavigatorDefaults } from "./useTopTabNavigatorDefaults";
 
 const Tab = createMaterialTopTabNavigator<PatchMasterPedalGkCtlTabParamList>();
 

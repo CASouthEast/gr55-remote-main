@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { ThemedText as Text } from "./ThemedText";
-import { RootTabParamList } from "./navigation";
+import { RootTabParamList } from "./navigation/navigation";
 
 export function RolandGR55NotConnectedView({
   navigation,

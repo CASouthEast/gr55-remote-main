@@ -23,10 +23,10 @@ import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { PatchId } from "./RolandRemotePatchSelection";
 import { useTheme } from "./Theme";
 import { ThemedText as Text } from "./ThemedText";
-import { PatchStackParamList } from "./navigation";
-import { usePatchMap } from "./usePatchMap";
+import { usePatchMap } from "./hooks/usePatchMap";
+import { useRenamePatchPrompt } from "./hooks/useRenamePatchPrompt";
+import { PatchStackParamList } from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
-import { useRenamePatchPrompt } from "./useRenamePatchPrompt";
 
 export function PatchSaveAsScreen({
   navigation,

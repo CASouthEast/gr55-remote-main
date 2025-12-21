@@ -10,7 +10,7 @@ import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchEffectsTabParamList } from "./navigation";
+import { PatchEffectsTabParamList } from "./navigation/navigation";
 
 const { sendsAndEq } = GR55.temporaryPatch;
 

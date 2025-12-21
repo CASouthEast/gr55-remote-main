@@ -2,7 +2,7 @@ import { Slider as RNESlider } from "@rneui/themed";
 import { StyleSheet } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 
-import type { PortableSliderProps } from "./Slider";
+import type { PortableSliderProps } from "./components/Slider";
 
 export function Slider(props: PortableSliderProps) {
   const pan = Gesture.Pan();

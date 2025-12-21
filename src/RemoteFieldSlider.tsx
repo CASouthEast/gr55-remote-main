@@ -5,9 +5,9 @@ import { PendingTextPlaceholder } from "./PendingContentPlaceholders";
 import { RemoteFieldRow } from "./RemoteFieldRow";
 import { FieldReference, NumericField } from "./RolandAddressMap";
 import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { Slider } from "./Slider";
 import { useTheme } from "./Theme";
 import { ThemedText as Text } from "./ThemedText";
+import { Slider } from "./components/Slider";
 import { useMaybeControlledRemoteField } from "./useRemoteField";
 
 export function RemoteFieldSlider({

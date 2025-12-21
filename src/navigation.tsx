@@ -1,1 +1,1 @@
-export * from "./src/navigation/index";
+export * from "./navigation/index";

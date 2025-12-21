@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { StyleProp, TextStyle, ViewStyle } from "react-native";
 
-import { FieldStyles } from "./FieldStyles";
 import { RemoteFieldRow } from "./RemoteFieldRow";
 import {
   EnumField,
@@ -12,7 +11,8 @@ import {
   NumericField,
 } from "./RolandAddressMap";
 import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { ThemedPicker as Picker } from "./ThemedPicker";
+import { ThemedPicker as Picker } from "./components/ThemedPicker";
+import { FieldStyles } from "./styles/FieldStyles";
 import { useMaybeControlledRemoteField } from "./useRemoteField";
 
 export function useRemoteFieldSystemPicker<T extends number | string>({

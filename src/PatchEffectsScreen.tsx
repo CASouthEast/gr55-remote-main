@@ -2,19 +2,22 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 
-import { PatchEffectsAmpScreen } from "./PatchEffectsAmpScreen";
-import { PatchEffectsChorusScreen } from "./PatchEffectsChorusScreen";
-import { PatchEffectsDelayScreen } from "./PatchEffectsDelayScreen";
-import { PatchEffectsEQScreen } from "./PatchEffectsEQScreen";
-import { PatchEffectsMFXScreen } from "./PatchEffectsMFXScreen";
-import { PatchEffectsModScreen } from "./PatchEffectsModScreen";
-import { PatchEffectsReverbScreen } from "./PatchEffectsReverbScreen";
-import { PatchEffectsStructureScreen } from "./PatchEffectsStructureScreen";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { PatchEffectsTabParamList, PatchStackParamList } from "./navigation";
+import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
+import {
+  PatchEffectsTabParamList,
+  PatchStackParamList,
+} from "./navigation/navigation";
+import { PatchEffectsAmpScreen } from "./screens/PatchEffectsAmpScreen";
+import { PatchEffectsChorusScreen } from "./screens/PatchEffectsChorusScreen";
+import { PatchEffectsDelayScreen } from "./screens/PatchEffectsDelayScreen";
+import { PatchEffectsEQScreen } from "./screens/PatchEffectsEQScreen";
+import { PatchEffectsMFXScreen } from "./screens/PatchEffectsMFXScreen";
+import { PatchEffectsModScreen } from "./screens/PatchEffectsModScreen";
+import { PatchEffectsReverbScreen } from "./screens/PatchEffectsReverbScreen";
+import { PatchEffectsStructureScreen } from "./screens/PatchEffectsStructureScreen";
 import { useRemoteField } from "./useRemoteField";
-import { useTopTabNavigatorDefaults } from "./useTopTabNavigatorDefaults";
 
 const Tab = createMaterialTopTabNavigator<PatchEffectsTabParamList>();
 

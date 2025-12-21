@@ -10,7 +10,7 @@ import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchStackParamList } from "./navigation";
+import { PatchStackParamList } from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
 
 export function PatchMasterOtherScreen({

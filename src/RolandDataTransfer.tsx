@@ -10,7 +10,6 @@ import {
 } from "react";
 
 import { MidiIoContext } from "./MidiIo";
-import { MultiQueueScheduler } from "./MultiQueueScheduler";
 import {
   AtomDefinition,
   FieldDefinition,
@@ -18,8 +17,10 @@ import {
   fetchAndTokenize,
   RawDataBag,
 } from "./RolandAddressMap";
-import { RolandGR55SysExConfig } from "./RolandDevices";
 import { RolandIoSetupContext } from "./RolandIoSetup";
+import { useUserOptions } from "./components/UserOptions";
+import { MultiQueueScheduler } from "./lib/MultiQueueScheduler";
+import { RolandGR55SysExConfig } from "./lib/RolandDevices";
 import {
   parseDataResponseMessage,
   isValidChecksum,
@@ -29,8 +30,7 @@ import {
   GAP_BETWEEN_MESSAGES_MS,
   unpack7,
   makeRawDataRequestMessage,
-} from "./RolandSysExProtocol";
-import { useUserOptions } from "./UserOptions";
+} from "./lib/RolandSysExProtocol";
 
 type PendingFetch = {
   inputPortId: string;

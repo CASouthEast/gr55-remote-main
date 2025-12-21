@@ -9,7 +9,7 @@ import {
 } from "./RolandAddressMap";
 import { RolandDataTransferContext } from "./RolandDataTransfer";
 import { RolandIoSetupContext } from "./RolandIoSetup";
-import useCancellablePromise from "./useCancellablePromise";
+import useCancellablePromise from "./hooks/useCancellablePromise";
 
 export function useRolandRemotePageState(
   page: AtomReference | void,

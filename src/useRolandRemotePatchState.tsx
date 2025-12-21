@@ -9,10 +9,10 @@ import {
 
 import { AtomReference, FieldDefinition } from "./RolandAddressMap";
 import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { RolandGR55SysExConfig } from "./RolandDevices";
 import { RolandIoSetupContext } from "./RolandIoSetup";
 import { useRolandRemotePatchSelection } from "./RolandRemotePatchSelection";
-import { useRolandRemotePageState } from "./useRolandRemotePageState";
+import { useRolandRemotePageState } from "./hooks/useRolandRemotePageState";
+import { RolandGR55SysExConfig } from "./lib/RolandDevices";
 
 export function useRolandRemotePatchState() {
   const { selectedDevice } = useContext(RolandIoSetupContext);

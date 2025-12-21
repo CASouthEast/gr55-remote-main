@@ -1,4 +1,4 @@
-import { pack7 } from "./RolandSysExProtocol";
+import { pack7 } from "./lib/RolandSysExProtocol";
 
 export interface RolandAddressMap {
   readonly temporaryPatch: AtomReference;

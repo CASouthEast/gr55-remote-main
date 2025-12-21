@@ -15,8 +15,8 @@ import {
   USplit12Field,
   USplit8Field,
 } from "./RolandAddressMap";
-import { pcmToneSelectField } from "./RolandGR55ToneMap";
-import { pack7 } from "./RolandSysExProtocol";
+import { pcmToneSelectField } from "./lib/RolandGR55ToneMap";
+import { pack7 } from "./lib/RolandSysExProtocol";
 
 // TODO: Fully implement rate field types
 // 0-100, and then 13 tempo-relative labelled values

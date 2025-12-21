@@ -3,7 +3,7 @@ import { throttle } from "throttle-debounce";
 
 import { FieldReference, FieldType } from "./RolandAddressMap";
 import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { GAP_BETWEEN_MESSAGES_MS } from "./RolandSysExProtocol";
+import { GAP_BETWEEN_MESSAGES_MS } from "./lib/RolandSysExProtocol";
 
 export function useRemoteField<T>(
   page: RolandRemotePageContext,

@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import { GestureResponderEvent } from "react-native";
 import { Rect } from "react-native-popover-view";
 
-import { FieldRow } from "./FieldRow";
 import { usePopovers } from "./Popovers";
 import { FieldReference } from "./RolandAddressMap";
 import { useRolandGR55Assigns } from "./RolandGR55AssignsContainer";
@@ -11,8 +10,9 @@ import {
   RolandRemotePageContext,
   RolandRemotePatchContext as PATCH,
 } from "./RolandRemotePageContext";
-import { GlobalNavigationProp } from "./navigation";
-import { useAssignsMap } from "./useAssignsMap";
+import { FieldRow } from "./components/FieldRow";
+import { useAssignsMap } from "./hooks/useAssignsMap";
+import { GlobalNavigationProp } from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
 
 export function RemoteFieldRow({

@@ -12,9 +12,9 @@ import {
 import { MidiIoContext } from "./MidiIo";
 import { parse } from "./RolandAddressMap";
 import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { RolandGR55SysExConfig } from "./RolandDevices";
 import { RolandIoSetupContext } from "./RolandIoSetup";
-import useCancellablePromise from "./useCancellablePromise";
+import useCancellablePromise from "./hooks/useCancellablePromise";
+import { RolandGR55SysExConfig } from "./lib/RolandDevices";
 
 export type PatchId = Readonly<{
   bankSelectMSB: number;

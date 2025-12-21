@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { roundTripEncode } from "./RolandAddressMap";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { usePrompt } from "./usePrompt";
+import { usePrompt } from "./hooks/usePrompt";
 
 export function useRenamePatchPrompt({
   patchName,

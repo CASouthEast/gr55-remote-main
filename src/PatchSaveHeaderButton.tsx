@@ -6,8 +6,8 @@ import { View } from "react-native";
 
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useRolandRemotePatchSelection } from "./RolandRemotePatchSelection";
-import { GlobalNavigationProp } from "./navigation";
-import { usePatchMap } from "./usePatchMap";
+import { usePatchMap } from "./hooks/usePatchMap";
+import { GlobalNavigationProp } from "./navigation/navigation";
 
 export function PatchSaveHeaderButton({
   tintColor,

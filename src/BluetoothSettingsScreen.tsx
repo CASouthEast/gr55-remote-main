@@ -4,8 +4,8 @@ import { Button } from "@rneui/themed";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 
-import { BluetoothDevicesView } from "./BluetoothDevicesView";
-import { SetupStackParamList } from "./navigation";
+import { BluetoothDevicesView } from "./components/BluetoothDevicesView";
+import { SetupStackParamList } from "./navigation/navigation";
 
 export function BluetoothSettingsScreen({
   navigation,

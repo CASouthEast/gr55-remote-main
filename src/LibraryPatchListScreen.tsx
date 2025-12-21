@@ -1,1 +1,1 @@
-export * from "./src/screens/LibraryPatchListScreen";
+export * from "./screens/LibraryPatchListScreen";

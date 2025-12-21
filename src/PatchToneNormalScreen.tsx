@@ -9,7 +9,7 @@ import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchToneTabParamList } from "./navigation";
+import { PatchToneTabParamList } from "./navigation/navigation";
 
 export function PatchToneNormalScreen({
   navigation,

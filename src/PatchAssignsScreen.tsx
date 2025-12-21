@@ -18,17 +18,20 @@ import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RemoteFieldWaveShapePicker } from "./RemoteFieldWaveShapePicker";
 import { FieldReference, NumericField } from "./RolandAddressMap";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { AssignDefinition, AssignsMap } from "./RolandGR55Assigns";
 import { useRolandGR55Assigns } from "./RolandGR55AssignsContainer";
 import { RolandGR55NotConnectedView } from "./RolandGR55NotConnectedView";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
 import { useTheme } from "./Theme";
 import { ThemedText as Text } from "./ThemedText";
-import { PatchAssignsTabParamList, PatchStackParamList } from "./navigation";
-import { useAssignsMap } from "./useAssignsMap";
+import { useAssignsMap } from "./hooks/useAssignsMap";
+import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
+import { AssignDefinition, AssignsMap } from "./lib/RolandGR55Assigns";
+import {
+  PatchAssignsTabParamList,
+  PatchStackParamList,
+} from "./navigation/navigation";
 import { useRemoteField } from "./useRemoteField";
-import { useTopTabNavigatorDefaults } from "./useTopTabNavigatorDefaults";
 
 const Tab = createMaterialTopTabNavigator<PatchAssignsTabParamList>();
 

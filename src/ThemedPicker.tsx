@@ -1,7 +1,7 @@
 import { useTheme } from "@react-navigation/native";
 import { forwardRef } from "react";
 
-import { Picker } from "./Picker";
+import { Picker } from "./components/Picker";
 
 export const ThemedPicker = forwardRef(function ThemedPicker<T>(
   {

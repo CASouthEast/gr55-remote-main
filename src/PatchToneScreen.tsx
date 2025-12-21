@@ -2,14 +2,17 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 
-import { PatchToneModelingScreen } from "./PatchToneModelingScreen";
-import { PatchToneNormalScreen } from "./PatchToneNormalScreen";
-import { PatchTonePCMScreen } from "./PatchTonePCMScreen";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { PatchToneTabParamList, PatchStackParamList } from "./navigation";
+import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
+import {
+  PatchToneTabParamList,
+  PatchStackParamList,
+} from "./navigation/navigation";
+import { PatchToneModelingScreen } from "./screens/tones/PatchToneModelingScreen";
+import { PatchToneNormalScreen } from "./screens/tones/PatchToneNormalScreen";
+import { PatchTonePCMScreen } from "./screens/tones/PatchTonePCMScreen";
 import { useRemoteField } from "./useRemoteField";
-import { useTopTabNavigatorDefaults } from "./useTopTabNavigatorDefaults";
 
 const Tab = createMaterialTopTabNavigator<PatchToneTabParamList>();
 

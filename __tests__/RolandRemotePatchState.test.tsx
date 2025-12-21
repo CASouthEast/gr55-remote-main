@@ -12,12 +12,12 @@ import {
   StructDefinition,
   tokenize,
   UByteField,
-} from "../RolandAddressMap";
-import { RolandDataTransferContext } from "../RolandDataTransfer";
-import { RolandIoSetupContext } from "../RolandIoSetup";
-import { RolandRemotePatchContext } from "../RolandRemotePageContext";
-import { useRemoteField } from "../useRemoteField";
-import { useRolandRemotePatchState } from "../useRolandRemotePatchState";
+} from "../src/RolandAddressMap";
+import { RolandDataTransferContext } from "../src/RolandDataTransfer";
+import { RolandIoSetupContext } from "../src/RolandIoSetup";
+import { RolandRemotePatchContext } from "../src/RolandRemotePageContext";
+import { useRolandRemotePatchState } from "../src/hooks/useRolandRemotePatchState";
+import { useRemoteField } from "../src/useRemoteField";
 
 function RolandRemotePatchStateContainer({
   children,

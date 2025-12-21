@@ -15,10 +15,10 @@ import {
 } from "./RolandAddressMap";
 import { RolandDataTransferContext } from "./RolandDataTransfer";
 import { RolandRemotePatchContext } from "./RolandRemotePageContext";
-import { pack7 } from "./RolandSysExProtocol";
-import useCancellablePromise from "./useCancellablePromise";
-import { usePatchMap } from "./usePatchMap";
-import { useRolandRemotePatchState } from "./useRolandRemotePatchState";
+import useCancellablePromise from "./hooks/useCancellablePromise";
+import { usePatchMap } from "./hooks/usePatchMap";
+import { useRolandRemotePatchState } from "./hooks/useRolandRemotePatchState";
+import { pack7 } from "./lib/RolandSysExProtocol";
 
 const CompactPatchDefinition = new StructDefinition(
   pack7(0x000000),

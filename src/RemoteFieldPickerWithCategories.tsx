@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { Dimensions, Platform, StyleSheet, View } from "react-native";
 
-import { FieldRow } from "./FieldRow";
-import { styles as pickerStyles } from "./Picker";
 import { RemoteFieldRow } from "./RemoteFieldRow";
 import {
   PickerControl,
@@ -17,8 +15,10 @@ import {
   NumericField,
 } from "./RolandAddressMap";
 import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { ThemedPicker as Picker } from "./ThemedPicker";
 import { ThemedText as Text } from "./ThemedText";
+import { FieldRow } from "./components/FieldRow";
+import { styles as pickerStyles } from "./components/Picker";
+import { ThemedPicker as Picker } from "./components/ThemedPicker";
 
 const SINGLE_PICKER_REQUIRED_WIDTH = 300;
 

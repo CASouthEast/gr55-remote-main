@@ -25,7 +25,7 @@ import { RolandGR55PatchDescription } from "./RolandGR55RemotePatchDescriptions"
 import { PatchId } from "./RolandRemotePatchSelection";
 import { useTheme } from "./Theme";
 import { AnimatedThemedText } from "./ThemedText";
-import { useLayout } from "./useLayout";
+import { useLayout } from "./hooks/useLayout";
 
 const ITEM_HEIGHT = 2 * 32;
 const ITEM_WIDTH = 16 * 16;

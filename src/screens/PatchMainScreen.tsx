@@ -39,7 +39,7 @@ import {
   GlobalNavigationProp,
   PatchStackParamList,
   RootTabParamList,
-} from "../navigation";
+} from "../navigation/navigation";
 import { useRemoteField } from "../useRemoteField";
 
 export function PatchMainScreen({

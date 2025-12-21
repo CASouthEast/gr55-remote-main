@@ -10,10 +10,10 @@ import { RemoteFieldSlider } from "./RemoteFieldSlider";
 import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
 import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { rolandToneCategories } from "./RolandGR55ToneMap";
 import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
 import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchToneTabParamList } from "./navigation";
+import { rolandToneCategories } from "./lib/RolandGR55ToneMap";
+import { PatchToneTabParamList } from "./navigation/navigation";
 
 export function PatchTonePCMScreen({
   navigation,
