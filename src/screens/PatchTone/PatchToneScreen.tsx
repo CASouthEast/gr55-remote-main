@@ -2,17 +2,17 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
+import { PatchToneModelingScreen } from "./PatchToneModelingScreen";
+import { PatchToneNormalScreen } from "./PatchToneNormalScreen";
+import { PatchTonePCMScreen } from "./PatchTonePCMScreen";
 import {
   PatchToneTabParamList,
   PatchStackParamList,
-} from "./navigation/navigation";
-import { PatchToneModelingScreen } from "./screens/tones/PatchToneModelingScreen";
-import { PatchToneNormalScreen } from "./screens/tones/PatchToneNormalScreen";
-import { PatchTonePCMScreen } from "./screens/tones/PatchTonePCMScreen";
-import { useRemoteField } from "./useRemoteField";
+} from "../../components/navigation";
+import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../hooks/useRemoteField";
+import { useTopTabNavigatorDefaults } from "../../hooks/useTopTabNavigatorDefaults";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
 
 const Tab = createMaterialTopTabNavigator<PatchToneTabParamList>();
 

@@ -2,7 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
-import { ThemedText as Text } from "./ThemedText";
+import { ThemedText as Text } from "../components/ThemedText";
 
 export function LibraryPatchListNoResultsView() {
   const dimensions = useWindowDimensions();

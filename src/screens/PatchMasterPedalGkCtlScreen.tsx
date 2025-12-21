@@ -7,12 +7,19 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useContext, useEffect, useMemo } from "react";
 import { Button, StyleSheet, View } from "react-native";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldDynamic } from "./RemoteFieldDynamic";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
+import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { RefreshControl } from "../components/RefreshControl";
+import {
+  PatchMasterPedalGkCtlTabParamList,
+  PatchStackParamList,
+} from "../components/navigation";
+import { RemoteFieldDynamic } from "../components/remote-fields/RemoteFieldDynamic";
+import { RemoteFieldPicker } from "../components/remote-fields/RemoteFieldPicker";
+import { RemoteFieldSlider } from "../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitch } from "../components/remote-fields/RemoteFieldSwitch";
+import { RolandRemotePatchContext as PATCH } from "../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../hooks/useRemoteField";
+import { useTopTabNavigatorDefaults } from "../hooks/useTopTabNavigatorDefaults";
 import {
   BooleanField,
   EnumField,
@@ -22,16 +29,9 @@ import {
   isEnumField,
   isNumericField,
   NumericField,
-} from "./RolandAddressMap";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
-import {
-  PatchMasterPedalGkCtlTabParamList,
-  PatchStackParamList,
-} from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+} from "../lib/RolandAddressMap";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 
 const Tab = createMaterialTopTabNavigator<PatchMasterPedalGkCtlTabParamList>();
 

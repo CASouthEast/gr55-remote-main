@@ -2,18 +2,18 @@ import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useContext } from "react";
 import { StyleSheet } from "react-native";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RemoteFieldPickerWithCategories } from "./RemoteFieldPickerWithCategories";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
-import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { rolandToneCategories } from "./lib/RolandGR55ToneMap";
-import { PatchToneTabParamList } from "./navigation/navigation";
+import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
+import { RefreshControl } from "../../components/RefreshControl";
+import { PatchToneTabParamList } from "../../components/navigation";
+import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
+import { RemoteFieldPickerWithCategories } from "../../components/remote-fields/RemoteFieldPickerWithCategories";
+import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitch } from "../../components/remote-fields/RemoteFieldSwitch";
+import { RemoteFieldSwitchedSection } from "../../components/remote-fields/RemoteFieldSwitchedSection";
+import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
+import { rolandToneCategories } from "../../lib/RolandGR55ToneMap";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
+import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
 export function PatchTonePCMScreen({
   navigation,

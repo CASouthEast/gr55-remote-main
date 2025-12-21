@@ -4,7 +4,7 @@ export type RootTabParamList = {
   PatchDrawer: object;
   LibraryPatchList: object;
   SetupStack: object;
-  Docs: object;
+  Hardware: object;
 };
 
 export type PatchDrawerParamList = {

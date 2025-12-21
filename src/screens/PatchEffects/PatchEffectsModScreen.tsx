@@ -2,18 +2,18 @@ import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useCallback, useContext } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RemoteFieldSegmentedSwitch } from "./RemoteFieldSegmentedSwitch";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
-import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { PatchEffectsTabParamList } from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
+import { RefreshControl } from "../../components/RefreshControl";
+import { PatchEffectsTabParamList } from "../../components/navigation";
+import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
+import { RemoteFieldSegmentedSwitch } from "../../components/remote-fields/RemoteFieldSegmentedSwitch";
+import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitch } from "../../components/remote-fields/RemoteFieldSwitch";
+import { RemoteFieldSwitchedSection } from "../../components/remote-fields/RemoteFieldSwitchedSection";
+import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../hooks/useRemoteField";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
+import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
 export function PatchEffectsModScreen({
   navigation,

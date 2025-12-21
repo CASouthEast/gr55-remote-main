@@ -1,18 +1,18 @@
 import { enumField, USplit12Field } from "./RolandAddressMap";
 import {
+  AssignsMap,
+  FieldAssignDefinition,
+  MultiFieldAssignDefinition,
+  VirtualFieldAssignDefinition,
+} from "./RolandGR55Assigns";
+import {
   feedback98Field,
   mfx1300msecField,
   mfx2600msecField,
   rate113Field,
   RolandGR55AddressMapAbsolute as GR55,
   time3413Field,
-} from "./RolandGR55AddressMap";
-import {
-  AssignsMap,
-  FieldAssignDefinition,
-  MultiFieldAssignDefinition,
-  VirtualFieldAssignDefinition,
-} from "./lib/RolandGR55Assigns";
+} from "./roland-gr55/RolandGR55AddressMap";
 const patch = GR55.temporaryPatch;
 
 const bendRangeField = new USplit12Field(-12, 12, {

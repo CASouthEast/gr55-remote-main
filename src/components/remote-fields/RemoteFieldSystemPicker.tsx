@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { StyleProp, TextStyle, ViewStyle } from "react-native";
 
 import { RemoteFieldRow } from "./RemoteFieldRow";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
+import { useMaybeControlledRemoteField } from "../../hooks/useRemoteField";
 import {
   EnumField,
   FieldReference,
@@ -9,11 +11,9 @@ import {
   isEnumFieldReference,
   isNumericFieldReference,
   NumericField,
-} from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { ThemedPicker as Picker } from "./components/ThemedPicker";
-import { FieldStyles } from "./styles/FieldStyles";
-import { useMaybeControlledRemoteField } from "./useRemoteField";
+} from "../../lib/RolandAddressMap";
+import { ThemedPicker as Picker } from "../ThemedPicker";
+import { FieldStyles } from "../fields/FieldStyles";
 
 export function useRemoteFieldSystemPicker<T extends number | string>({
   page,

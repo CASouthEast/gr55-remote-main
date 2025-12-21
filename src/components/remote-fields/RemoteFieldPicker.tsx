@@ -1,13 +1,13 @@
 import { RemoteFieldSegmentedPicker } from "./RemoteFieldSegmentedPicker";
 import { RemoteFieldSystemPicker } from "./RemoteFieldSystemPicker";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
 import {
   EnumField,
   FieldReference,
   FieldType,
   isEnumFieldReference,
   NumericField,
-} from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
+} from "../../lib/RolandAddressMap";
 
 export function RemoteFieldPicker<T extends number | string>({
   page,

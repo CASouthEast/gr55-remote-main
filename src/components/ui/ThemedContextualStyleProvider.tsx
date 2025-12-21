@@ -1,6 +1,6 @@
 import { useTheme } from "@react-navigation/native";
 
-import { ContextualStyleProvider } from "./ContextualStyle";
+import { ContextualStyleProvider } from "../../styles/ContextualStyle";
 
 export function ThemedContextualStyleProvider({
   children,

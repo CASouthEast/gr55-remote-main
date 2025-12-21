@@ -11,36 +11,36 @@ import React, { useContext, useEffect } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { MIDINotAvailableView } from "./MIDINotAvailableView";
-import { useMidiIoContext } from "./MidiIo";
-import { PatchNameHeaderButton } from "./PatchNameHeaderButton";
-import { PendingTextPlaceholder } from "./PendingContentPlaceholders";
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { usePopovers } from "./Popovers";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
+import { PatchNameHeaderButton } from "../components/PatchNameHeaderButton";
+import { PendingTextPlaceholder } from "../components/PendingContentPlaceholders";
+import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { usePopovers } from "../components/Popovers";
+import { RefreshControl } from "../components/RefreshControl";
+import { ThemedText as Text } from "../components/ThemedText";
+import {
+  GlobalNavigationProp,
+  PatchStackParamList,
+  RootTabParamList,
+} from "../components/navigation";
+import { RemoteFieldSlider } from "../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitch } from "../components/remote-fields/RemoteFieldSwitch";
+import {
+  RolandRemotePatchContext as PATCH,
+  RolandRemoteSystemContext as SYSTEM,
+  RolandRemotePageContext,
+} from "../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../hooks/useRemoteField";
 import {
   BooleanField,
   FieldReference,
   FieldType,
   NumericField,
-} from "./RolandAddressMap";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandGR55NotConnectedView } from "./RolandGR55NotConnectedView";
-import { RolandIoSetupContext } from "./RolandIoSetup";
-import {
-  RolandRemotePatchContext as PATCH,
-  RolandRemoteSystemContext as SYSTEM,
-  RolandRemotePageContext,
-} from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { ThemedText as Text } from "./ThemedText";
-import {
-  GlobalNavigationProp,
-  PatchStackParamList,
-  RootTabParamList,
-} from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+} from "../lib/RolandAddressMap";
+import { RolandIoSetupContext } from "../lib/RolandIoSetup";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
+import { RolandGR55NotConnectedView } from "../lib/roland-gr55/RolandGR55NotConnectedView";
+import { useMidiIoContext } from "../services/MidiIo";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 
 export function PatchMainScreen({
   navigation,

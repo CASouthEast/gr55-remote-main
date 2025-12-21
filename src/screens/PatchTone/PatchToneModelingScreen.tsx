@@ -2,25 +2,25 @@ import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useContext } from "react";
 import { StyleSheet } from "react-native";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RemoteFieldSegmentedPicker } from "./RemoteFieldSegmentedPicker";
-import { RemoteFieldSegmentedSwitch } from "./RemoteFieldSegmentedSwitch";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
-import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
-import { RemoteFieldWaveShapePicker } from "./RemoteFieldWaveShapePicker";
-import { ValueOf } from "./RolandAddressMap";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
+import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
+import { RefreshControl } from "../../components/RefreshControl";
+import { FieldPlaceholder } from "../../components/fields/FieldPlaceholder";
+import { PatchToneTabParamList } from "../../components/navigation";
+import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
+import { RemoteFieldSegmentedPicker } from "../../components/remote-fields/RemoteFieldSegmentedPicker";
+import { RemoteFieldSegmentedSwitch } from "../../components/remote-fields/RemoteFieldSegmentedSwitch";
+import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitch } from "../../components/remote-fields/RemoteFieldSwitch";
+import { RemoteFieldSwitchedSection } from "../../components/remote-fields/RemoteFieldSwitchedSection";
+import { RemoteFieldWaveShapePicker } from "../../components/remote-fields/RemoteFieldWaveShapePicker";
 import {
   RolandRemoteSystemContext as SYSTEM,
   RolandRemotePatchContext as PATCH,
-} from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { FieldPlaceholder } from "./components/FieldPlaceholder";
-import { PatchToneTabParamList } from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+} from "../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../hooks/useRemoteField";
+import { ValueOf } from "../../lib/RolandAddressMap";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
+import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
 const { modelingTone } = GR55.temporaryPatch;
 

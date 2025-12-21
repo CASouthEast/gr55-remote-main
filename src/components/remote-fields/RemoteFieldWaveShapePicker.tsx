@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
 import { RemoteFieldRow } from "./RemoteFieldRow";
-import { EnumField, FieldReference } from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { SegmentedPicker } from "./SegmentedPicker";
-import { FieldStyles } from "./styles/FieldStyles";
-import { useMaybeControlledRemoteField } from "./useRemoteField";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
+import { useMaybeControlledRemoteField } from "../../hooks/useRemoteField";
+import { EnumField, FieldReference } from "../../lib/RolandAddressMap";
+import { SegmentedPicker } from "../SegmentedPicker";
+import { FieldStyles } from "../fields/FieldStyles";
 
 const iconsByShapeLabel = {
   SAW: require("./assets/icon-rising-sawtooth-wave.png"),

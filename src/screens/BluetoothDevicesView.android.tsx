@@ -4,18 +4,18 @@ import { StyleSheet } from "react-native";
 import { Device as BLEDevice } from "react-native-ble-plx";
 import { List } from "react-native-paper";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { ThemedText as Text } from "./ThemedText";
-import useCancellablePromise from "./hooks/useCancellablePromise";
+import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { ThemedText as Text } from "../components/ThemedText";
+import useCancellablePromise from "../hooks/useCancellablePromise";
 import {
   OpenBluetoothDeviceInfo,
   closeDeviceById,
   openBluetoothDevice,
   useOpenedDevices,
-} from "./modules/midi-hardware-manager";
-import { MidiHardwareManagerViewProps } from "./modules/midi-hardware-manager/src/MidiHardwareManager.types";
-import { BLEService } from "./services/BLEService";
+} from "../modules/modules/midi-hardware-manager";
+import { MidiHardwareManagerViewProps } from "../modules/modules/midi-hardware-manager/src/MidiHardwareManager.types";
+import { BLEService } from "../services/BLEService";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 
 const emptyAsyncFn = async () => {};
 

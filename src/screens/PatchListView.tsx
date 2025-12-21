@@ -20,12 +20,12 @@ import {
 } from "react-native";
 import { useAnimation } from "react-native-animation-hooks";
 
-import { PendingTextPlaceholder } from "./PendingContentPlaceholders";
-import { RolandGR55PatchDescription } from "./RolandGR55RemotePatchDescriptions";
-import { PatchId } from "./RolandRemotePatchSelection";
-import { useTheme } from "./Theme";
-import { AnimatedThemedText } from "./ThemedText";
-import { useLayout } from "./hooks/useLayout";
+import { PendingTextPlaceholder } from "../components/PendingContentPlaceholders";
+import { useTheme } from "../components/Theme";
+import { AnimatedThemedText } from "../components/ThemedText";
+import { useLayout } from "../hooks/useLayout";
+import { PatchId } from "../lib/RolandRemotePatchSelection";
+import { RolandGR55PatchDescription } from "../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
 
 const ITEM_HEIGHT = 2 * 32;
 const ITEM_WIDTH = 16 * 16;

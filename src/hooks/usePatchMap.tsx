@@ -1,10 +1,10 @@
 import { useContext } from "react";
 
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandIoSetupContext } from "./RolandIoSetup";
-import { RolandRemoteSystemContext as SYSTEM } from "./RolandRemotePageContext";
-import type { RolandGR55PatchMap } from "./lib/RolandGR55PatchMap";
 import { useRemoteField } from "./useRemoteField";
+import { RolandRemoteSystemContext as SYSTEM } from "../contexts/RolandRemotePageContext";
+import type { RolandGR55PatchMap } from "../lib/RolandGR55PatchMap";
+import { RolandIoSetupContext } from "../lib/RolandIoSetup";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
 
 export function usePatchMap(): RolandGR55PatchMap | undefined {
   const { selectedDevice } = useContext(RolandIoSetupContext);

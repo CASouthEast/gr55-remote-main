@@ -9,12 +9,12 @@ import {
   useState,
 } from "react";
 
-import { MidiIoContext } from "./MidiIo";
 import { parse } from "./RolandAddressMap";
-import { RolandDataTransferContext } from "./RolandDataTransfer";
+import { RolandGR55SysExConfig } from "./RolandDevices";
 import { RolandIoSetupContext } from "./RolandIoSetup";
-import useCancellablePromise from "./hooks/useCancellablePromise";
-import { RolandGR55SysExConfig } from "./lib/RolandDevices";
+import useCancellablePromise from "../hooks/useCancellablePromise";
+import { MidiIoContext } from "../services/MidiIo";
+import { RolandDataTransferContext } from "../services/RolandDataTransfer";
 
 export type PatchId = Readonly<{
   bankSelectMSB: number;

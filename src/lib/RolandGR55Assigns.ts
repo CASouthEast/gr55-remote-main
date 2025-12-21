@@ -9,7 +9,7 @@ import {
   isNumericField,
   NumericField,
 } from "./RolandAddressMap";
-import { RolandGR55AddressMapAbsolute } from "./RolandGR55AddressMap";
+import { RolandGR55AddressMapAbsolute } from "./roland-gr55/RolandGR55AddressMap";
 
 export interface AssignDefinition {
   readonly description: string;

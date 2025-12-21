@@ -1,11 +1,11 @@
 import { RemoteFieldPicker } from "./RemoteFieldPicker";
 import { RemoteFieldSlider } from "./RemoteFieldSlider";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
 import {
   FieldReference,
   isEnumFieldReference,
   isNumericFieldReference,
-} from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
+} from "../../lib/RolandAddressMap";
 
 export function RemoteFieldDynamic({
   page,

@@ -7,12 +7,12 @@ import {
   useState,
 } from "react";
 
-import { AtomReference, FieldDefinition } from "./RolandAddressMap";
-import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { RolandIoSetupContext } from "./RolandIoSetup";
-import { useRolandRemotePatchSelection } from "./RolandRemotePatchSelection";
-import { useRolandRemotePageState } from "./hooks/useRolandRemotePageState";
-import { RolandGR55SysExConfig } from "./lib/RolandDevices";
+import { useRolandRemotePageState } from "./useRolandRemotePageState";
+import { AtomReference, FieldDefinition } from "../lib/RolandAddressMap";
+import { RolandGR55SysExConfig } from "../lib/RolandDevices";
+import { RolandIoSetupContext } from "../lib/RolandIoSetup";
+import { useRolandRemotePatchSelection } from "../lib/RolandRemotePatchSelection";
+import { RolandDataTransferContext } from "../services/RolandDataTransfer";
 
 export function useRolandRemotePatchState() {
   const { selectedDevice } = useContext(RolandIoSetupContext);

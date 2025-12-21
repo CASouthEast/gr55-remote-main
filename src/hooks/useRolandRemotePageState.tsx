@@ -1,15 +1,15 @@
 import EventEmitter from "events";
 import { useRef, useCallback, useContext, useMemo, useState } from "react";
 
+import useCancellablePromise from "../hooks/useCancellablePromise";
 import {
   AtomReference,
   FieldDefinition,
   FieldType,
   RawDataBag,
-} from "./RolandAddressMap";
-import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { RolandIoSetupContext } from "./RolandIoSetup";
-import useCancellablePromise from "./hooks/useCancellablePromise";
+} from "../lib/RolandAddressMap";
+import { RolandIoSetupContext } from "../lib/RolandIoSetup";
+import { RolandDataTransferContext } from "../services/RolandDataTransfer";
 
 export function useRolandRemotePageState(
   page: AtomReference | void,

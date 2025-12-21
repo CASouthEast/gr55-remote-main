@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import { renderAdjustingMaterialTopTabBar } from "./AdjustingTabBar";
-import { usePopovers } from "./Popovers";
+import { renderAdjustingMaterialTopTabBar } from "../components/AdjustingTabBar";
+import { usePopovers } from "../components/Popovers";
 
 export function useTopTabNavigatorDefaults() {
   const { closeAllPopovers } = usePopovers();

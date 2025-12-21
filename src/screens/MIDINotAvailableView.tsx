@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import UAParser from "ua-parser-js";
 
-import { ThemedText as Text } from "./ThemedText";
+import { ThemedText as Text } from "../components/ThemedText";
 
 function isLockedDownApplePlatform() {
   const ua = new UAParser().getResult();

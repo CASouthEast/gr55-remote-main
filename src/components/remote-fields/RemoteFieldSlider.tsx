@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 
-import { PendingTextPlaceholder } from "./PendingContentPlaceholders";
 import { RemoteFieldRow } from "./RemoteFieldRow";
-import { FieldReference, NumericField } from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { useTheme } from "./Theme";
-import { ThemedText as Text } from "./ThemedText";
-import { Slider } from "./components/Slider";
-import { useMaybeControlledRemoteField } from "./useRemoteField";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
+import { useMaybeControlledRemoteField } from "../../hooks/useRemoteField";
+import { FieldReference, NumericField } from "../../lib/RolandAddressMap";
+import { PendingTextPlaceholder } from "../PendingContentPlaceholders";
+import { Slider } from "../Slider";
+import { useTheme } from "../Theme";
+import { ThemedText as Text } from "../ThemedText";
 
 export function RemoteFieldSlider({
   page,

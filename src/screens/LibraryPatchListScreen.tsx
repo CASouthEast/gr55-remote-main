@@ -1,1 +1,103 @@
-export * from "./screens/LibraryPatchListScreen";
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { LibraryPatchListNoResultsView } from "./LibraryPatchListNoResultsView";
+import { PatchListView } from "./PatchListView";
+import { ThemedSearchBar } from "../components/ThemedSearchBar";
+import { RootTabParamList } from "../components/navigation";
+import { useRolandRemotePatchSelection } from "../lib/RolandRemotePatchSelection";
+import { RolandGR55NotConnectedView } from "../lib/roland-gr55/RolandGR55NotConnectedView";
+import { useRolandGR55RemotePatchDescriptions } from "../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
+import { MIDINotAvailableView } from "../screens/MIDINotAvailableView";
+import { useMidiIoContext } from "../services/MidiIo";
+import { useFocusQueryPriority } from "../services/RolandDataTransfer";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
+
+export function LibraryPatchListScreen({
+  navigation,
+}: BottomTabScreenProps<RootTabParamList, "LibraryPatchList", "RootTab">) {
+  const safeAreaStyle = useMainScrollViewSafeAreaStyle();
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  const { patches } = useRolandGR55RemotePatchDescriptions();
+  const filteredPatchList = useMemo(() => {
+    if (!patches) {
+      return null;
+    }
+    return deferredSearch
+      ? patches.filter((patch) => {
+          return patch.data?.name
+            .toLowerCase()
+            .includes(deferredSearch.toLowerCase());
+        })
+      : patches;
+  }, [deferredSearch, patches]);
+
+  const { selectedPatch, setSelectedPatch } = useRolandRemotePatchSelection();
+  const patchListRef = useRef<React.ComponentRef<typeof PatchListView>>(null);
+
+  const isPendingScroll = useRef<boolean>(false);
+  const handleChangeText = useCallback((value: string) => {
+    setSearch(value);
+    isPendingScroll.current = true;
+  }, []);
+  useEffect(() => {
+    if (isPendingScroll.current) {
+      isPendingScroll.current = false;
+      patchListRef.current?.scrollToPatch(selectedPatch);
+    }
+  }, [search, selectedPatch]);
+
+  useFocusQueryPriority("read_patch_list");
+
+  const anyPatchesPending = useMemo(
+    () => patches?.some((patch) => patch.status === "pending") ?? false,
+    [patches]
+  );
+
+  const { midiStatus } = useMidiIoContext();
+  if (midiStatus === "not-supported" || midiStatus === "permission-denied") {
+    return <MIDINotAvailableView reason={midiStatus} />;
+  }
+
+  if (!patches) {
+    return <RolandGR55NotConnectedView navigation={navigation} />;
+  }
+  let content;
+  if (
+    search !== "" &&
+    !(anyPatchesPending || deferredSearch !== search) &&
+    filteredPatchList &&
+    !filteredPatchList.length
+  ) {
+    content = <LibraryPatchListNoResultsView />;
+  } else {
+    content = (
+      <PatchListView
+        ref={patchListRef}
+        data={filteredPatchList}
+        selectedPatch={selectedPatch}
+        onSelectedPatchChange={setSelectedPatch}
+        contentContainerStyle={safeAreaStyle}
+      />
+    );
+  }
+  return (
+    <>
+      <ThemedSearchBar
+        placeholder="Search patches..."
+        onChangeText={handleChangeText}
+        value={search}
+        showLoading={anyPatchesPending || deferredSearch !== search}
+      />
+      {content}
+    </>
+  );
+}

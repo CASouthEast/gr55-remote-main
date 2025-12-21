@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { useAnimation } from "react-native-animation-hooks";
 
-import { AnimatedThemedText } from "./ThemedText";
-import { FieldStyles } from "./styles/FieldStyles";
+import { FieldStyles } from "./FieldStyles";
+import { AnimatedThemedText } from "../ThemedText";
 
 export const FieldRow = function FieldRow({
   description,

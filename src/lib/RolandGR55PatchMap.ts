@@ -3,7 +3,7 @@
 // Each "style" (LEAD, RHYTHM, OTHER or USER) has a sequential range of UI banks.
 // So a string like "LEAD 01-1" or "RHYTHM 02-3" uniquely identifies a patch location.
 
-import { pack7 } from "./lib/RolandSysExProtocol";
+import { pack7 } from "./RolandSysExProtocol";
 
 // Patch contents are fixed in the GR-55's ROM for the LEAD, RHYTHM, and OTHER styles,
 // so in particular we need to hardcode the patch names for these styles.

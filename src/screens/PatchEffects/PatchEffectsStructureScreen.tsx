@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import { StyleSheet } from "react-native";
 
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { ThemedText as Text } from "./ThemedText";
+import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
+import { RefreshControl } from "../../components/RefreshControl";
+import { ThemedText as Text } from "../../components/ThemedText";
+import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
+import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
+import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
 const { common, patchPCMTone1, patchPCMTone2 } = GR55.temporaryPatch;
 

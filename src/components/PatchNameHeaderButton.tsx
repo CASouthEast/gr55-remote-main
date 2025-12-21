@@ -1,10 +1,10 @@
 import HeaderTitle from "@react-navigation/elements/src/Header/HeaderTitle";
 import { useTheme as useNavigationTheme } from "@react-navigation/native";
 import { Button } from "@rneui/themed";
-import * as React from "react";
+import React from "react";
 import { View } from "react-native";
 
-import { useRenamePatchPrompt } from "./hooks/useRenamePatchPrompt";
+import { useRenamePatchPrompt } from "../hooks/useRenamePatchPrompt";
 
 export function PatchNameHeaderButton({
   children,

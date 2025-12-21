@@ -1,11 +1,11 @@
 import { View, Animated, StyleSheet } from "react-native";
 import { useAnimation } from "react-native-animation-hooks";
 
-import { useContextualStyle } from "./ContextualStyle";
 import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
-import { BooleanField, FieldReference } from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { useRemoteField } from "./useRemoteField";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../hooks/useRemoteField";
+import { BooleanField, FieldReference } from "../../lib/RolandAddressMap";
+import { useContextualStyle } from "../../styles/ContextualStyle";
 
 export function RemoteFieldSwitchedSection({
   page,

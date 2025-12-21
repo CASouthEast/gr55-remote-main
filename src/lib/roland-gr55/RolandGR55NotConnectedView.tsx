@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 
-import { ThemedText as Text } from "./ThemedText";
-import { RootTabParamList } from "./navigation/navigation";
+import { ThemedText as Text } from "../../components/ThemedText";
+import { RootTabParamList } from "../../components/navigation";
 
 export function RolandGR55NotConnectedView({
   navigation,

@@ -6,19 +6,19 @@ import React, {
   useState,
 } from "react";
 
+import { RolandRemotePatchContext } from "../../contexts/RolandRemotePageContext";
+import useCancellablePromise from "../../hooks/useCancellablePromise";
+import { usePatchMap } from "../../hooks/usePatchMap";
+import { useRolandRemotePatchState } from "../../hooks/useRolandRemotePatchState";
+import { RolandDataTransferContext } from "../../services/RolandDataTransfer";
 import {
   AsciiStringField,
   FieldDefinition,
   StructDefinition,
   getAddresses,
   parse,
-} from "./RolandAddressMap";
-import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { RolandRemotePatchContext } from "./RolandRemotePageContext";
-import useCancellablePromise from "./hooks/useCancellablePromise";
-import { usePatchMap } from "./hooks/usePatchMap";
-import { useRolandRemotePatchState } from "./hooks/useRolandRemotePatchState";
-import { pack7 } from "./lib/RolandSysExProtocol";
+} from "../RolandAddressMap";
+import { pack7 } from "../RolandSysExProtocol";
 
 const CompactPatchDefinition = new StructDefinition(
   pack7(0x000000),

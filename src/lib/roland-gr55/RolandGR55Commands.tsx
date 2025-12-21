@@ -1,5 +1,5 @@
-import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { pack7 } from "./lib/RolandSysExProtocol";
+import { RolandDataTransferContext } from "../../services/RolandDataTransfer";
+import { pack7 } from "../RolandSysExProtocol";
 
 export async function saveAndSelectUserPatch(
   userPatchNumber: number,

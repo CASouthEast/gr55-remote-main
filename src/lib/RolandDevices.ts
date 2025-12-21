@@ -1,14 +1,14 @@
-import { RolandGR55AddressMapAbsolute } from "./RolandGR55AddressMap";
 import {
   RolandGR55PatchAssignsMapBassMode,
   RolandGR55PatchAssignsMapGuitarMode,
-} from "./lib/RolandGR55AssignsMap";
-import * as RolandGR55Commands from "./lib/RolandGR55Commands";
+} from "./RolandGR55AssignsMap";
 import {
   RolandGR55PatchMapBassMode,
   RolandGR55PatchMapGuitarMode,
-} from "./lib/RolandGR55PatchMap";
-import { RolandSysExConfig } from "./lib/RolandSysExProtocol";
+} from "./RolandGR55PatchMap";
+import { RolandSysExConfig } from "./RolandSysExProtocol";
+import { RolandGR55AddressMapAbsolute } from "./roland-gr55/RolandGR55AddressMap";
+import * as RolandGR55Commands from "./roland-gr55/RolandGR55Commands";
 
 export const RolandGR55SysExConfig: RolandSysExConfig = {
   description: "Roland GR-55",

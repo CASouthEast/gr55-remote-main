@@ -4,7 +4,7 @@ import {
   DefaultTheme,
   DarkTheme,
 } from "@react-navigation/native";
-import * as React from "react";
+import React from "react";
 import { Linking, Platform, useColorScheme } from "react-native";
 
 const PERSISTENCE_KEY = "NAVIGATION_STATE_V1";

@@ -8,10 +8,10 @@ import {
   useState,
 } from "react";
 
-import { useStateWithStoredDefault } from "./AsyncStorageUtils";
-import { MidiIoContext } from "./MidiIo";
-import { AllSysExConfigs, RolandGR55SysExConfig } from "./lib/RolandDevices";
-import * as RolandSysExProtocol from "./lib/RolandSysExProtocol";
+import { AllSysExConfigs, RolandGR55SysExConfig } from "./RolandDevices";
+import * as RolandSysExProtocol from "./RolandSysExProtocol";
+import { useStateWithStoredDefault } from "../components/AsyncStorageUtils";
+import { MidiIoContext } from "../services/MidiIo";
 
 function useRolandIoSetupImpl() {
   const [includeFakeDevice, setIncludeFakeDevice] =

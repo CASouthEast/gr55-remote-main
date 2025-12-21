@@ -1,5 +1,5 @@
 import { enumField, EnumField, U3BytesField } from "./RolandAddressMap";
-import { pack7 } from "./lib/RolandSysExProtocol";
+import { pack7 } from "./RolandSysExProtocol";
 
 // The Tone Bank Select MSB field (first byte of Patch PCM Tone) is always 0x58,
 // except for the last 14 tones (the Drums category), which have an MSB of 0x56.

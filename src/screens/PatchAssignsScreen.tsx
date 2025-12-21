@@ -6,32 +6,32 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { StyleSheet } from "react-native";
 
-import { ContextualStyleProvider } from "./ContextualStyle";
 import { MIDINotAvailableView } from "./MIDINotAvailableView";
-import { useMidiIoContext } from "./MidiIo";
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RefreshControl } from "./RefreshControl";
-import { RemoteFieldDynamic } from "./RemoteFieldDynamic";
-import { RemoteFieldPicker } from "./RemoteFieldPicker";
-import { RemoteFieldSlider } from "./RemoteFieldSlider";
-import { RemoteFieldSwitchedSection } from "./RemoteFieldSwitchedSection";
-import { RemoteFieldWaveShapePicker } from "./RemoteFieldWaveShapePicker";
-import { FieldReference, NumericField } from "./RolandAddressMap";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { useRolandGR55Assigns } from "./RolandGR55AssignsContainer";
-import { RolandGR55NotConnectedView } from "./RolandGR55NotConnectedView";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { useTheme } from "./Theme";
-import { ThemedText as Text } from "./ThemedText";
-import { useAssignsMap } from "./hooks/useAssignsMap";
-import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
-import { AssignDefinition, AssignsMap } from "./lib/RolandGR55Assigns";
+import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { RefreshControl } from "../components/RefreshControl";
+import { useTheme } from "../components/Theme";
+import { ThemedText as Text } from "../components/ThemedText";
 import {
   PatchAssignsTabParamList,
   PatchStackParamList,
-} from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+} from "../components/navigation";
+import { RemoteFieldDynamic } from "../components/remote-fields/RemoteFieldDynamic";
+import { RemoteFieldPicker } from "../components/remote-fields/RemoteFieldPicker";
+import { RemoteFieldSlider } from "../components/remote-fields/RemoteFieldSlider";
+import { RemoteFieldSwitchedSection } from "../components/remote-fields/RemoteFieldSwitchedSection";
+import { RemoteFieldWaveShapePicker } from "../components/remote-fields/RemoteFieldWaveShapePicker";
+import { RolandRemotePatchContext as PATCH } from "../contexts/RolandRemotePageContext";
+import { useAssignsMap } from "../hooks/useAssignsMap";
+import { useRemoteField } from "../hooks/useRemoteField";
+import { useTopTabNavigatorDefaults } from "../hooks/useTopTabNavigatorDefaults";
+import { FieldReference, NumericField } from "../lib/RolandAddressMap";
+import { AssignDefinition, AssignsMap } from "../lib/RolandGR55Assigns";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
+import { useRolandGR55Assigns } from "../lib/roland-gr55/RolandGR55AssignsContainer";
+import { RolandGR55NotConnectedView } from "../lib/roland-gr55/RolandGR55NotConnectedView";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
+import { useMidiIoContext } from "../services/MidiIo";
+import { ContextualStyleProvider } from "../styles/ContextualStyle";
 
 const Tab = createMaterialTopTabNavigator<PatchAssignsTabParamList>();
 

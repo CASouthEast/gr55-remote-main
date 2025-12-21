@@ -4,10 +4,10 @@ import { Button } from "@rneui/themed";
 import { useContext, useCallback, useMemo } from "react";
 import { View } from "react-native";
 
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useRolandRemotePatchSelection } from "./RolandRemotePatchSelection";
-import { usePatchMap } from "./hooks/usePatchMap";
-import { GlobalNavigationProp } from "./navigation/navigation";
+import { GlobalNavigationProp } from "./navigation";
+import { RolandRemotePatchContext as PATCH } from "../contexts/RolandRemotePageContext";
+import { usePatchMap } from "../hooks/usePatchMap";
+import { useRolandRemotePatchSelection } from "../lib/RolandRemotePatchSelection";
 
 export function PatchSaveHeaderButton({
   tintColor,

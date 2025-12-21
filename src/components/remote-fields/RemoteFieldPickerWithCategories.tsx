@@ -6,6 +6,7 @@ import {
   PickerControl,
   useRemoteFieldSystemPicker,
 } from "./RemoteFieldSystemPicker";
+import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
 import {
   EnumField,
   FieldReference,
@@ -13,12 +14,11 @@ import {
   isEnumFieldReference,
   isNumericFieldReference,
   NumericField,
-} from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { ThemedText as Text } from "./ThemedText";
-import { FieldRow } from "./components/FieldRow";
-import { styles as pickerStyles } from "./components/Picker";
-import { ThemedPicker as Picker } from "./components/ThemedPicker";
+} from "../../lib/RolandAddressMap";
+import { styles as pickerStyles } from "../Picker/Picker";
+import { ThemedPicker as Picker } from "../ThemedPicker";
+import { ThemedText as Text } from "../ThemedText";
+import { FieldRow } from "../fields/FieldRow";
 
 const SINGLE_PICKER_REQUIRED_WIDTH = 300;
 

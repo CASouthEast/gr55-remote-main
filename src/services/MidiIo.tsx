@@ -11,7 +11,7 @@ import {
 import { Platform } from "react-native";
 import usePromise from "react-use-promise";
 
-import { useStateWithStoredDefault } from "./AsyncStorageUtils";
+import { useStateWithStoredDefault } from "../components/AsyncStorageUtils";
 
 export const MidiIoContext = createContext<{
   inputPort: MIDIInput | void | null;

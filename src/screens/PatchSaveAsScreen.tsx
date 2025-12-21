@@ -12,21 +12,21 @@ import React, {
 import { StyleSheet, View } from "react-native";
 
 import { MIDINotAvailableView } from "./MIDINotAvailableView";
-import { useMidiIoContext } from "./MidiIo";
 import { PatchListView } from "./PatchListView";
-import { PendingTextPlaceholder } from "./PendingContentPlaceholders";
-import { useFocusQueryPriority } from "./RolandDataTransfer";
-import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandGR55NotConnectedView } from "./RolandGR55NotConnectedView";
-import { useRolandGR55RemotePatchDescriptions } from "./RolandGR55RemotePatchDescriptions";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { PatchId } from "./RolandRemotePatchSelection";
-import { useTheme } from "./Theme";
-import { ThemedText as Text } from "./ThemedText";
-import { usePatchMap } from "./hooks/usePatchMap";
-import { useRenamePatchPrompt } from "./hooks/useRenamePatchPrompt";
-import { PatchStackParamList } from "./navigation/navigation";
-import { useRemoteField } from "./useRemoteField";
+import { PendingTextPlaceholder } from "../components/PendingContentPlaceholders";
+import { useTheme } from "../components/Theme";
+import { ThemedText as Text } from "../components/ThemedText";
+import { PatchStackParamList } from "../components/navigation";
+import { RolandRemotePatchContext as PATCH } from "../contexts/RolandRemotePageContext";
+import { usePatchMap } from "../hooks/usePatchMap";
+import { useRemoteField } from "../hooks/useRemoteField";
+import { useRenamePatchPrompt } from "../hooks/useRenamePatchPrompt";
+import { PatchId } from "../lib/RolandRemotePatchSelection";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
+import { RolandGR55NotConnectedView } from "../lib/roland-gr55/RolandGR55NotConnectedView";
+import { useRolandGR55RemotePatchDescriptions } from "../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
+import { useMidiIoContext } from "../services/MidiIo";
+import { useFocusQueryPriority } from "../services/RolandDataTransfer";
 
 export function PatchSaveAsScreen({
   navigation,

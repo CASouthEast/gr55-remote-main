@@ -5,15 +5,15 @@ import { Button } from "@rneui/themed";
 import { useCallback, useContext, useEffect } from "react";
 import { StyleSheet, Switch } from "react-native";
 
-import { MidiIoSetupContext } from "./MidiIo";
-import { PopoverAwareScrollView } from "./PopoverAwareScrollView";
-import { RolandIoSetupContext } from "./RolandIoSetup";
-import { useMainScrollViewSafeAreaStyle } from "./SafeAreaUtils";
-import { ThemedText as Text } from "./ThemedText";
-import { ThemedPicker as Picker } from "./components/ThemedPicker";
-import { useUserOptions } from "./components/UserOptions";
-import { SetupStackParamList } from "./navigation/navigation";
-import { canShowBluetoothSettings } from "./screens/BluetoothSettingsScreen";
+import { canShowBluetoothSettings } from "./BluetoothSettingsScreen";
+import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { ThemedPicker as Picker } from "../components/ThemedPicker";
+import { ThemedText as Text } from "../components/ThemedText";
+import { useUserOptions } from "../components/UserOptions";
+import { SetupStackParamList } from "../components/navigation";
+import { RolandIoSetupContext } from "../lib/RolandIoSetup";
+import { MidiIoSetupContext } from "../services/MidiIo";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 
 export function IoSetupScreen({
   navigation,

@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 
 import { RolandGR55AddressMapAbsolute as GR55 } from "./RolandGR55AddressMap";
-import { RolandRemotePatchContext as PATCH } from "./RolandRemotePageContext";
-import { useAssignsMap } from "./hooks/useAssignsMap";
-import { useRemoteField } from "./useRemoteField";
+import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
+import { useAssignsMap } from "../../hooks/useAssignsMap";
+import { useRemoteField } from "../../hooks/useRemoteField";
 
 export function RolandGR55AssignsContainer({
   children,

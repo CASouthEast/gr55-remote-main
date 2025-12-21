@@ -1,6 +1,10 @@
-import * as React from "react";
+import React from "react";
 
-import { AtomReference, FieldDefinition, RawDataBag } from "./RolandAddressMap";
+import {
+  AtomReference,
+  FieldDefinition,
+  RawDataBag,
+} from "../lib/RolandAddressMap";
 
 export type RolandRemotePageState = {
   pageData: undefined | RawDataBag;

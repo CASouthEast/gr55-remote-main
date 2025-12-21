@@ -1,9 +1,9 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { throttle } from "throttle-debounce";
 
-import { FieldReference, FieldType } from "./RolandAddressMap";
-import { RolandRemotePageContext } from "./RolandRemotePageContext";
-import { GAP_BETWEEN_MESSAGES_MS } from "./lib/RolandSysExProtocol";
+import { RolandRemotePageContext } from "../contexts/RolandRemotePageContext";
+import { FieldReference, FieldType } from "../lib/RolandAddressMap";
+import { GAP_BETWEEN_MESSAGES_MS } from "../lib/RolandSysExProtocol";
 
 export function useRemoteField<T>(
   page: RolandRemotePageContext,

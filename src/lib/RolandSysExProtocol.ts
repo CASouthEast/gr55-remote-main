@@ -1,7 +1,7 @@
 import type { RolandAddressMap } from "./RolandAddressMap";
-import { RolandDataTransferContext } from "./RolandDataTransfer";
-import { AssignsMap } from "./lib/RolandGR55Assigns";
-import type { RolandGR55PatchMap } from "./lib/RolandGR55PatchMap";
+import { AssignsMap } from "./RolandGR55Assigns";
+import type { RolandGR55PatchMap } from "./RolandGR55PatchMap";
+import { RolandDataTransferContext } from "../services/RolandDataTransfer";
 
 export interface RolandSysExConfig {
   readonly description: string;
