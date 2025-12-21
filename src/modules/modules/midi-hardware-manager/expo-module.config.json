@@ -5,7 +5,7 @@
   },
   "android": {
     "modules": [
-      "com.motiz88.gr55remote.midihardwaremanager.MidiHardwareManagerModule"
+      "com.CASouthEast.gr55remote.midihardwaremanager.MidiHardwareManagerModule"
     ]
   }
 }

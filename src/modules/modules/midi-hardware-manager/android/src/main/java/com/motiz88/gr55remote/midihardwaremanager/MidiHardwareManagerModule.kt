@@ -1,4 +1,4 @@
-package com.motiz88.gr55remote.midihardwaremanager
+package com.CASouthEast.gr55remote.midihardwaremanager
 
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition

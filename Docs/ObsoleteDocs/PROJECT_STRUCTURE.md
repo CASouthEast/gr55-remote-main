@@ -16,7 +16,7 @@ The application is built around a few core concepts:
 
 ### 1. MIDI and SysEx Communication
 
-- **`MidiIo.tsx`**: This file is responsible for initializing and managing MIDI I/O. It uses the `@motiz88/react-native-midi` library to request MIDI access and provides a `MidiIoContext` to make the MIDI input and output ports available to the rest of the application.
+- **`MidiIo.tsx`**: This file is responsible for initializing and managing MIDI I/O. It uses the `@CASouthEast/react-native-midi` library to request MIDI access and provides a `MidiIoContext` to make the MIDI input and output ports available to the rest of the application.
 
 - **`RolandSysExProtocol.ts`**: This file contains the low-level implementation of the Roland SysEx protocol. It defines constants for different message types, functions for calculating checksums, and functions for constructing and parsing SysEx messages (`makeDataSetMessage`, `makeDataRequestMessage`, `parseDataResponseMessage`).
 

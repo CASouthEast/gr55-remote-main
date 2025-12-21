@@ -14,14 +14,18 @@ config.resolver.blockList = [
   ...Array.from(config.resolver.blockList ?? []),
   new RegExp(
     // TODO: escaping
-    path.join("@motiz88", "react-native-midi", "node_modules", "react-native") +
-      path.sep
+    path.join(
+      "@CASouthEast",
+      "react-native-midi",
+      "node_modules",
+      "react-native"
+    ) + path.sep
   ),
 ];
 
 config.resolver.nodeModulesPaths = [path.resolve(__dirname, "./node_modules")];
 
-const LINKABLE_PACKAGES = ["@motiz88/react-native-midi"];
+const LINKABLE_PACKAGES = ["@CASouthEast/react-native-midi"];
 
 // Hack to make Metro follow symlinks to certain packages if they exist.
 config.watchFolders = [];

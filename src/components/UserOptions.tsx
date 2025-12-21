@@ -21,7 +21,7 @@ export function UserOptionsContainer({
 }) {
   const [enableExperimentalFeatures, setEnableExperimentalFeatures] =
     useStateWithStoredDefault<boolean>(
-      "@motiz88/gr55-remote/UserOptions/enableExperimentalFeatures",
+      "@CASouthEast/gr55-remote/UserOptions/enableExperimentalFeatures",
       false
     );
   const userOptionsAndSetter = useMemo(

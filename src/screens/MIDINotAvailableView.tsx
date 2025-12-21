@@ -35,7 +35,7 @@ export function MIDINotAvailableView({
   return (
     <View style={[styles.center, styles.container]}>
       <Image
-        source={require("./assets/midi-error.png")}
+        source={require("../../assets/midi-error.png")}
         style={{
           width: dimensions.width / 2,
           height: ((1404 / 3060) * dimensions.width) / 2,

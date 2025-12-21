@@ -1,5 +1,5 @@
-import { requestMIDIAccess } from "@motiz88/react-native-midi";
-import type { MIDIInput, MIDIOutput } from "@motiz88/react-native-midi";
+import { requestMIDIAccess } from "@CASouthEast/react-native-midi";
+import type { MIDIInput, MIDIOutput } from "@CASouthEast/react-native-midi";
 import {
   createContext,
   useCallback,
@@ -48,7 +48,7 @@ const MIDI_NOT_SUPPORTED_ERROR = new Error();
 function useMIDIAccess(sysex: boolean = false) {
   return usePromise(
     () =>
-      // TODO: Move check into @motiz88/react-native-midi?
+      // TODO: Move check into @CASouthEast/react-native-midi?
       Platform.OS === "web" &&
       typeof navigator.requestMIDIAccess === "undefined"
         ? Promise.reject(MIDI_NOT_SUPPORTED_ERROR)
@@ -75,11 +75,11 @@ function useMidiIoSetupImpl() {
 
   const [inputPort, setInputPort, inputPortReadStatus] =
     useStateWithStoredDefault<string>(
-      "@motiz88/gr55-remote/MidiIoSetup/inputPort"
+      "@CASouthEast/gr55-remote/MidiIoSetup/inputPort"
     );
   const [outputPort, setOutputPort, outputPortReadStatus] =
     useStateWithStoredDefault<string>(
-      "@motiz88/gr55-remote/MidiIoSetup/outputPort"
+      "@CASouthEast/gr55-remote/MidiIoSetup/outputPort"
     );
   const [midiStateChangeCount, setMidiStateChangeCount] = useState(0);
 
