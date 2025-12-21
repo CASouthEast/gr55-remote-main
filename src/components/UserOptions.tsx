@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo } from "react";
 
-import { useStateWithStoredDefault } from "../../AsyncStorageUtils";
+import { useStateWithStoredDefault } from "./AsyncStorageUtils";
 
 export type UserOptions = Readonly<{
   enableExperimentalFeatures: boolean;
