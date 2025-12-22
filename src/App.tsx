@@ -2,13 +2,7 @@
 import "setimmediate";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-  createDrawerNavigator,
-  DrawerContentComponentProps,
-  DrawerContentScrollView,
-  DrawerItem,
-  DrawerItemList,
-} from "@react-navigation/drawer";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useMemo } from "react";
@@ -58,9 +52,27 @@ import {
   RolandDataTransferContainer,
 } from "./services/RolandDataTransfer";
 
+// Only import drawer on native platforms
+let createDrawerNavigator: any;
+let DrawerContentComponentProps: any;
+let DrawerContentScrollView: any;
+let DrawerItem: any;
+let DrawerItemList: any;
+
+if (Platform.OS !== "web") {
+  const drawer = require("@react-navigation/drawer");
+  createDrawerNavigator = drawer.createDrawerNavigator;
+  DrawerContentComponentProps = drawer.DrawerContentComponentProps;
+  DrawerContentScrollView = drawer.DrawerContentScrollView;
+  DrawerItem = drawer.DrawerItem;
+  DrawerItemList = drawer.DrawerItemList;
+}
+
 const PatchStack = createNativeStackNavigator<PatchStackParamList>();
 
-const PatchDrawer = createDrawerNavigator();
+const PatchDrawer = Platform.OS !== "web" ? createDrawerNavigator() : null;
+const PatchTopTabs =
+  Platform.OS === "web" ? createMaterialTopTabNavigator() : null;
 const RootTab = createBottomTabNavigator<RootTabParamList>();
 const SetupStack = createNativeStackNavigator<SetupStackParamList>();
 
@@ -140,9 +152,7 @@ export default function App() {
   );
 }
 
-function PatchDrawerContent(
-  props: DrawerContentComponentProps
-): React.ReactNode {
+function PatchDrawerContent(props: any): React.ReactNode {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
@@ -216,6 +226,61 @@ function PatchDrawerNavigator() {
   );
 }
 
+function PatchTopTabsNavigator() {
+  useFocusQueryPriority("read_patch_details");
+  const { closeAllPopovers } = usePopovers();
+  const theme = useTheme();
+
+  return (
+    <PatchTopTabs.Navigator
+      id="PatchTabs"
+      screenOptions={{
+        tabBarScrollEnabled: true,
+        tabBarStyle: { backgroundColor: theme.colors.card },
+      }}
+      screenListeners={{
+        transitionStart: () => {
+          closeAllPopovers();
+        },
+        blur: () => {
+          closeAllPopovers();
+        },
+      }}
+    >
+      <PatchTopTabs.Screen
+        name="PatchMain"
+        component={PatchMainScreen}
+        options={{ title: "Main" }}
+      />
+      <PatchTopTabs.Screen
+        name="PatchTone"
+        component={PatchToneScreen}
+        options={{ title: "Tone" }}
+      />
+      <PatchTopTabs.Screen
+        name="PatchEffects"
+        component={PatchEffectsScreen}
+        options={{ title: "Effects" }}
+      />
+      <PatchTopTabs.Screen
+        name="PatchMasterPedalGkCtl"
+        component={PatchMasterPedalGkCtlScreen}
+        options={{ title: "Pedal/GK" }}
+      />
+      <PatchTopTabs.Screen
+        name="PatchAssigns"
+        component={PatchAssignsScreen}
+        options={{ title: "Assigns" }}
+      />
+      <PatchTopTabs.Screen
+        name="PatchMasterOther"
+        component={PatchMasterOtherScreen}
+        options={{ title: "Other" }}
+      />
+    </PatchTopTabs.Navigator>
+  );
+}
+
 function RootTabNavigator() {
   const EXPERIMENTAL_ROUTES: (keyof RootTabParamList)[] = [];
   const [{ enableExperimentalFeatures }] = useUserOptions();
@@ -235,7 +300,9 @@ function RootTabNavigator() {
     >
       <RootTab.Screen
         name="PatchDrawer"
-        component={PatchDrawerNavigator}
+        component={
+          Platform.OS === "web" ? PatchTopTabsNavigator : PatchDrawerNavigator
+        }
         options={{
           headerShown: false,
           title: "Patch",

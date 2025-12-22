@@ -53,7 +53,7 @@ export const FieldRow = function FieldRow({
     y: number;
     width: number;
     height: number;
-  }>();
+  }>(null);
   const viewRef = useRef<View>(null);
   const handlePressIn = useCallback(() => {
     if (isLongPressable || isPressable) {

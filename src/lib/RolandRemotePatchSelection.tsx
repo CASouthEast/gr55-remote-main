@@ -39,7 +39,7 @@ export function RolandRemotePatchSelectionContainer({
 
   const { inputPort, outputPort } = useContext(MidiIoContext);
 
-  const nextBankSelectMSB = useRef<number>();
+  const nextBankSelectMSB = useRef<number>(null);
 
   const { requestData, setField } = useContext(RolandDataTransferContext);
 

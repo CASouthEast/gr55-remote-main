@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useCallback, useMemo } from "react";
 import {
   NativeScrollEvent,
@@ -13,7 +14,7 @@ export function PopoverAwareScrollView({
   onScrollBeginDrag,
   onScroll,
   ...props
-}: ScrollViewProps): JSX.Element {
+}: ScrollViewProps): React.JSX.Element {
   const { closeAllPopovers } = usePopovers();
   const handleScrollBeginDrag = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {

@@ -127,7 +127,7 @@ function AssignFromFieldPopover({
     lastProps.current.onDeleteAssigns();
     onRequestClose();
   }, [onRequestClose]);
-  const lastProps = useRef<PopoverProps & { id: "AssignFromField" }>();
+  const lastProps = useRef<PopoverProps & { id: "AssignFromField" }>(null);
   if (state.props?.id === "AssignFromField") {
     lastProps.current = state.props;
   }

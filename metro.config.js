@@ -23,7 +23,18 @@ config.resolver.blockList = [
   ),
 ];
 
-config.resolver.nodeModulesPaths = [path.resolve(__dirname, "./node_modules")];
+// Exclude worklets from web builds
+if (process.env.EXPO_PLATFORM === "web") {
+  config.resolver.blockList.push(
+    /react-native-worklets/,
+    /react-native-reanimated/
+  );
+}
+
+config.resolver.nodeModulesPaths = [
+  path.resolve(__dirname, "./node_modules"),
+  path.resolve(__dirname, "./assets"),
+];
 
 const LINKABLE_PACKAGES = ["@CASouthEast/react-native-midi"];
 

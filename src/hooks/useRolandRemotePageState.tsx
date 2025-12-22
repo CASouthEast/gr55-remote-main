@@ -87,7 +87,7 @@ export function useRolandRemotePageState(
     []
   );
 
-  const subscriptions = useRef<EventEmitter>();
+  const subscriptions = useRef<EventEmitter>(null);
   if (!subscriptions.current) {
     subscriptions.current = new EventEmitter();
     // This is the max number of connected components that may be mounted at any given time.

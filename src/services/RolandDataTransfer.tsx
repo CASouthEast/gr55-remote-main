@@ -48,7 +48,7 @@ function useRolandDataTransferImpl() {
   const { selectedDevice, selectedDeviceKey } =
     useContext(RolandIoSetupContext);
   const refCountByQueueId = useRef(new Map<string, number>());
-  const scheduler = useRef<MultiQueueScheduler<string>>();
+  const scheduler = useRef<MultiQueueScheduler<string>>(null);
   if (!scheduler.current) {
     scheduler.current = new MultiQueueScheduler([
       "write_utmost",

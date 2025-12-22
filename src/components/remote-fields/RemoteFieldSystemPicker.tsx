@@ -116,7 +116,7 @@ export function PickerControl<T extends number | string>({
 }: {
   value: T;
   onValueChange: (value: T) => void;
-  items: readonly JSX.Element[];
+  items: readonly React.JSX.Element[];
   isPending: boolean;
   style?: StyleProp<ViewStyle>;
   itemStyle?: StyleProp<TextStyle>;

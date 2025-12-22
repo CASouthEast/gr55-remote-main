@@ -1,4 +1,5 @@
 import { SearchBar } from "@rneui/themed";
+import * as React from "react";
 import { ComponentPropsWithoutRef } from "react";
 import { Platform, useColorScheme } from "react-native";
 
@@ -6,7 +7,7 @@ import { useTheme } from "./Theme";
 
 export function ThemedSearchBar(
   props: ComponentPropsWithoutRef<typeof SearchBar>
-): JSX.Element {
+): React.JSX.Element {
   // TODO: Investigate why this doesn't update the first time the appearance changes
   const scheme = useColorScheme();
   const theme = useTheme();

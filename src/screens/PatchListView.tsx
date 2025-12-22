@@ -1,4 +1,5 @@
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import * as React from "react";
 import {
   forwardRef,
   memo,
@@ -86,7 +87,7 @@ export const PatchListView = forwardRef(function (
   const viewableRowsRange = useRef<{
     firstVisibleItemIndex: number | null;
     lastVisibleItemIndex: number | null;
-  }>();
+  }>(null);
   const scrollToPatch = useCallback(
     (patch: PatchId | undefined) => {
       const rowIndex =
@@ -171,7 +172,7 @@ export const PatchListView = forwardRef(function (
     }),
     [scrollToPatch]
   );
-  const list: JSX.Element = (
+  const list: React.JSX.Element = (
     <FlatList
       ref={listRef}
       contentContainerStyle={contentContainerStyle}

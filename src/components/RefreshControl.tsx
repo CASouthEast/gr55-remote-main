@@ -16,10 +16,12 @@ export const RefreshControl = Platform.select<
   }: RefreshControlProps) {
     // Workaround for https://github.com/NiciusB/react-native-web-refresh-control/issues/11
     const [didRefresh, setDidRefresh] = useState(false);
-    const timeout = useRef<ReturnType<typeof setTimeout>>();
+    const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const handleRefresh = useCallback(() => {
       setDidRefresh(true);
-      clearTimeout(timeout.current);
+      if (timeout.current) {
+        clearTimeout(timeout.current);
+      }
       timeout.current = setTimeout(() => {
         setDidRefresh(false);
       }, 0);
