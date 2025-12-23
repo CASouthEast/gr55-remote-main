@@ -32,6 +32,9 @@ config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, "./assets"),
 ];
 
+// Alias problematic packages to local shims when needed
+// Note: no custom aliasing required currently
+
 const LINKABLE_PACKAGES = ["@motiz88/react-native-midi"];
 
 // Hack to make Metro follow symlinks to certain packages if they exist.

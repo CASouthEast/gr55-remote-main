@@ -1,0 +1,9 @@
+diff --git a/node_modules/use-latest-callback/lib/src/index.js b/node_modules/use-latest-callback/lib/src/index.js
+index 0ab1ba8..cc7730a 100644
+--- a/node_modules/use-latest-callback/lib/src/index.js
++++ b/node_modules/use-latest-callback/lib/src/index.js
+@@ -26,3 +26,4 @@ function useLatestCallback(callback) {
+     return latestCallback;
+ }
+ module.exports = useLatestCallback;
++module.exports.default = useLatestCallback;

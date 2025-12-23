@@ -10,7 +10,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "strict": true
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": [
     "Docs",

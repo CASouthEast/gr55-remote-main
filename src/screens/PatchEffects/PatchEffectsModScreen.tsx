@@ -1,6 +1,12 @@
 import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useCallback, useContext } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
@@ -585,11 +591,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
     elevation: 4,
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+      },
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {},
+      default: {},
+    }),
     maxWidth: 600,
     width: "100%",
   },

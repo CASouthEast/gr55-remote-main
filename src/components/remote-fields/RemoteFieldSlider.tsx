@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 
 import { RemoteFieldRow } from "./RemoteFieldRow";
 import { RolandRemotePageContext } from "../../contexts/RolandRemotePageContext";
@@ -104,7 +104,6 @@ function SliderControl({
 }) {
   // const { isAssigned } = useContext(FieldRowContext);
   // TODO: Show assigned state when all controls can reliably handle long press etc
-  const isAssigned = false;
 
   const theme = useTheme();
 
@@ -141,9 +140,20 @@ function SliderControl({
               styles.labelText,
               {
                 color: theme.colors.slider.labelText,
-                textShadowColor: theme.colors.slider.labelTextShadow,
                 backgroundColor: theme.colors.slider.labelTextBackground,
               },
+              Platform.select({
+                web: {},
+                ios: {
+                  textShadowColor: theme.colors.slider.labelTextShadow,
+                },
+                android: {
+                  textShadowColor: theme.colors.slider.labelTextShadow,
+                },
+                default: {
+                  textShadowColor: theme.colors.slider.labelTextShadow,
+                },
+              }) as any,
             ]}
           >
             {prettyValue}
@@ -175,8 +185,18 @@ const styles = StyleSheet.create({
   labelText: {
     textAlign: "center",
     opacity: 1,
-    textShadowRadius: 2,
-    textShadowOffset: { width: 0, height: 0 },
+    ...Platform.select({
+      web: {},
+      ios: { textShadowRadius: 2, textShadowOffset: { width: 0, height: 0 } },
+      android: {
+        textShadowRadius: 2,
+        textShadowOffset: { width: 0, height: 0 },
+      },
+      default: {
+        textShadowRadius: 2,
+        textShadowOffset: { width: 0, height: 0 },
+      },
+    }),
   },
   sliderThumb: {
     opacity: 0,

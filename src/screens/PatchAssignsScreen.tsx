@@ -4,7 +4,7 @@ import {
 } from "@react-navigation/material-top-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useContext, useEffect, useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 import { MIDINotAvailableView } from "./MIDINotAvailableView";
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
@@ -29,9 +29,9 @@ import { AssignDefinition, AssignsMap } from "../lib/RolandGR55Assigns";
 import { RolandGR55AddressMapAbsolute as GR55 } from "../lib/roland-gr55/RolandGR55AddressMap";
 import { useRolandGR55Assigns } from "../lib/roland-gr55/RolandGR55AssignsContainer";
 import { RolandGR55NotConnectedView } from "../lib/roland-gr55/RolandGR55NotConnectedView";
-import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 import { useMidiIoContext } from "../services/MidiIo";
 import { ContextualStyleProvider } from "../styles/ContextualStyle";
+import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
 
 const Tab = createMaterialTopTabNavigator<PatchAssignsTabParamList>();
 
@@ -416,9 +416,24 @@ const styles = StyleSheet.create({
   },
   labelAssigned: {
     fontWeight: "bold",
-    textShadowColor: "lightgray",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
+    ...Platform.select({
+      web: {},
+      ios: {
+        textShadowColor: "lightgray",
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 1,
+      },
+      android: {
+        textShadowColor: "lightgray",
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 1,
+      },
+      default: {
+        textShadowColor: "lightgray",
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 1,
+      },
+    }),
     fontSize: 18,
   },
 });
