@@ -22,7 +22,7 @@ export function RolandGR55NotConnectedView({
   return (
     <View style={[styles.center, styles.container]}>
       <Image
-        source={require("./assets/gr55-pixel-masked.png")}
+        source={require("../../../assets/gr55-pixel-masked.png")}
         style={{
           width: dimensions.width / 2,
           height: ((601 / 1024) * dimensions.width) / 2,
