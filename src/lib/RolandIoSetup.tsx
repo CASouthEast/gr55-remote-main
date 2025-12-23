@@ -1,4 +1,4 @@
-import type { MIDIMessageEvent } from "@CASouthEast/react-native-midi";
+import type { MIDIMessageEvent } from "@motiz88/react-native-midi";
 import {
   createContext,
   useContext,
@@ -16,7 +16,7 @@ import { MidiIoContext } from "../services/MidiIo";
 function useRolandIoSetupImpl() {
   const [includeFakeDevice, setIncludeFakeDevice] =
     useStateWithStoredDefault<boolean>(
-      "@CASouthEast/gr55-remote/RolandIoSetup/includeFakeDevice",
+      "@motiz88/gr55-remote/RolandIoSetup/includeFakeDevice",
       false
     );
 

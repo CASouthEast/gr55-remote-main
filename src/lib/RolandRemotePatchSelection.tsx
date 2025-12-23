@@ -1,4 +1,4 @@
-import { MIDIMessageEvent } from "@CASouthEast/react-native-midi";
+import { MIDIMessageEvent } from "@motiz88/react-native-midi";
 import {
   createContext,
   useCallback,
