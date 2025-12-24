@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Platform } from "react-native";
 
-import { renderAdjustingMaterialTopTabBar } from "../components/AdjustingTabBar";
+// TESTING: Comment out custom tab bar import to use native React Navigation component
+// import { renderAdjustingMaterialTopTabBar } from "../components/AdjustingTabBar";
 import { usePopovers } from "../components/Popovers";
 
 export function useTopTabNavigatorDefaults() {
@@ -73,7 +74,8 @@ export function useTopTabNavigatorDefaults() {
             },
           }),
         },
-        tabBar: renderAdjustingMaterialTopTabBar,
+        // TESTING: Comment out custom tab bar to use native React Navigation component
+        // tabBar: renderAdjustingMaterialTopTabBar,
         // Enhanced accessibility configuration for web
         ...(Platform.OS === "web" && {
           // Ensure proper focus management
