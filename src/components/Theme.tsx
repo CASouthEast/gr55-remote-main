@@ -12,7 +12,47 @@ import {
   Provider as PaperProvider,
 } from "react-native-paper";
 
-export const DefaultTheme = {
+// TypeScript interfaces for theme structure
+export interface NavigationTabBarColors {
+  background: string;
+  activeText: string;
+  inactiveText: string;
+  indicator: string;
+  border: string;
+  hoverBackground: string;
+  pressBackground: string;
+}
+
+export interface NavigationColors {
+  tabBar: NavigationTabBarColors;
+}
+
+export interface ThemeColors {
+  assigns: {
+    background: string;
+    tabBarBackground: string;
+  };
+  library: {
+    selectedPatch: string;
+  };
+  navigation: NavigationColors;
+  pendingTextPlaceholder: string;
+  searchBarText: string;
+  saveAsSummaryBackground: string;
+  slider: {
+    trackMaximum: string;
+    trackMinimum: string;
+    labelText: string;
+    labelTextShadow: string;
+    labelTextBackground: string;
+  };
+}
+
+export interface AppTheme {
+  colors: ThemeColors;
+}
+
+export const DefaultTheme: AppTheme = {
   colors: {
     assigns: {
       // 10/11ths of the way from cornflowerblue to #f2f2f2
@@ -22,6 +62,17 @@ export const DefaultTheme = {
     },
     library: {
       selectedPatch: "#73b2f9",
+    },
+    navigation: {
+      tabBar: {
+        background: "rgb(242, 242, 242)",
+        activeText: "rgb(0, 122, 255)",
+        inactiveText: "rgb(28, 28, 30)",
+        indicator: "rgb(0, 122, 255)",
+        border: "rgb(216, 216, 216)",
+        hoverBackground: "rgba(0, 122, 255, 0.1)",
+        pressBackground: "rgba(0, 122, 255, 0.2)",
+      },
     },
     pendingTextPlaceholder: "rgb(216, 216, 216)",
     searchBarText: "#000000",
@@ -36,7 +87,7 @@ export const DefaultTheme = {
   },
 };
 
-export const DarkTheme = {
+export const DarkTheme: AppTheme = {
   colors: {
     assigns: {
       // 10/11ths of the way from cornflowerblue to #010101
@@ -46,6 +97,17 @@ export const DarkTheme = {
     },
     library: {
       selectedPatch: "#05448b",
+    },
+    navigation: {
+      tabBar: {
+        background: "rgb(28, 28, 30)",
+        activeText: "rgb(0, 122, 255)",
+        inactiveText: "rgb(255, 255, 255)",
+        indicator: "rgb(0, 122, 255)",
+        border: "rgb(39, 39, 41)",
+        hoverBackground: "rgba(0, 122, 255, 0.15)",
+        pressBackground: "rgba(0, 122, 255, 0.25)",
+      },
     },
     pendingTextPlaceholder: "rgb(39, 39, 41)",
     searchBarText: "#ffffff",
@@ -119,9 +181,9 @@ const paperThemeLight = {
   },
 };
 
-const ThemeContext = createContext(DefaultTheme);
+const ThemeContext = createContext<AppTheme>(DefaultTheme);
 
-export function useTheme() {
+export function useTheme(): AppTheme {
   return useContext(ThemeContext);
 }
 

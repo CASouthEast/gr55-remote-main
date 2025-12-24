@@ -236,55 +236,134 @@ function PatchTopTabsNavigator() {
     return null;
   }
 
+  // Web-specific styling enhancements for better browser compatibility
+  const webSpecificStyles =
+    Platform.OS === "web"
+      ? {
+          tabBarStyle: {
+            backgroundColor: navigationTheme.colors.card,
+            borderBottomWidth: 1,
+            borderBottomColor: navigationTheme.colors.border,
+            // Web-specific CSS properties for better browser compatibility
+            ...(Platform.OS === "web" && {
+              userSelect: "none" as any,
+              WebkitUserSelect: "none" as any,
+            }),
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600" as const,
+            color: navigationTheme.colors.text, // Explicit color for web visibility
+            textTransform: "none" as any,
+            // Web-specific CSS properties
+            ...(Platform.OS === "web" && {
+              userSelect: "none" as any,
+              WebkitUserSelect: "none" as any,
+              cursor: "pointer" as any,
+            }),
+          },
+          tabBarActiveTintColor: navigationTheme.colors.primary,
+          tabBarInactiveTintColor: navigationTheme.colors.text,
+          // Web-specific hover and focus states with fallback colors
+          ...(Platform.OS === "web" && {
+            tabBarPressColor: navigationTheme.colors.primary + "20", // 20% opacity
+            tabBarIndicatorStyle: {
+              backgroundColor: navigationTheme.colors.primary,
+              height: 2,
+            },
+            // Fallback colors for better browser compatibility
+            tabBarItemStyle: {
+              // Fallback background color
+              backgroundColor: navigationTheme.colors.card || "#ffffff",
+            },
+            tabBarContentContainerStyle: {
+              // Fallback container background
+              backgroundColor: navigationTheme.colors.card || "#ffffff",
+            },
+          }),
+        }
+      : {
+          tabBarActiveTintColor: navigationTheme.colors.primary,
+          tabBarInactiveTintColor: navigationTheme.colors.text,
+          tabBarStyle: { backgroundColor: navigationTheme.colors.card },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600" as const,
+            color: navigationTheme.colors.text, // Explicit color for web visibility
+          },
+        };
+
   return (
     <PatchTopTabs.Navigator
       id="PatchTabs"
-      screenOptions={{
-        tabBarActiveTintColor: navigationTheme.colors.primary,
-        tabBarInactiveTintColor: navigationTheme.colors.text,
-        tabBarStyle: { backgroundColor: navigationTheme.colors.card },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "600",
-        },
-      }}
+      screenOptions={webSpecificStyles}
       {...topTabNavigatorDefaults}
     >
       <PatchTopTabs.Screen
         name="PatchMain"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMainScreen}
-        options={{ title: "Main" }}
+        options={{
+          title: "Main",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Main patch settings tab",
+          tabBarTestID: "patch-main-tab",
+        }}
       />
       <PatchTopTabs.Screen
         name="PatchTone"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchToneScreen}
-        options={{ title: "Tone" }}
+        options={{
+          title: "Tone",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Tone settings tab",
+          tabBarTestID: "patch-tone-tab",
+        }}
       />
       <PatchTopTabs.Screen
         name="PatchEffects"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchEffectsScreen}
-        options={{ title: "Effects" }}
+        options={{
+          title: "Effects",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Effects settings tab",
+          tabBarTestID: "patch-effects-tab",
+        }}
       />
       <PatchTopTabs.Screen
         name="PatchMasterPedalGkCtl"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMasterPedalGkCtlScreen}
-        options={{ title: "Pedal/GK" }}
+        options={{
+          title: "Pedal/GK",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Pedal and GK control settings tab",
+          tabBarTestID: "patch-pedal-gk-tab",
+        }}
       />
       <PatchTopTabs.Screen
         name="PatchAssigns"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchAssignsScreen}
-        options={{ title: "Assigns" }}
+        options={{
+          title: "Assigns",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Assigns settings tab",
+          tabBarTestID: "patch-assigns-tab",
+        }}
       />
       <PatchTopTabs.Screen
         name="PatchMasterOther"
         // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMasterOtherScreen}
-        options={{ title: "Other" }}
+        options={{
+          title: "Other",
+          // Accessibility attributes for screen readers and keyboard navigation
+          tabBarAccessibilityLabel: "Other patch settings tab",
+          tabBarTestID: "patch-other-tab",
+        }}
       />
     </PatchTopTabs.Navigator>
   );

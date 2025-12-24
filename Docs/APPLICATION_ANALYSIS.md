@@ -14,6 +14,7 @@ This document provides a comprehensive analysis of the GR-55 Remote application'
 ## 1. Application Overview
 
 ### 1.1 Project Identity
+
 - **Name:** `@motiz88/gr55-remote-app`
 - **Version:** 0.0.2
 - **Type:** Cross-platform mobile and web application
@@ -22,7 +23,9 @@ This document provides a comprehensive analysis of the GR-55 Remote application'
 - **Primary Language:** TypeScript with strict mode enabled
 
 ### 1.2 Purpose
+
 An experimental, unofficial patch editing application for the Roland GR-55 guitar synthesizer that enables:
+
 - Real-time patch parameter editing via MIDI
 - Patch management and organization
 - Cross-platform compatibility (iOS, Android, Web)
@@ -33,12 +36,14 @@ An experimental, unofficial patch editing application for the Roland GR-55 guita
 ## 2. Technology Stack
 
 ### 2.1 Core Framework
+
 - **React:** 18.2.0
 - **React Native:** 0.72.6
 - **Expo:** ^49.0.21
 - **TypeScript:** ^5.1.3 (strict mode enabled)
 
 ### 2.2 Navigation & UI
+
 - **React Navigation:** v6.x family
   - `@react-navigation/native` (^6.1.6)
   - `@react-navigation/native-stack` (^6.9.12)
@@ -53,11 +58,13 @@ An experimental, unofficial patch editing application for the Roland GR-55 guita
   - Expo Vector Icons (^13.0.0)
 
 ### 2.3 MIDI & Hardware
+
 - **Custom MIDI Library:** `@motiz88/react-native-midi` (^0.0.6)
 - **Bluetooth:** `react-native-ble-plx` (^3.1.2-rc.0)
 - **Haptics:** `expo-haptics` (~12.4.0)
 
 ### 2.4 State Management & Data
+
 - **Storage:** `@react-native-async-storage/async-storage` (1.18.2)
 - **State Patterns:**
   - React Context API (12 files use contexts)
@@ -66,6 +73,7 @@ An experimental, unofficial patch editing application for the Roland GR-55 guita
 - **Promise Utilities:** `react-use-promise` (^0.5.0)
 
 ### 2.5 Platform-Specific Modules
+
 - Native module: `midi-hardware-manager` (custom Expo module)
 - Platform-specific implementations: 4 files
   - `BluetoothDevicesView.android.tsx`
@@ -74,6 +82,7 @@ An experimental, unofficial patch editing application for the Roland GR-55 guita
   - `Slider.web.tsx`
 
 ### 2.6 Development Tools
+
 - **Linting:** ESLint (^8.38.0) with Universe config
 - **Formatting:** Prettier (^2.8.7)
 - **Testing:** Jest (^29.5.0) with jest-expo (~49.0.0)
@@ -101,6 +110,7 @@ gr55-remote-main/
 ```
 
 **File Type Distribution:**
+
 - TypeScript React (`.tsx`): 85 files (83%)
 - TypeScript (`.ts`): 14 files (14%)
 - JavaScript (`.js`): 3 configuration files
@@ -110,6 +120,7 @@ gr55-remote-main/
 
 **1. Screen Components (21 files)**
 Primary navigation destinations with full-screen UI:
+
 - `PatchMainScreen.tsx`
 - `PatchToneScreen.tsx`
 - `PatchEffectsScreen.tsx` (+ 7 sub-screens)
@@ -123,6 +134,7 @@ Primary navigation destinations with full-screen UI:
 
 **2. View Components (7 files)**
 Reusable UI sections:
+
 - `PatchListView.tsx`
 - `BluetoothDevicesView.tsx` (+ platform variants)
 - `LibraryPatchListNoResultsView.tsx`
@@ -132,6 +144,7 @@ Reusable UI sections:
 
 **3. Field Components (11 files)**
 Specialized input controls for MIDI parameters:
+
 - `RemoteFieldRow.tsx`
 - `RemoteFieldPicker.tsx`
 - `RemoteFieldSlider.tsx`
@@ -146,6 +159,7 @@ Specialized input controls for MIDI parameters:
 
 **4. Roland/MIDI Protocol (19 files)**
 Device-specific logic and data mappings:
+
 - `RolandSysExProtocol.ts` - Core SysEx message handling
 - `RolandAddressMap.ts` - Address mapping framework
 - `RolandGR55AddressMap.ts` - GR-55 specific addresses
@@ -165,6 +179,7 @@ Device-specific logic and data mappings:
 
 **5. Custom Hooks (22+ files)**
 React hooks for shared logic:
+
 - `useRolandRemotePatchState.tsx` - Patch state management
 - `useRolandRemoteSystemState.tsx` - System state management
 - `useRolandRemotePageState.tsx` - Page-level state
@@ -180,6 +195,7 @@ React hooks for shared logic:
 
 **6. Context Providers (12 contexts)**
 State management via React Context API:
+
 - `RolandRemotePatchContext`
 - `RolandRemoteSystemContext`
 - `RolandDataTransferContext`
@@ -188,6 +204,7 @@ State management via React Context API:
 - Others embedded in containers
 
 **7. Services & Utilities**
+
 - `BLEService.tsx` - Bluetooth Low Energy service
 - `MidiIo.tsx` - MIDI input/output
 - `AsyncStorageUtils.tsx` - Persistent storage
@@ -196,12 +213,14 @@ State management via React Context API:
 - `UserOptions.tsx` - User preferences
 
 **8. Theming & Styling**
+
 - `Theme.tsx` - Theme configuration
 - `ThemedText.tsx`, `ThemedPicker.tsx`, `ThemedSearchBar.tsx`
 - `ThemedContextualStyleProvider.tsx`
 - `ContextualStyle.tsx`
 
 **9. Navigation**
+
 - `App.tsx` - Root application component
 - `AppNavigationContainer.tsx` - Navigation wrapper
 - `navigation.tsx` - Navigation structure
@@ -210,10 +229,12 @@ State management via React Context API:
 ### 3.3 Dependency Graph Analysis
 
 **Internal Import Patterns:**
+
 - Total relative imports: 425
 - Files with exports: 95 out of 102 (93%)
 
 **Most Imported External Packages:**
+
 1. `react-native` (48 imports)
 2. `react` (65 imports)
 3. `@react-navigation/native` (14 imports)
@@ -222,6 +243,7 @@ State management via React Context API:
 6. `@rneui/themed` (7 imports)
 
 **Import Coupling:** The application shows moderate coupling with:
+
 - Heavy reliance on React Navigation for routing
 - Centralized Roland/MIDI protocol files
 - Shared utility and context files
@@ -231,6 +253,7 @@ State management via React Context API:
 ## 4. Code Quality & Consistency
 
 ### 4.1 TypeScript Configuration
+
 ```json
 {
   "extends": "expo/tsconfig.base",
@@ -239,22 +262,26 @@ State management via React Context API:
   }
 }
 ```
+
 - **Strict mode enabled** - High type safety
 - **Extends Expo defaults** - Consistent with framework
 
 ### 4.2 Linting & Formatting
 
 **ESLint Configuration:**
+
 - Extends `universe/native` config
 - React hooks plugin enabled
 - TypeScript parser configured
 - Minimal custom rules (clean ruleset)
 
 **Prettier Configuration:**
+
 - Standard formatting (inferred from `.prettierrc.json`)
 - Integrated with git hooks via husky
 
 **Git Hooks:**
+
 - Pre-commit: `lint-staged` runs linters on changed files
 - Ensures code quality before commits
 
@@ -266,19 +293,22 @@ State management via React Context API:
    - Screens: `[Feature]Screen.tsx` (e.g., `PatchMainScreen.tsx`)
    - Views: `[Feature]View.tsx` (e.g., `PatchListView.tsx`)
    - Containers: `[Feature]Container.tsx`
-   
 2. **Custom Hooks:**
+
    - Format: `use[Feature].tsx` (e.g., `useRolandRemotePatchState.tsx`)
    - Follows React hook naming convention
 
 3. **Roland/MIDI Files:**
+
    - Prefix: `Roland[Feature]` (e.g., `RolandSysExProtocol.ts`)
    - GR-55 specific: `RolandGR55[Feature]` (e.g., `RolandGR55AddressMap.ts`)
 
 4. **Themed Components:**
+
    - Prefix: `Themed[Component]` (e.g., `ThemedText.tsx`)
 
 5. **Platform-Specific:**
+
    - Suffix: `.[platform].tsx` (e.g., `.android.tsx`, `.ios.tsx`, `.web.tsx`)
 
 6. **Field Components:**
@@ -289,11 +319,13 @@ State management via React Context API:
 **Potential Consistency Issues:**
 
 1. **Flat Structure:**
+
    - All 99 root-level components in one directory
    - No feature-based folder organization
    - Can make navigation difficult as project grows
 
 2. **Mixed Concerns:**
+
    - UI components, business logic, and utilities all at root level
    - Would benefit from directories like:
      - `/screens`
@@ -304,6 +336,7 @@ State management via React Context API:
      - `/utils`
 
 3. **TODO Comments:**
+
    - 111 TODO/FIXME/HACK comments found
    - Indicates incomplete features or technical debt
    - Examples:
@@ -319,6 +352,7 @@ State management via React Context API:
 ### 4.5 Testing Coverage
 
 **Test Infrastructure:**
+
 - Framework: Jest with jest-expo preset
 - Test files: 4 test suites
   - `RolandChecksum.test.ts`
@@ -327,6 +361,7 @@ State management via React Context API:
   - `RolandAddressMap.test.ts`
 
 **Coverage Assessment:**
+
 - **Low test coverage:** Only 4 test files for 102 source files (~4%)
 - Tests focus on critical infrastructure:
   - Protocol/checksum validation
@@ -336,6 +371,7 @@ State management via React Context API:
 - **Integration tests:** None found
 
 **Mock Infrastructure:**
+
 - Mock directories exist for:
   - `@motiz88` packages
   - `@react-native-async-storage`
@@ -347,6 +383,7 @@ State management via React Context API:
 ### 5.1 Production Dependencies (46 packages)
 
 **Critical Dependencies:**
+
 - **React Ecosystem:** `react`, `react-native`, `react-dom`
 - **Expo:** Core framework and modules
 - **Navigation:** 6 React Navigation packages
@@ -355,6 +392,7 @@ State management via React Context API:
 - **Storage:** `@react-native-async-storage/async-storage`
 
 **UI Libraries:**
+
 - `@rneui/themed` - React Native Elements
 - `react-native-paper` - Material Design
 - `react-native-vector-icons` - Icons
@@ -362,6 +400,7 @@ State management via React Context API:
 - `react-native-popover-view` - Popovers
 
 **Utilities:**
+
 - `invariant` - Runtime assertions
 - `promise-throttle` - Rate limiting
 - `throttle-debounce` - Debouncing
@@ -371,10 +410,12 @@ State management via React Context API:
 ### 5.2 Development Dependencies (20 packages)
 
 **Type Definitions:**
+
 - `@types/react`, `@types/jest`, `@types/invariant`
 - `@types/throttle-debounce`, `@types/ua-parser-js`
 
 **Build & Tooling:**
+
 - `@babel/core` - Transpilation
 - `typescript` - Type checking
 - `eslint` - Linting
@@ -385,6 +426,7 @@ State management via React Context API:
 ### 5.3 Dependency Health
 
 **Observations:**
+
 1. **Version Consistency:** Most packages use caret (^) ranges
 2. **Expo SDK:** Aligned with Expo 49
 3. **React Navigation:** All v6.x packages
@@ -394,10 +436,12 @@ State management via React Context API:
    - `react-native-ble-plx@^3.1.2-rc.0`
 
 **Potential Concerns:**
+
 - RC dependencies may have instability
 - Custom MIDI package (`@motiz88/react-native-midi`) is version 0.0.6 (early stage)
 
 ### 5.4 Dependency Tree Depth
+
 - **Direct dependencies:** 46 production, 20 dev
 - **Package manager:** npm (package-lock.json present)
 - **Node version:** Specified in `.nvmrc`
@@ -421,6 +465,7 @@ State management via React Context API:
 ```
 
 **Script Analysis:**
+
 - **Development:** Platform-specific with Expo CLI
 - **Testing:** Jest integration
 - **Linting:** Auto-fix enabled, integrated formatting
@@ -430,11 +475,13 @@ State management via React Context API:
 
 **Metro Bundler:** Custom config in `metro.config.js`
 **Babel:** Custom preset with plugins:
+
 - `babel-preset-expo`
 - `@babel/plugin-proposal-logical-assignment-operators`
 - `react-native-reanimated/plugin`
 
 **Expo Configuration (app.json):**
+
 - App name: "GR-55 Editor"
 - Slug: "gr55-remote"
 - Bundle identifiers configured for iOS/Android
@@ -444,16 +491,19 @@ State management via React Context API:
 ### 6.3 Platform Support
 
 **iOS:**
+
 - Supports tablets
 - Bundle ID: `com.motiz88.gr55remote.app`
 - Network MIDI sessions support (via custom module)
 
 **Android:**
+
 - Adaptive icon configured
 - Package: `com.motiz88.gr55remote.app`
 - Bluetooth MIDI device support (via custom module)
 
 **Web:**
+
 - Metro bundler
 - Web MIDI API support
 - Favicon configured
@@ -467,6 +517,7 @@ State management via React Context API:
 **Location:** `modules/midi-hardware-manager/`
 
 **Structure:**
+
 ```
 midi-hardware-manager/
 ├── android/          # Android native code
@@ -478,16 +529,19 @@ midi-hardware-manager/
 ```
 
 **Functionality:**
+
 - iOS: Network MIDI session management
 - Android: Bluetooth device opening/closing
 - Cross-platform: Device token management
 - React hook: `useOpenedDevices()`
 
 **Platform Abstraction:**
+
 - Web: Returns null (no native module)
 - iOS/Android: Uses `requireNativeModule`
 
 ### 7.2 Module Responsibilities
+
 1. **Device Discovery:** Bluetooth device enumeration
 2. **Connection Management:** Open/close MIDI devices
 3. **Event Emission:** Device state changes
@@ -502,17 +556,20 @@ midi-hardware-manager/
 **Multi-Layered Approach:**
 
 1. **React Context (Global State)**
+
    - `RolandRemotePatchContext` - Current patch data
    - `RolandRemoteSystemContext` - System configuration
    - `RolandDataTransferContext` - MIDI communication state
    - Theme contexts
 
 2. **Custom Hooks (Derived State)**
+
    - State derivation and transformation
    - Data fetching and caching
    - Complex business logic
 
 3. **Local Component State**
+
    - UI-specific state (form inputs, animations)
    - Ephemeral state
 
@@ -537,18 +594,21 @@ User Input → RemoteField Component
 ```
 
 **Bidirectional Flow:**
+
 - Write: User → Component → Hook → Protocol → Device
 - Read: Device → Protocol → Context → Hook → Component
 
 ### 8.3 Patch State Management
 
 **Key Files:**
+
 - `useRolandRemotePatchState.tsx` - Patch state hook
 - `RolandGR55PatchMap.ts` - Patch metadata
 - `RolandGR55AddressMap.ts` - Memory addresses
 - `RolandDataTransfer.tsx` - Transfer orchestration
 
 **State Lifecycle:**
+
 1. Device connection
 2. Identity request
 3. Patch data request
@@ -565,14 +625,17 @@ User Input → RemoteField Component
 **Multi-Modal Navigation:**
 
 1. **Drawer Navigation** (Root)
+
    - Settings
    - I/O Setup
 
 2. **Stack Navigation** (Primary)
+
    - Patch screens
    - Modal screens (Save As)
 
 3. **Tab Navigation** (Bottom/Top)
+
    - Main, Tone, Effects, Master, Assigns
    - Sub-screens within Effects
 
@@ -584,6 +647,7 @@ User Input → RemoteField Component
 ### 9.2 Theme System
 
 **Implementation:**
+
 - `Theme.tsx` - Theme definition
 - `ThemedContextualStyleProvider.tsx` - Context provider
 - Themed component wrappers
@@ -593,6 +657,7 @@ User Input → RemoteField Component
 ### 9.3 Responsive Design
 
 **Strategies:**
+
 - `useLayout()` hook for layout information
 - Platform-specific components (`.ios`, `.android`, `.web`)
 - Safe area handling via `SafeAreaUtils.tsx`
@@ -608,18 +673,21 @@ User Input → RemoteField Component
 **Comprehensive Coverage:**
 
 1. **SysEx Message Handling** (`RolandSysExProtocol.ts`)
+
    - Message construction/parsing
    - Checksum calculation
    - Address conversion
    - Bulk data transfer
 
 2. **Address Mapping** (`RolandAddressMap.ts`)
+
    - Field type definitions (UByteField, USplit12Field, etc.)
    - Struct definitions
    - Flexible addressing system
    - Value encoding/decoding
 
 3. **Device-Specific Mappings:**
+
    - **Patch Parameters** (`RolandGR55PatchMap.ts`) - 297 user patches
    - **Tone Parameters** (`RolandGR55ToneMap.ts`) - Modeling, Normal, PCM tones
    - **System Parameters** (`RolandGR55AddressMap.ts`) - Global settings
@@ -635,6 +703,7 @@ User Input → RemoteField Component
 ### 10.2 MIDI Implementation
 
 **Features:**
+
 - Web MIDI API (web platform)
 - Custom native module (iOS/Android)
 - Bluetooth Low Energy support
@@ -642,6 +711,7 @@ User Input → RemoteField Component
 - Multi-queue scheduler for message ordering
 
 **Challenges Addressed:**
+
 - Message timing (20ms gaps)
 - Bulk transfer chunking (256 bytes)
 - Device identity detection
@@ -654,6 +724,7 @@ User Input → RemoteField Component
 ### 11.1 Structural Issues
 
 **Issue 1: Flat File Structure**
+
 - **Impact:** Navigation difficulty, reduced maintainability
 - **Recommendation:** Organize into feature folders
   ```
@@ -670,6 +741,7 @@ User Input → RemoteField Component
   ```
 
 **Issue 2: Low Test Coverage**
+
 - **Impact:** Reduced confidence in refactoring, potential bugs
 - **Recommendation:**
   - Add component tests for critical UI
@@ -678,6 +750,7 @@ User Input → RemoteField Component
   - Target: >60% coverage
 
 **Issue 3: 111 TODO Comments**
+
 - **Impact:** Incomplete features, technical debt accumulation
 - **Recommendation:**
   - Create GitHub issues for each TODO
@@ -687,12 +760,14 @@ User Input → RemoteField Component
 ### 11.2 Dependency Issues
 
 **Issue 1: RC Dependencies**
+
 - **Impact:** Potential instability
 - **Recommendation:** Monitor for stable releases, test thoroughly
 
 **Issue 2: Custom MIDI Package (v0.0.6)**
+
 - **Impact:** Early-stage dependency
-- **Recommendation:** 
+- **Recommendation:**
   - Consider upstreaming improvements
   - Maintain fork stability
   - Document known issues
@@ -700,6 +775,7 @@ User Input → RemoteField Component
 ### 11.3 Code Quality Issues
 
 **Issue 1: Platform-Specific Code Scattered**
+
 - **Impact:** Harder to maintain cross-platform consistency
 - **Recommendation:**
   - Consolidate platform checks
@@ -707,6 +783,7 @@ User Input → RemoteField Component
   - Create platform abstraction layer
 
 **Issue 2: Missing Documentation**
+
 - **Impact:** Onboarding difficulty
 - **Recommendation:**
   - Add JSDoc comments for complex functions
@@ -717,11 +794,13 @@ User Input → RemoteField Component
 ### 11.4 Performance Considerations
 
 **Potential Issues:**
+
 - Deep component trees (navigation nesting)
 - Frequent MIDI message processing
 - Large address maps in memory
 
 **Recommendations:**
+
 - Profile with React DevTools
 - Consider memoization for expensive computations
 - Implement virtual scrolling for patch lists
@@ -734,11 +813,13 @@ User Input → RemoteField Component
 ### 12.1 Security Observations
 
 **Good Practices:**
+
 - TypeScript strict mode (type safety)
 - No hardcoded credentials found
 - Proper module encapsulation
 
 **Considerations:**
+
 - Bluetooth permissions properly declared
 - AsyncStorage for non-sensitive data only
 - Web MIDI API requires user gesture (browser security)
@@ -746,11 +827,13 @@ User Input → RemoteField Component
 ### 12.2 Accessibility
 
 **Current State:**
+
 - Limited accessibility implementation found
 - No obvious screen reader support
 - Relies on React Native Elements defaults
 
 **Recommendations:**
+
 - Add accessibility labels
 - Support for screen readers
 - Keyboard navigation for web
@@ -763,12 +846,14 @@ User Input → RemoteField Component
 ### 13.1 Existing Documentation
 
 **README.md:**
+
 - Good overview
 - Development setup instructions
 - Acknowledgements
 - Platform limitations documented
 
 **Docs Directory (15 files):**
+
 - Parameter documentation
 - Protocol details
 - Project structure notes
@@ -779,6 +864,7 @@ User Input → RemoteField Component
 ### 13.2 Documentation Gaps
 
 **Missing:**
+
 - API documentation
 - Component usage examples
 - Architecture diagrams
@@ -834,18 +920,21 @@ User Input → RemoteField Component
 ## 16. Conclusion
 
 The GR-55 Remote application demonstrates **strong technical foundations** with:
+
 - Modern, type-safe TypeScript codebase
 - Consistent naming and architectural patterns
 - Comprehensive Roland GR-55 protocol implementation
 - True cross-platform support
 
 **Key strengths:**
+
 - Well-structured domain logic (Roland/MIDI)
 - Effective use of React patterns (hooks, contexts)
 - Clean separation of platform-specific code
 - Quality tooling (linting, formatting, git hooks)
 
 **Primary areas for improvement:**
+
 - File organization (flat → hierarchical)
 - Test coverage (4% → 60%+)
 - Technical debt reduction (111 TODOs)
@@ -854,6 +943,7 @@ The GR-55 Remote application demonstrates **strong technical foundations** with:
 The application is **production-ready** for its current scope but would benefit from the structural improvements outlined above to ensure long-term maintainability and scalability.
 
 **Overall Assessment:** 7.5/10
+
 - Code Quality: 8/10
 - Architecture: 7/10
 - Documentation: 7/10
@@ -864,18 +954,18 @@ The application is **production-ready** for its current scope but would benefit 
 
 ## Appendix A: File Count by Category
 
-| Category | Count | Percentage |
-|----------|-------|------------|
-| Screen Components | 21 | 20.6% |
-| Field Components | 11 | 10.8% |
-| Custom Hooks | 22 | 21.6% |
-| Roland/MIDI Files | 19 | 18.6% |
-| View Components | 7 | 6.9% |
-| Utilities & Services | 8 | 7.8% |
-| Theming | 6 | 5.9% |
-| Navigation | 3 | 2.9% |
-| Other | 5 | 4.9% |
-| **Total** | **102** | **100%** |
+| Category             | Count   | Percentage |
+| -------------------- | ------- | ---------- |
+| Screen Components    | 21      | 20.6%      |
+| Field Components     | 11      | 10.8%      |
+| Custom Hooks         | 22      | 21.6%      |
+| Roland/MIDI Files    | 19      | 18.6%      |
+| View Components      | 7       | 6.9%       |
+| Utilities & Services | 8       | 7.8%       |
+| Theming              | 6       | 5.9%       |
+| Navigation           | 3       | 2.9%       |
+| Other                | 5       | 4.9%       |
+| **Total**            | **102** | **100%**   |
 
 ## Appendix B: Key Statistics
 
@@ -892,13 +982,13 @@ The application is **production-ready** for its current scope but would benefit 
 
 ## Appendix C: Technology Versions
 
-| Technology | Version |
-|------------|---------|
-| React | 18.2.0 |
-| React Native | 0.72.6 |
-| Expo | 49.0.21 |
-| TypeScript | 5.1.3 |
-| React Navigation | 6.x |
+| Technology         | Version    |
+| ------------------ | ---------- |
+| React              | 18.2.0     |
+| React Native       | 0.72.6     |
+| Expo               | 49.0.21    |
+| TypeScript         | 5.1.3      |
+| React Navigation   | 6.x        |
 | Node (recommended) | See .nvmrc |
 
 ---
