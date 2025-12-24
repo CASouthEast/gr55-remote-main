@@ -51,9 +51,9 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
     - Keep App.tsx focused on providers and main structure only
     - _Requirements: 1.3, 6.2, 6.3_
 
-- [ ] 3. Major checkpoint - Verify POC works correctly
+- [x] 3. Major checkpoint - Verify POC works correctly
 
-  - [ ] 3.1 Test basic navigation functionality
+  - [x] 3.1 Test basic navigation functionality
 
     - Verify bottom navigation (Patch, Library, Hardware, Setup) works unchanged
     - Verify top navigation appears only in Patch section
@@ -61,21 +61,21 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
     - Test navigation between tabs works correctly
     - _Requirements: 2.4, 2.5, 3.3, 3.4_
 
-  - [ ] 3.2 Test web browser compatibility
+  - [x] 3.2 Test web browser compatibility
     - Test in Chrome, Firefox, Safari, and Edge
     - Verify tab labels are visible and clickable
     - Test responsive behavior at different screen sizes
     - Ensure no console errors appear
     - _Requirements: 5.1, 5.2, 5.4, 5.5_
 
-- [ ] 4. Checkpoint - Ensure POC is stable before proceeding
+- [x] 4. Checkpoint - Ensure POC is stable before proceeding
 
   - Ensure all tests pass and navigation works correctly with mock screens
   - Ask the user if questions arise before proceeding to production screen integration
 
-- [ ] 5. Integrate production patch screens
+- [x] 5. Integrate production patch screens
 
-  - [ ] 5.1 Replace mock screens with actual production screens
+  - [x] 5.1 Replace mock screens with actual production screens
 
     - Replace MockPatchMainScreen with PatchMainScreen
     - Replace MockPatchToneScreen with PatchToneScreen
@@ -85,11 +85,20 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
     - Replace MockPatchOtherScreen with PatchMasterOtherScreen
     - _Requirements: 3.2, 3.5_
 
-  - [ ] 5.2 Update navigation type definitions
+  - [x] 5.2 Update navigation type definitions
+
     - Update PatchTabParamList to match existing navigation types
     - Ensure compatibility with existing screen prop types
     - Maintain TypeScript type safety throughout
     - _Requirements: 1.4, 4.1_
+
+  - [x] 5.3 Fix submenu navigation visibility issues
+    - Identify screens with Material Top Tab Navigator submenus (PatchToneScreen, PatchEffectsScreen, PatchAssignsScreen, PatchMasterPedalGkCtlScreen)
+    - Apply web-specific styling fixes to submenu tab bars for better visibility
+    - Ensure consistent styling between main navigation and submenu navigation
+    - Test submenu navigation in web browsers for proper text visibility
+    - Update useTopTabNavigatorDefaults hook if needed for better web compatibility
+    - _Requirements: 5.3, 5.4, 6.4_
 
 - [ ] 6. Clean up legacy navigation code and refactor remaining components
 
@@ -149,6 +158,7 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
 
 ## Notes
 
+- **App Running Command**: Use `npx expo start --web` to run the application in web mode for testing
 - **Phased Approach**: Start with mock screens for POC, then integrate production screens
 - **Complete Replacement**: Remove both PatchDrawer AND existing PatchTopTabsNavigator
 - **App.tsx Refactoring**: Break out large components to separate files, keep App.tsx slim

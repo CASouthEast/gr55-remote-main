@@ -21,6 +21,15 @@ export type PatchStackParamList = {
   PatchSaveAs: { readonly initialUserPatchNumber: void | number };
 };
 
+export type PatchTabParamList = {
+  Main: undefined;
+  Tone: undefined;
+  Effects: undefined;
+  PedalGK: undefined;
+  Assigns: undefined;
+  Other: undefined;
+};
+
 export type PatchEffectsTabParamList = {
   Struct: object;
   Amp: object;
@@ -69,14 +78,21 @@ export type GlobalNavigationProp = NavigationProp<
   | RootTabParamList
   | PatchDrawerParamList
   | PatchStackParamList
+  | PatchTabParamList
   | PatchToneTabParamList
   | PatchEffectsTabParamList,
   keyof (
     | RootTabParamList
     | PatchDrawerParamList
     | PatchStackParamList
+    | PatchTabParamList
     | PatchToneTabParamList
     | PatchEffectsTabParamList
   ),
-  "RootTab" | "PatchDrawer" | "PatchStack" | "PatchTone" | "PatchEffects"
+  | "RootTab"
+  | "PatchDrawer"
+  | "PatchStack"
+  | "PatchTab"
+  | "PatchTone"
+  | "PatchEffects"
 >;
