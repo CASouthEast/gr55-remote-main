@@ -3,6 +3,7 @@ import {
   MaterialTopTabNavigationProp,
   MaterialTopTabScreenProps,
 } from "@react-navigation/material-top-tabs";
+import { useTheme as useNavigationTheme } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useContext, useEffect, useMemo } from "react";
 import { Button, StyleSheet, View } from "react-native";
@@ -38,6 +39,7 @@ const Tab = createMaterialTopTabNavigator<PatchMasterPedalGkCtlTabParamList>();
 export function PatchMasterPedalGkCtlScreen({
   navigation,
 }: NativeStackScreenProps<PatchStackParamList, "PatchMasterPedalGkCtl">) {
+  const navigationTheme = useNavigationTheme();
   const [patchName] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.common.patchName
@@ -49,7 +51,14 @@ export function PatchMasterPedalGkCtlScreen({
   }, [navigation, patchName]);
 
   return (
-    <Tab.Navigator id="PatchMasterPedalGkCtl" {...useTopTabNavigatorDefaults()}>
+    <Tab.Navigator
+      id="PatchMasterPedalGkCtl"
+      screenOptions={{
+        tabBarActiveTintColor: navigationTheme.colors.primary,
+        tabBarInactiveTintColor: navigationTheme.colors.text,
+      }}
+      {...useTopTabNavigatorDefaults()}
+    >
       <Tab.Screen name="Ctl" component={CtlScreen} />
       <Tab.Screen name="Exp" component={ExpScreen} />
       <Tab.Screen

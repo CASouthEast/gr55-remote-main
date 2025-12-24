@@ -27,6 +27,7 @@ import {
 } from "./contexts/RolandRemotePageContext";
 import { useRolandRemotePatchState } from "./hooks/useRolandRemotePatchState";
 import { useRolandRemoteSystemState } from "./hooks/useRolandRemoteSystemState";
+import { useTopTabNavigatorDefaults } from "./hooks/useTopTabNavigatorDefaults";
 import { RolandIoSetupContainer } from "./lib/RolandIoSetup";
 import { RolandRemotePatchSelectionContainer } from "./lib/RolandRemotePatchSelection";
 import { RolandGR55AssignsContainer } from "./lib/roland-gr55/RolandGR55AssignsContainer";
@@ -228,6 +229,7 @@ function PatchDrawerNavigator() {
 function PatchTopTabsNavigator() {
   useFocusQueryPriority("read_patch_details");
   const navigationTheme = useNavigationTheme();
+  const topTabNavigatorDefaults = useTopTabNavigatorDefaults();
 
   // Null-safety check for web-only navigator
   if (!PatchTopTabs) {
@@ -244,9 +246,9 @@ function PatchTopTabsNavigator() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",
-          color: navigationTheme.colors.text,
         },
       }}
+      {...topTabNavigatorDefaults}
     >
       <PatchTopTabs.Screen
         name="PatchMain"

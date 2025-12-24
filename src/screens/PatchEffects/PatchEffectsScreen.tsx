@@ -1,4 +1,5 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { useTheme as useNavigationTheme } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 
@@ -24,6 +25,7 @@ const Tab = createMaterialTopTabNavigator<PatchEffectsTabParamList>();
 export function PatchEffectsScreen({
   navigation,
 }: NativeStackScreenProps<PatchStackParamList, "PatchEffects">) {
+  const navigationTheme = useNavigationTheme();
   const [patchName] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.common.patchName
@@ -35,7 +37,14 @@ export function PatchEffectsScreen({
   }, [navigation, patchName]);
 
   return (
-    <Tab.Navigator id="PatchEffects" {...useTopTabNavigatorDefaults()}>
+    <Tab.Navigator
+      id="PatchEffects"
+      screenOptions={{
+        tabBarActiveTintColor: navigationTheme.colors.primary,
+        tabBarInactiveTintColor: navigationTheme.colors.text,
+      }}
+      {...useTopTabNavigatorDefaults()}
+    >
       <Tab.Screen
         name="Struct"
         component={PatchEffectsStructureScreen}
