@@ -3,7 +3,7 @@ import "setimmediate";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { useTheme } from "@react-navigation/native";
+import { useTheme as useNavigationTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useMemo } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
@@ -54,7 +54,6 @@ import {
 
 // Only import drawer on native platforms
 let createDrawerNavigator: any;
-let DrawerContentComponentProps: any;
 let DrawerContentScrollView: any;
 let DrawerItem: any;
 let DrawerItemList: any;
@@ -62,7 +61,7 @@ let DrawerItemList: any;
 if (Platform.OS !== "web") {
   const drawer = require("@react-navigation/drawer");
   createDrawerNavigator = drawer.createDrawerNavigator;
-  DrawerContentComponentProps = drawer.DrawerContentComponentProps;
+  // DrawerContentComponentProps is available but not used in this file
   DrawerContentScrollView = drawer.DrawerContentScrollView;
   DrawerItem = drawer.DrawerItem;
   DrawerItemList = drawer.DrawerItemList;
@@ -228,52 +227,60 @@ function PatchDrawerNavigator() {
 
 function PatchTopTabsNavigator() {
   useFocusQueryPriority("read_patch_details");
-  const { closeAllPopovers } = usePopovers();
-  const theme = useTheme();
+  const navigationTheme = useNavigationTheme();
+
+  // Null-safety check for web-only navigator
+  if (!PatchTopTabs) {
+    return null;
+  }
 
   return (
     <PatchTopTabs.Navigator
       id="PatchTabs"
       screenOptions={{
-        tabBarScrollEnabled: true,
-        tabBarStyle: { backgroundColor: theme.colors.card },
-      }}
-      screenListeners={{
-        transitionStart: () => {
-          closeAllPopovers();
-        },
-        blur: () => {
-          closeAllPopovers();
+        tabBarActiveTintColor: navigationTheme.colors.primary,
+        tabBarInactiveTintColor: navigationTheme.colors.text,
+        tabBarStyle: { backgroundColor: navigationTheme.colors.card },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+          color: navigationTheme.colors.text,
         },
       }}
     >
       <PatchTopTabs.Screen
         name="PatchMain"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMainScreen}
         options={{ title: "Main" }}
       />
       <PatchTopTabs.Screen
         name="PatchTone"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchToneScreen}
         options={{ title: "Tone" }}
       />
       <PatchTopTabs.Screen
         name="PatchEffects"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchEffectsScreen}
         options={{ title: "Effects" }}
       />
       <PatchTopTabs.Screen
         name="PatchMasterPedalGkCtl"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMasterPedalGkCtlScreen}
         options={{ title: "Pedal/GK" }}
       />
       <PatchTopTabs.Screen
         name="PatchAssigns"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchAssignsScreen}
         options={{ title: "Assigns" }}
       />
       <PatchTopTabs.Screen
         name="PatchMasterOther"
+        // @ts-ignore - MaterialTopTab and NativeStack prop types differ but are compatible at runtime
         component={PatchMasterOtherScreen}
         options={{ title: "Other" }}
       />
@@ -348,7 +355,7 @@ function RootTabNavigator() {
 
 function PatchStackNavigator() {
   const { closeAllPopovers } = usePopovers();
-  const theme = useTheme();
+  const navigationTheme = useNavigationTheme();
   return (
     <PatchStack.Navigator
       initialRouteName="PatchMain"
@@ -367,11 +374,11 @@ function PatchStackNavigator() {
           () => ({
             headerRight: ({ tintColor }) => (
               <PatchSaveHeaderButton
-                tintColor={tintColor ?? theme.colors.primary}
+                tintColor={tintColor ?? navigationTheme.colors.primary}
               />
             ),
           }),
-          [theme.colors.primary]
+          [navigationTheme.colors.primary]
         )}
       >
         <PatchStack.Screen name="PatchMain" component={PatchMainScreen} />
