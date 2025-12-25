@@ -1,6 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { DrawerToggleButton } from "@react-navigation/drawer";
 import {
   StackActions,
   useNavigation,
@@ -94,16 +93,7 @@ export function PatchMainScreen({
       });
     }
     navigation.setOptions({
-      headerLeft: () =>
-        selectedDevice ? (
-          <DrawerToggleButton tintColor={theme.colors.primary} />
-        ) : (
-          <DrawerToggleButton
-            // @ts-expect-error DrawerToggleButton passes props to Pressable which supports `disabled`
-            disabled
-            tintColor={theme.colors.border}
-          />
-        ),
+      headerLeft: undefined, // Remove drawer toggle button since we no longer use drawer navigation
     });
   }, [
     navigation,

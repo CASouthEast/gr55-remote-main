@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
@@ -8,6 +9,7 @@ import { PatchEffectsScreen } from "../../screens/PatchEffects/PatchEffectsScree
 import { PatchMainScreen } from "../../screens/PatchMainScreen";
 import { PatchMasterOtherScreen } from "../../screens/PatchMasterOtherScreen";
 import { PatchMasterPedalGkCtlScreen } from "../../screens/PatchMasterPedalGkCtlScreen";
+import { PatchSaveAsScreen } from "../../screens/PatchSaveAsScreen";
 import { PatchToneScreen } from "../../screens/PatchTone/PatchToneScreen";
 import { PatchTabParamList, PatchStackParamList } from "../navigation";
 
@@ -139,7 +141,10 @@ const tabs: {
   { key: "Other", title: "Other", component: PatchMasterOtherWrapper },
 ];
 
-export function PatchSectionWithTopNavigation(): JSX.Element {
+const PatchStack = createNativeStackNavigator<PatchStackParamList>();
+
+// Main patch navigation with tabs
+function PatchTabNavigation(): JSX.Element {
   const [activeTab, setActiveTab] = useState<keyof PatchTabParamList>("Main");
 
   const ActiveComponent =
@@ -175,6 +180,29 @@ export function PatchSectionWithTopNavigation(): JSX.Element {
         <ActiveComponent />
       </View>
     </View>
+  );
+}
+
+export function PatchSectionWithTopNavigation(): JSX.Element {
+  return (
+    <PatchStack.Navigator
+      initialRouteName="PatchMain"
+      id="PatchStack"
+      screenOptions={{ headerShown: false }}
+    >
+      <PatchStack.Screen
+        name="PatchMain"
+        component={PatchTabNavigation}
+        options={{ headerShown: false }}
+      />
+      <PatchStack.Group screenOptions={{ presentation: "modal" }}>
+        <PatchStack.Screen
+          name="PatchSaveAs"
+          component={PatchSaveAsScreen}
+          options={{ title: "Write user patch", headerShown: true }}
+        />
+      </PatchStack.Group>
+    </PatchStack.Navigator>
   );
 }
 

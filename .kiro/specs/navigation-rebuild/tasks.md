@@ -100,9 +100,9 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
     - Update useTopTabNavigatorDefaults hook if needed for better web compatibility
     - _Requirements: 5.3, 5.4, 6.4_
 
-- [ ] 6. Clean up legacy navigation code and refactor remaining components
+- [x] 6. Clean up legacy navigation code and refactor remaining components
 
-  - [ ] 6.1 Remove all legacy patch navigation components
+  - [x] 6.1 Remove all legacy patch navigation components
 
     - Remove PatchDrawerNavigator and PatchDrawerContent functions from App.tsx
     - Remove PatchStackNavigator if no longer needed (evaluate modal screens)
@@ -110,7 +110,7 @@ The implementation will also refactor App.tsx to be more maintainable by breakin
     - Clean up any remaining unused navigation components
     - _Requirements: 1.3, 6.2, 6.3_
 
-  - [ ] 6.2 Extract remaining large components from App.tsx if needed
+  - [x] 6.2 Extract remaining large components from App.tsx if needed
     - Evaluate if SetupStackNavigator should be extracted to separate file
     - Keep App.tsx focused on main structure and providers only
     - Avoid large code blocks in any single file
