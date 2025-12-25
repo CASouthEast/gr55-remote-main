@@ -1,5 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
+
+import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../../hooks/useRemoteField";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../../lib/roland-gr55/RolandGR55AddressMap";
 
 interface DisplayProps {
   patchName: string;
@@ -14,6 +18,52 @@ interface DisplayProps {
  * Adapted for React Native compatibility
  */
 export function Display({ patchName, bank, mode, style }: DisplayProps) {
+  // Live tone switches so the top bar mirrors the active sources on the current patch
+  const [pcm1Muted] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.patchPCMTone1.muteSwitch
+  );
+  const [pcm2Muted] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.patchPCMTone2.muteSwitch
+  );
+  const [modelMuted] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.muteSwitch
+  );
+  const [normalPuMuted] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.normalPuMute
+  );
+
+  const renderStatusChip = (
+    label: string,
+    isMuted: boolean,
+    isGuitar?: boolean
+  ) => (
+    <Pressable
+      onPress={() => {}}
+      style={({ pressed }) => [
+        styles.statusChip,
+        pressed && styles.statusChipPressed,
+        isMuted ? styles.statusChipInactive : styles.statusChipActive,
+        isGuitar && styles.statusChipGuitar,
+      ]}
+    >
+      <Text
+        style={({ pressed }) =>
+          pressed
+            ? styles.statusChipTextPressed
+            : isMuted
+            ? [styles.statusText, styles.statusTextInactive]
+            : styles.statusText
+        }
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+
   return (
     <View style={[styles.container, style]}>
       {/* Inner Bezel Shadow */}
@@ -24,16 +74,10 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
         {/* Top Status Bar */}
         <View style={styles.statusBar}>
           <View style={styles.statusLeft}>
-            <View style={styles.guitarBadge}>
-              <Text style={styles.guitarBadgeText}>GUITAR</Text>
-            </View>
-            <Text style={styles.statusText}>PCM1</Text>
-            <Text style={[styles.statusText, styles.statusTextInactive]}>
-              PCM2
-            </Text>
-            <Text style={[styles.statusText, styles.statusTextInactive]}>
-              MODEL
-            </Text>
+            {renderStatusChip("GUITAR", normalPuMuted, true)}
+            {renderStatusChip("PCM1", pcm1Muted)}
+            {renderStatusChip("PCM2", pcm2Muted)}
+            {renderStatusChip("MODEL", modelMuted)}
           </View>
           <Text style={styles.bpmText}>BPM: 120</Text>
         </View>
@@ -132,17 +176,6 @@ const styles = StyleSheet.create({
     gap: 16,
     alignItems: "center",
   },
-  guitarBadge: {
-    backgroundColor: "#1e3a8a", // blue-900
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 2,
-  },
-  guitarBadgeText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "700",
-  },
   statusText: {
     fontWeight: "700",
     fontSize: 14,
@@ -151,6 +184,29 @@ const styles = StyleSheet.create({
   },
   statusTextInactive: {
     color: "rgba(30, 58, 138, 0.5)", // blue-900/50
+  },
+  statusChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  statusChipActive: {
+    backgroundColor: "#bfdbfe", // blue-200
+  },
+  statusChipGuitar: {
+    paddingHorizontal: 10,
+  },
+  statusChipInactive: {
+    opacity: 0.6,
+  },
+  statusChipPressed: {
+    backgroundColor: "#1e3a8a", // blue-900
+  },
+  statusChipTextPressed: {
+    fontWeight: "700",
+    fontSize: 14,
+    color: "#ffffff",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   bpmText: {
     fontSize: 14,
