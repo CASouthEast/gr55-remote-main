@@ -36,6 +36,28 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
     GR55.temporaryPatch.common.normalPuMute
   );
 
+  // Effect switches for bottom parameter rows
+  const [mfxOn] = useRemoteField(PATCH, GR55.temporaryPatch.mfx.mfxSwitch);
+  const [delayOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.sendsAndEq.delaySwitch
+  );
+  const [chorusOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.sendsAndEq.chorusSwitch
+  );
+  const [reverbOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.sendsAndEq.reverbSwitch
+  );
+  const [ampOn] = useRemoteField(PATCH, GR55.temporaryPatch.ampModNs.ampSwitch);
+  const [nsOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.nsSwitch
+  );
+  const [modOn] = useRemoteField(PATCH, GR55.temporaryPatch.ampModNs.modSwitch);
+  const [eqOn] = useRemoteField(PATCH, GR55.temporaryPatch.sendsAndEq.eqSwitch);
+
   const renderStatusChip = (
     label: string,
     isMuted: boolean,
@@ -50,28 +72,27 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
         isGuitar && styles.statusChipGuitar,
       ]}
     >
-      <Text
-        style={({ pressed }) =>
-          pressed
-            ? styles.statusChipTextPressed
-            : isMuted
-            ? [styles.statusText, styles.statusTextInactive]
-            : styles.statusText
-        }
-      >
-        {label}
-      </Text>
+      {({ pressed }) => (
+        <Text
+          style={
+            pressed
+              ? styles.statusChipTextPressed
+              : isMuted
+              ? [styles.statusText, styles.statusTextInactive]
+              : styles.statusText
+          }
+        >
+          {label}
+        </Text>
+      )}
     </Pressable>
   );
 
   return (
     <View style={[styles.container, style]}>
-      {/* Inner Bezel Shadow */}
       <View style={styles.innerBezel} />
 
-      {/* LCD Screen Content */}
       <View style={styles.screenContent}>
-        {/* Top Status Bar */}
         <View style={styles.statusBar}>
           <View style={styles.statusLeft}>
             {renderStatusChip("GUITAR", normalPuMuted, true)}
@@ -82,7 +103,6 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
           <Text style={styles.bpmText}>BPM: 120</Text>
         </View>
 
-        {/* Main Patch Info */}
         <View style={styles.mainInfo}>
           <Text style={styles.bankText}>{bank}</Text>
           <View style={styles.patchInfo}>
@@ -93,27 +113,147 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
           </View>
         </View>
 
-        {/* Bottom Parameters */}
         <View style={styles.parameters}>
-          <View style={[styles.parameterButton, styles.parameterButtonActive]}>
-            <Text style={styles.parameterText}>MFX</Text>
+          <View style={styles.parameterRow}>
+            <View
+              style={[
+                styles.parameterButton,
+                mfxOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !mfxOn && styles.parameterTextInactive,
+                ]}
+              >
+                MFX
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                delayOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !delayOn && styles.parameterTextInactive,
+                ]}
+              >
+                DELAY
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                chorusOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !chorusOn && styles.parameterTextInactive,
+                ]}
+              >
+                CHORUS
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                reverbOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !reverbOn && styles.parameterTextInactive,
+                ]}
+              >
+                REVERB
+              </Text>
+            </View>
           </View>
-          <View
-            style={[styles.parameterButton, styles.parameterButtonInactive]}
-          >
-            <Text style={[styles.parameterText, styles.parameterTextInactive]}>
-              AMP
-            </Text>
-          </View>
-          <View
-            style={[styles.parameterButton, styles.parameterButtonInactive]}
-          >
-            <Text style={[styles.parameterText, styles.parameterTextInactive]}>
-              MOD
-            </Text>
-          </View>
-          <View style={[styles.parameterButton, styles.parameterButtonActive]}>
-            <Text style={styles.parameterText}>DLY</Text>
+
+          <View style={styles.parameterRow}>
+            <View
+              style={[
+                styles.parameterButton,
+                ampOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !ampOn && styles.parameterTextInactive,
+                ]}
+              >
+                AMP
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                nsOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !nsOn && styles.parameterTextInactive,
+                ]}
+              >
+                NS
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                modOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !modOn && styles.parameterTextInactive,
+                ]}
+              >
+                MOD
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.parameterButton,
+                eqOn
+                  ? styles.parameterButtonActive
+                  : styles.parameterButtonInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.parameterText,
+                  !eqOn && styles.parameterTextInactive,
+                ]}
+              >
+                EQ
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -161,6 +301,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     padding: 24,
+    minHeight: 240,
     justifyContent: "space-between",
     backgroundColor: "#dbeafe", // blue-100
   },
@@ -252,11 +393,16 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   parameters: {
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 8,
     paddingTop: 8,
     borderTopWidth: 2,
     borderTopColor: "rgba(30, 58, 138, 0.2)", // blue-900/20
+  },
+  parameterRow: {
+    flexDirection: "row",
+    gap: 8,
+    width: "100%",
   },
   parameterButton: {
     flex: 1,
