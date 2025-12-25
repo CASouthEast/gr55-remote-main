@@ -16,7 +16,6 @@
   "exclude": [
     "Docs",
     "DocsDesign",
-    "GR55HWView",
     "node_modules",
     "android",
     "ios",
