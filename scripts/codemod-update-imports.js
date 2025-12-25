@@ -2,8 +2,6 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const repoRoot = process.cwd();
-
 function buildMapping() {
   const mapping = {}; // originalBasename -> srcModulePath (without extension)
   const srcFiles = glob.sync("src/**/*.{ts,tsx,js,jsx}", { nodir: true });
@@ -55,7 +53,7 @@ function updateImports(mapping) {
     let changed = false;
     // match import/export from '...';
     const importRe =
-      /(from\s+|import\s+\(?.*?\)\s*from\s+|require\()\s*['"]([^'"\)]+)['"]/g;
+      /(from\s+|import\s+\(?.*?\)\s*from\s+|require\()\s*['"]([^'")]+)['"]/g;
     content = content.replace(importRe, (full, prefix, spec) => {
       // skip absolute or already src paths
       if (

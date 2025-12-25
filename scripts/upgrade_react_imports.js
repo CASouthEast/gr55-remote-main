@@ -19,13 +19,13 @@ function processFile(file) {
 
   // Replace `import * as React from 'react';` with default import
   s = s.replace(
-    /import \* as React from ['\"]react['\"];?/g,
+    /import \* as React from ['"]react['"];?/g,
     "import React from 'react';"
   );
 
   // Merge separate imports: import React from 'react';\nimport { useState } from 'react'; -> import React, { useState } from 'react';
   s = s.replace(
-    /import React from ['\"]react['\"];?\s*import \{([\s\S]*?)\} from ['\"]react['\"];?/g,
+    /import React from ['"]react['"];?\s*import \{([\s\S]*?)\} from ['"]react['"];?/g,
     (m, inner) => {
       // Normalize whitespace
       const clean = inner.replace(/\s+/g, " ").trim();

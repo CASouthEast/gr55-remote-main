@@ -46,10 +46,8 @@ for (const file of files) {
     if (!mapping) return m;
     const targetAbs = path.join(repoRoot, mapping);
     if (!fs.existsSync(targetAbs)) {
-      // try adding extension
-      const altTsx = targetAbs + "x";
-      const altTs = targetAbs.replace(/\.tsx?$/, ".ts");
-      // but mapping likely already has extension trimmed; we try variants
+      // try adding extension - but mapping likely already has extension trimmed
+      // we could try variants here if needed
     }
     let rel = path.relative(path.dirname(file), targetAbs);
     rel = rel.replace(/\\/g, "/");

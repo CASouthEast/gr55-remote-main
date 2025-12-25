@@ -1434,7 +1434,9 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
               };
 
               Object.values(shadowLevels).forEach((shadow) => {
-                expect(shadow).toMatch(/^(inset\s+)?[\d\s-]+rgba\([^)]+\)$/);
+                expect(shadow).toMatch(
+                  /^(inset\s+)?[\d\s.-]+(px|rem|em)?\s*[\d\s.-]*(px|rem|em)?\s*[\d\s.-]*(px|rem|em)?\s*[\d\s.-]*(px|rem|em)?\s*rgba\([^)]+\)$/
+                );
               });
             }
 

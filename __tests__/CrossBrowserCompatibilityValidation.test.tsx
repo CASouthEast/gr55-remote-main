@@ -617,6 +617,7 @@ describe("Cross-Browser Compatibility Validation", () => {
         };
 
         const component = operation.createComponent();
+        expect(component).toBeDefined(); // Use the component
         memoryUsage += 1; // Simulate memory allocation
 
         // Simulate cleanup

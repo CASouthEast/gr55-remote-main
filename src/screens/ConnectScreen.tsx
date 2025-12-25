@@ -1,6 +1,6 @@
-import { useTheme } from "@react-navigation/native";
+import { useTheme, useNavigation } from "@react-navigation/native";
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
 import { ThemedPicker as Picker } from "../components/ThemedPicker";
@@ -20,10 +20,39 @@ export function ConnectScreen() {
 
   const rolandIoSetupContext = useContext(RolandIoSetupContext);
   const theme = useTheme();
+  const navigation = useNavigation();
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
 
-  // Check if we have a connected GR-55 device
+  // Check device connection and selection status
   const hasConnectedDevice = rolandIoSetupContext.connectedDevices.size > 0;
+  const hasSelectedDevice = rolandIoSetupContext.selectedDeviceKey !== null;
+
+  // Get the selected device to check its type
+  const selectedDevice =
+    hasSelectedDevice && rolandIoSetupContext.selectedDeviceKey
+      ? rolandIoSetupContext.connectedDevices.get(
+          rolandIoSetupContext.selectedDeviceKey
+        )
+      : null;
+
+  // Check if selected device is a real GR-55 (0x10 device ID)
+  const isRealGR55Selected = selectedDevice?.identity?.deviceId === 0x10;
+
+  // Check if selected device is a fake GR-55
+  const isFakeGR55Selected = hasSelectedDevice && !isRealGR55Selected;
+
+  // Determine connection status and colors
+  const connectionStatus = isRealGR55Selected
+    ? "real"
+    : isFakeGR55Selected
+    ? "fake"
+    : "none";
+
+  const handleHardwareImagePress = () => {
+    if (isRealGR55Selected) {
+      navigation.navigate("Hardware" as never);
+    }
+  };
 
   return (
     <PopoverAwareScrollView
@@ -42,34 +71,66 @@ export function ConnectScreen() {
 
       {/* Hardware Image */}
       <View style={styles.imageContainer}>
-        <Image
-          source={
-            hasConnectedDevice
-              ? require("../../assets/gr-55-bk_top_gal.jpg")
-              : require("../../assets/gr55-pixel-masked.png")
-          }
+        <TouchableOpacity
+          onPress={handleHardwareImagePress}
+          disabled={!isRealGR55Selected}
           style={[
-            styles.hardwareImage,
-            !hasConnectedDevice && styles.blurredImage,
+            styles.imageButton,
+            isRealGR55Selected && styles.imageButtonActive,
           ]}
-          resizeMode="contain"
-        />
-        {!hasConnectedDevice && (
-          <View style={styles.imageOverlay}>
-            <Text style={styles.overlayText}>Not Connected</Text>
-            <Text style={styles.overlaySubtext}>Configure MIDI to connect</Text>
-          </View>
-        )}
-        {hasConnectedDevice && (
-          <View style={[styles.imageOverlay, styles.connectedOverlay]}>
-            <Text style={[styles.overlayText, styles.connectedText]}>
-              ✓ Connected
-            </Text>
-            <Text style={[styles.overlaySubtext, styles.connectedSubtext]}>
-              Roland GR-55 Ready
-            </Text>
-          </View>
-        )}
+          accessible
+          accessibilityLabel={
+            isRealGR55Selected
+              ? "Connected real GR-55 hardware - tap to view hardware interface"
+              : isFakeGR55Selected
+              ? "Fake GR-55 selected - hardware interface not available"
+              : "GR-55 hardware not connected"
+          }
+          accessibilityRole="button"
+        >
+          <Image
+            source={
+              isRealGR55Selected
+                ? require("../../assets/gr-55-bk_top_gal.jpg")
+                : isFakeGR55Selected
+                ? require("../../assets/gr-55_blue.png")
+                : require("../../assets/gr55-pixel-masked.png")
+            }
+            style={[
+              styles.hardwareImage,
+              connectionStatus === "none" && styles.blurredImage,
+            ]}
+            resizeMode="contain"
+          />
+          {connectionStatus === "none" && (
+            <View style={styles.imageOverlay}>
+              <Text style={styles.overlayText}>Not Connected</Text>
+              <Text style={styles.overlaySubtext}>
+                Configure MIDI to connect
+              </Text>
+            </View>
+          )}
+          {isRealGR55Selected && (
+            <View style={[styles.imageOverlay, styles.connectedOverlay]}>
+              <Text style={[styles.overlayText, styles.connectedText]}>
+                ✓ Connected
+              </Text>
+              <Text style={[styles.overlaySubtext, styles.connectedSubtext]}>
+                Tap to view hardware
+              </Text>
+            </View>
+          )}
+          {isFakeGR55Selected && (
+            <View style={[styles.imageOverlay, styles.fakeOverlay]}>
+              <Text style={[styles.overlayText, styles.fakeText]}>
+                ⚠ Fake Device
+              </Text>
+              <Text style={[styles.overlaySubtext, styles.fakeSubtext]}>
+                For testing only
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* Connection Status */}
@@ -78,9 +139,12 @@ export function ConnectScreen() {
           styles.statusCard,
           {
             backgroundColor: theme.colors.card,
-            borderColor: hasConnectedDevice
-              ? "#10b981"
-              : theme.colors.border || "#374151",
+            borderColor:
+              connectionStatus === "real"
+                ? "#10b981" // Green for real GR-55
+                : connectionStatus === "fake"
+                ? "#f59e0b" // Yellow for fake GR-55
+                : theme.colors.border || "#374151", // Gray for no connection
           },
         ]}
       >
@@ -92,7 +156,12 @@ export function ConnectScreen() {
             style={[
               styles.statusIndicator,
               {
-                backgroundColor: hasConnectedDevice ? "#10b981" : "#ef4444",
+                backgroundColor:
+                  connectionStatus === "real"
+                    ? "#10b981" // Green for real GR-55
+                    : connectionStatus === "fake"
+                    ? "#f59e0b" // Yellow for fake GR-55
+                    : "#ef4444", // Red for no connection
               },
             ]}
           />
@@ -101,14 +170,27 @@ export function ConnectScreen() {
           style={[
             styles.statusText,
             {
-              color: hasConnectedDevice
-                ? "#10b981"
-                : theme.colors.text || "#9ca3af",
+              color:
+                connectionStatus === "real"
+                  ? "#10b981" // Green for real GR-55
+                  : connectionStatus === "fake"
+                  ? "#f59e0b" // Yellow for fake GR-55
+                  : theme.colors.text || "#9ca3af", // Gray for no connection
             },
           ]}
         >
-          {hasConnectedDevice
-            ? `Connected to ${rolandIoSetupContext.connectedDevices.size} device(s)`
+          {connectionStatus === "real"
+            ? `Real GR-55 connected and ready (Device ID: 0x${selectedDevice?.identity?.deviceId
+                ?.toString(16)
+                .padStart(2, "0")
+                .toUpperCase()})`
+            : connectionStatus === "fake"
+            ? `Fake GR-55 selected for testing (Device ID: 0x${selectedDevice?.identity?.deviceId
+                ?.toString(16)
+                .padStart(2, "0")
+                .toUpperCase()})`
+            : hasConnectedDevice
+            ? "Device connected but not selected"
             : "No devices connected"}
         </Text>
       </View>
@@ -284,6 +366,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     alignItems: "center",
   },
+  imageButton: {
+    position: "relative",
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  imageButtonActive: {
+    shadowColor: "#10b981",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
   hardwareImage: {
     width: 320,
     height: 240,
@@ -307,6 +401,9 @@ const styles = StyleSheet.create({
   connectedOverlay: {
     backgroundColor: "rgba(16, 185, 129, 0.9)",
   },
+  fakeOverlay: {
+    backgroundColor: "rgba(245, 158, 11, 0.9)",
+  },
   overlayText: {
     color: "#ffffff",
     fontSize: 16,
@@ -314,6 +411,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   connectedText: {
+    color: "#ffffff",
+  },
+  fakeText: {
     color: "#ffffff",
   },
   overlaySubtext: {
@@ -324,6 +424,9 @@ const styles = StyleSheet.create({
   },
   connectedSubtext: {
     color: "#f0fdf4",
+  },
+  fakeSubtext: {
+    color: "#fefce8",
   },
   statusCard: {
     width: "100%",

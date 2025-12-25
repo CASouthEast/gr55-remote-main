@@ -31,8 +31,8 @@ function PatchMainWrapper() {
     route: {
       key: "PatchMain-" + Date.now(),
       name: "PatchMain",
-      params: {},
-      path: undefined,
+      params: parentRoute.params || {},
+      path: parentRoute.path,
     },
   };
 
@@ -48,8 +48,8 @@ function PatchToneWrapper() {
     route: {
       key: "PatchTone-" + Date.now(),
       name: "PatchTone",
-      params: {},
-      path: undefined,
+      params: parentRoute.params || {},
+      path: parentRoute.path,
     },
   };
 
@@ -66,8 +66,8 @@ function PatchEffectsWrapper() {
       route: {
         key: "PatchEffects-" + Date.now(),
         name: "PatchEffects",
-        params: {},
-        path: undefined,
+        params: parentRoute.params || {},
+        path: parentRoute.path,
       },
     };
 
@@ -86,8 +86,8 @@ function PatchMasterPedalGkCtlWrapper() {
     route: {
       key: "PatchMasterPedalGkCtl-" + Date.now(),
       name: "PatchMasterPedalGkCtl",
-      params: {},
-      path: undefined,
+      params: parentRoute.params || {},
+      path: parentRoute.path,
     },
   };
 
@@ -104,8 +104,8 @@ function PatchAssignsWrapper() {
       route: {
         key: "PatchAssigns-" + Date.now(),
         name: "PatchAssigns",
-        params: {},
-        path: undefined,
+        params: parentRoute.params || {},
+        path: parentRoute.path,
       },
     };
 
@@ -124,8 +124,8 @@ function PatchMasterOtherWrapper() {
     route: {
       key: "PatchMasterOther-" + Date.now(),
       name: "PatchMasterOther",
-      params: {},
-      path: undefined,
+      params: parentRoute.params || {},
+      path: parentRoute.path,
     },
   };
 

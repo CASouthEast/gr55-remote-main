@@ -14,7 +14,6 @@ import {
 } from "react-native";
 
 import { GR55HWViewProps, GR55State } from "./GR55HWView.types";
-import { NativeFallback } from "./components/NativeFallback";
 
 export function GR55HWView({ initialState, onStateChange }: GR55HWViewProps) {
   const [state, setState] = useState<GR55State>({

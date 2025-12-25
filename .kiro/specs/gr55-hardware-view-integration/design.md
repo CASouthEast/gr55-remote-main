@@ -10,7 +10,7 @@ The solution involves creating a hybrid approach where web platforms use the ric
 
 ## Architecture
 
-### Component Structure
+### Enhanced Component Structure with Real-Time Integration
 
 ```mermaid
 graph TD
@@ -18,22 +18,55 @@ graph TD
     B -->|Web| C[GR55HWView.web.tsx]
     B -->|Native| D[GR55HWView.native.tsx]
 
-    C --> E[GR55Controller - Superior Design]
-    E --> F[Display Component - Enhanced]
-    E --> G[Button Components - Enhanced]
-    E --> H[DataWheel Component - Enhanced]
-    E --> I[Pedal Components - Enhanced]
+    C --> E[GR55Controller - Enhanced Interactive]
+    E --> F[Display Component - Dual Row Effects]
+    E --> G[Button Components - LED Integration]
+    E --> H[DataWheel Component - Rotary Control]
+    E --> I[Pedal Components - Real-time LEDs]
+    E --> J[Expression Pedal - Slider Function]
+    E --> K[Output Level - Rotatable Control]
 
-    D --> J[Native Fallback UI]
-    J --> K[Hardware Image]
-    J --> L[Basic Controls]
+    D --> L[Native Fallback UI]
+    L --> M[Hardware Image]
+    L --> N[Basic Controls]
 
-    M[Shared Types] --> C
-    M --> D
-    N[Shared Utils] --> C
-    N --> D
-    O[Superior Design Files] --> E
+    O[MIDI Integration Layer] --> C
+    O --> P[Device State Manager]
+    P --> Q[Real-time Data Sync]
+    P --> R[Control Command Sender]
+
+    S[Shared Types] --> C
+    S --> D
+    T[Layout Alignment Utils] --> C
+    U[MIDI Protocol Utils] --> O
 ```
+
+### Real-Time Data Integration Architecture
+
+```mermaid
+graph LR
+    A[GR55 Device] -->|MIDI In| B[MIDI Integration Layer]
+    B --> C[Device State Manager]
+    C --> D[State Synchronizer]
+    D --> E[Hardware View Components]
+
+    E -->|User Interactions| F[Control Handler]
+    F -->|MIDI Out| A
+
+    G[Connection Monitor] --> B
+    H[Error Handler] --> B
+    I[Reconnection Logic] --> B
+```
+
+### Enhanced Layout Alignment System
+
+The enhanced hardware view implements precise alignment following these principles:
+
+1. **Horizontal Alignment Groups**: All related elements align on consistent horizontal planes
+2. **Vertical Spacing Optimization**: Reduced spacing between page controls and foot pedals
+3. **LED State Integration**: All LEDs reflect real device state with proper mutual exclusivity
+4. **Interactive Controls**: Rotatable and slider controls with visual feedback
+5. **Extended Display**: Two-row effects display with real-time status updates
 
 ### Design Source Priority
 
@@ -48,6 +81,41 @@ graph TD
 
 - Provides React Native compatibility patterns
 - Basic component interfaces and state management
+
+### Testing Architecture
+
+```mermaid
+graph TD
+    A[Test Files] --> B[Component Interface Validation]
+    A --> C[Platform-Specific Testing]
+    A --> D[Navigation Integration Testing]
+
+    B --> E[TypeScript Compliance]
+    B --> F[Prop Interface Validation]
+
+    C --> G[Web Platform Tests]
+    C --> H[Native Platform Tests]
+
+    D --> I[Navigation Mock Framework]
+    D --> J[Route Parameter Testing]
+
+    K[Test Utilities] --> A
+    L[Mock Factories] --> A
+    M[Type Definitions] --> A
+```
+
+**Testing Quality Requirements:**
+
+1. **TypeScript Compliance**: All test files must compile without type errors
+2. **Component Interface Accuracy**: Tests must only pass props that components actually accept
+3. **Navigation Testing**: Proper mocks that match React Navigation interfaces
+4. **Consistent Patterns**: Standardized test utilities and mock factories
+
+**Current Testing Issues:**
+
+- `GR55HWViewPage` component doesn't accept navigation props but tests try to pass them
+- React Test Renderer deprecation warnings need addressing
+- Component interface validation needs improvement
 - Platform detection and conditional rendering approaches
 
 **Integration Strategy**:
@@ -252,40 +320,167 @@ export default function GR55HWViewPage() {
 
 ## Data Models
 
-### State Management
+### Enhanced State Management
 
-The hardware view will use local React state for managing the interface state. The state structure follows the existing patterns in the original component:
+The hardware view will use comprehensive state management to handle real-time GR55 device integration and enhanced interactivity:
 
 ```typescript
-interface GR55State {
-  // Current active pedal (1-4)
+interface GR55EnhancedState {
+  // Device connection
+  isConnected: boolean;
+  connectionStatus: "disconnected" | "connecting" | "connected" | "error";
+
+  // Current active pedal (1-4) with mutual exclusivity
   activePedal: number;
+  pedalLEDs: {
+    pedal1: boolean;
+    pedal2: boolean;
+    pedal3: boolean;
+    ctl: boolean; // Independent from 1,2,3
+  };
 
-  // Current patch name displayed on LCD
+  // Current patch information from device
   patchName: string;
-
-  // Active sound style selection
-  activeStyle: "LEAD" | "RHYTHM" | "OTHER" | "USER";
-
-  // Current bank display (e.g., "01-1")
   bank: string;
+
+  // Active sound style selection with LED states
+  activeStyle: "LEAD" | "RHYTHM" | "OTHER" | "USER";
+  styleLEDs: {
+    lead: boolean;
+    rhythm: boolean;
+    other: boolean;
+    user: boolean;
+    vlink: boolean;
+  };
+
+  // Tone source information
+  toneSource: {
+    guitar: boolean;
+    pcm: boolean;
+    activeTone: "guitar" | "pcm" | "both";
+  };
+
+  // Effects status (real device state)
+  effects: {
+    // Row 1 in display
+    mfx: boolean;
+    delay: boolean;
+    chorus: boolean;
+    reverb: boolean;
+    // Row 2 in display
+    amp: boolean;
+    ns: boolean;
+    mod: boolean;
+    eq: boolean;
+  };
+
+  // Control states
+  controls: {
+    ezEdit: boolean;
+    exit: boolean;
+    enter: boolean;
+    write: boolean;
+    pageLeft: boolean;
+    pageRight: boolean;
+    edit: boolean;
+  };
+
+  // Physical controls
+  outputLevel: number; // 0-127, rotatable with start/stop
+  dataWheel: number; // Rotary position
+  expressionPedal: number; // 0-127, slider representation
+  expSwitch: boolean; // With LED indicator
+
+  // Bank selection
+  bankSelect: {
+    up: boolean;
+    down: boolean;
+  };
 }
 ```
 
-### Style Configuration
+### MIDI Integration Data Models
 
 ```typescript
-interface StyleConfig {
-  styles: StyleButtonConfig[];
+interface MIDIControlMapping {
+  // Control Change mappings for GR55
+  outputLevel: { cc: number; channel: number };
+  expressionPedal: { cc: number; channel: number };
+
+  // System Exclusive mappings for patch data
+  patchRequest: Uint8Array;
+  effectsRequest: Uint8Array;
+
+  // Button mappings
+  buttons: {
+    [key: string]: { cc?: number; sysex?: Uint8Array };
+  };
 }
 
-const DEFAULT_STYLES: StyleButtonConfig[] = [
-  { id: "LEAD", label: "LEAD", patch: "LEAD GUITAR" },
-  { id: "RHYTHM", label: "RHYTHM", patch: "FUNK RHYTHM" },
-  { id: "OTHER", label: "OTHER", patch: "STRINGS ENS" },
-  { id: "USER", label: "USER", patch: "CUSTOM 01" },
-];
+interface DeviceState {
+  lastUpdate: number;
+  patchData: Uint8Array;
+  effectsData: Uint8Array;
+  controllerData: Map<number, number>;
+}
 ```
+
+### Layout Configuration
+
+```typescript
+interface LayoutAlignment {
+  // Horizontal alignment groups
+  topRowHeadings: {
+    vlink: { x: number; y: number };
+    lead: { x: number; y: number };
+    rhythm: { x: number; y: number };
+    other: { x: number; y: number };
+    user: { x: number; y: number };
+    ezEdit: { x: number; y: number };
+    exit: { x: number; y: number };
+    enter: { x: number; y: number };
+    write: { x: number; y: number };
+  };
+
+  buttonRow: {
+    vlink: { x: number; y: number };
+    lead: { x: number; y: number };
+    rhythm: { x: number; y: number };
+    other: { x: number; y: number };
+    user: { x: number; y: number };
+    ez: { x: number; y: number };
+    exit: { x: number; y: number };
+    enter: { x: number; y: number };
+    write: { x: number; y: number };
+  };
+
+  pageControls: {
+    pageLeft: { x: number; y: number };
+    pageRight: { x: number; y: number };
+    edit: { x: number; y: number };
+  };
+
+  footPedals: {
+    pedal1: { x: number; y: number };
+    pedal2: { x: number; y: number };
+    pedal3: { x: number; y: number };
+    ctl: { x: number; y: number };
+    bankUp: { x: number; y: number }; // Right of pedal 2
+    bankDown: { x: number; y: number }; // Right of pedal 1
+  };
+
+  audioPlayer: {
+    button: { x: number; y: number }; // Aligned with CTL pedal
+    topText: { x: number; y: number };
+    bottomText: { x: number; y: number };
+  };
+
+  display: {
+    topRow: { height: number }; // Guitar, PCM indicators
+    midRow: { height: number }; // Patch name
+    bottomArea: { height: number }; // Extended for two effect rows
+  };
+}
 
 ## Correctness Properties
 
@@ -341,10 +536,45 @@ _For any_ component lifecycle, the system should efficiently manage resources an
 _For any_ user interaction (pedals, buttons, data wheel), the system should provide appropriate visual feedback and execute expected actions
 **Validates: Requirements 5.2, 5.3, 5.4**
 
-### Property 11: Enhanced Visual Design Preservation
+### Property 12: Layout Alignment Consistency
 
-_For any_ component rendering, the visual design should match the authentic Roland GR-55 hardware appearance as shown in GR55HWDesign.png with proper 3D effects, realistic styling, and accurate proportions
-**Validates: Requirements 4.1, 4.3, 4.4**
+_For any_ hardware view rendering, all horizontally aligned elements (V-link icon, button headings, buttons, page controls) should maintain consistent horizontal positioning
+**Validates: Requirements 11.1, 11.2, 11.4**
+
+### Property 13: LED State Accuracy
+
+_For any_ device state change, all LED indicators should accurately reflect the real GR55 device state within 100ms
+**Validates: Requirements 11.3, 11.10, 11.11, 12.2**
+
+### Property 14: Mutual Exclusivity of Foot Pedal LEDs
+
+_For any_ foot pedal activation, LEDs 1, 2, 3 should be mutually exclusive while CTL LED operates independently
+**Validates: Requirements 11.10, 11.11**
+
+### Property 15: Real-Time Data Synchronization
+
+_For any_ GR55 device state change, the hardware view should update all visual indicators to match device state within 100ms
+**Validates: Requirements 12.2, 12.4, 12.5, 12.6**
+
+### Property 16: Bidirectional Control Integration
+
+_For any_ user interaction with hardware view controls, appropriate MIDI commands should be sent to the GR55 device and visual feedback should be provided
+**Validates: Requirements 12.3, 12.7, 12.8**
+
+### Property 17: Enhanced Display Content Accuracy
+
+_For any_ patch or effects change, the extended display should show accurate tone source indicators (top row), patch name (mid row), and two-row effects status (bottom area)
+**Validates: Requirements 11.15, 11.16, 11.17, 12.5, 12.6**
+
+### Property 18: Interactive Control Responsiveness
+
+_For any_ rotatable control (output level, data wheel) or slider control (expression pedal), the control should provide appropriate visual feedback and send corresponding device commands
+**Validates: Requirements 11.13, 11.14, 11.18, 12.8**
+
+### Property 19: Connection State Management
+
+_For any_ connection state change (connected, disconnected, error), the system should handle the transition gracefully and update all dependent components appropriately
+**Validates: Requirements 12.1, 12.10**
 
 ## Error Handling
 
@@ -405,12 +635,14 @@ The testing strategy combines unit tests for specific functionality with propert
 ### Test Organization
 
 ```
-__tests__/
+
+**tests**/
 ├── hardware-view/
-│   ├── GR55HWView.test.tsx              # Unit tests
-│   ├── GR55HWView.properties.test.tsx   # Property-based tests
-│   ├── platform-detection.test.tsx      # Platform-specific tests
-│   └── performance.test.tsx             # Performance tests
+│ ├── GR55HWView.test.tsx # Unit tests
+│ ├── GR55HWView.properties.test.tsx # Property-based tests
+│ ├── platform-detection.test.tsx # Platform-specific tests
+│ └── performance.test.tsx # Performance tests
+
 ```
 
 Each property test will be tagged with:
@@ -422,3 +654,4 @@ Each property test will be tagged with:
 - Mock platform detection for cross-platform testing
 - Mock performance APIs for consistent testing
 - Use React Native Testing Library utilities for component testing
+```

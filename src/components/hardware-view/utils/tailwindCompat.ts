@@ -3,6 +3,7 @@
  * Provides platform-specific handling for web-only features
  */
 
+import React from "react";
 import { Platform } from "react-native";
 
 /**
@@ -58,16 +59,11 @@ export function getMotionComponent(componentType: "div" | "button" = "div") {
  * Conditional lucide-react icon import wrapper
  * Returns the icon component for web, a fallback for native
  */
-export function getLucideIcon(iconName: string) {
-  if (isWeb) {
-    try {
-      // Simplified - just return null for now
-      return null;
-    } catch {
-      // Fallback if lucide-react is not available
-      return null;
-    }
-  }
+export function getLucideIcon(
+  iconName: string
+): React.ComponentType<any> | null {
+  // Simplified - just return null for now
+  // TODO: Implement actual lucide-react icon loading for web
   return null;
 }
 

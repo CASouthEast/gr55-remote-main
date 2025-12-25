@@ -1,6 +1,5 @@
 {
   "preset": "jest-expo",
-  "testEnvironment": "node",
   "moduleNameMapper": {
     "^@motiz88/react-native-midi$": "<rootDir>/__mocks__/@motiz88/react-native-midi.ts"
   },

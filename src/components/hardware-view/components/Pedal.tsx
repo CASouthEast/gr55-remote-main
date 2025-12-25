@@ -72,6 +72,7 @@ export function Pedal({
           style={styles.pedalActuator}
           onPress={onClick}
           activeOpacity={0.8}
+          {...pedalAnimationProps}
         >
           {/* Metal Tread Plate */}
           <View style={styles.treadPlate}>

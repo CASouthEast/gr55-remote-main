@@ -58,6 +58,7 @@ export function Button({
         style={buttonStyle}
         onPress={onPress}
         activeOpacity={0.8}
+        {...animationProps}
         {...props}
       >
         {/* LED Indicator Window */}
@@ -114,6 +115,7 @@ export function SoundStyleButton({
         style={styles.soundStyleButton}
         onPress={onClick}
         activeOpacity={0.8}
+        {...animationProps}
       >
         <View
           style={[

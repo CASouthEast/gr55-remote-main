@@ -18,7 +18,6 @@ let changed = 0;
 for (const file of files) {
   let s = fs.readFileSync(file, "utf8");
   const original = s;
-  const relPath = path.relative(path.join(repoRoot, "src"), file);
 
   // Replace ./lib/ with ../lib/ for files not in src/lib
   if (!file.includes(path.join("src", "lib"))) {

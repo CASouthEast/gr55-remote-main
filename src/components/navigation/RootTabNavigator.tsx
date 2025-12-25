@@ -56,6 +56,20 @@ export function RootTabNavigator() {
         }}
       />
       <RootTab.Screen
+        name="Hardware"
+        component={GR55HWViewPage}
+        options={{
+          title: "Hardware",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="hardware-chip" size={24} color={color} />
+          ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Hardware view",
+            tabBarAccessibilityHint: "View hardware interface and controls",
+          }),
+        }}
+      />
+      <RootTab.Screen
         name="PatchDrawer"
         component={PatchSectionWithTopNavigation}
         options={{
@@ -81,20 +95,6 @@ export function RootTabNavigator() {
           ...(Platform.OS === "web" && {
             tabBarAccessibilityLabel: "Patch library",
             tabBarAccessibilityHint: "Browse and manage saved patches",
-          }),
-        }}
-      />
-      <RootTab.Screen
-        name="Hardware"
-        component={GR55HWViewPage}
-        options={{
-          title: "Hardware",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="hardware-chip" size={24} color={color} />
-          ),
-          ...(Platform.OS === "web" && {
-            tabBarAccessibilityLabel: "Hardware view",
-            tabBarAccessibilityHint: "View hardware interface and controls",
           }),
         }}
       />
