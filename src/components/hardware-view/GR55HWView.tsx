@@ -1,17 +1,19 @@
 /**
- * Main GR55 Hardware View component
- * This file will be implemented in task 2-3 with platform-specific logic
+ * Platform-specific GR55HWView component loader
+ * This file conditionally loads the appropriate implementation based on platform
  */
 
-import React from "react";
-import { View, Text } from "react-native";
+import { Platform } from "react-native";
 
-import { GR55HWViewProps } from "./GR55HWView.types";
+// Conditional platform-specific imports
+let GR55HWView: any;
 
-export function GR55HWView(props: GR55HWViewProps) {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>GR55 Hardware View - Implementation Pending</Text>
-    </View>
-  );
+if (Platform.OS === "web") {
+  // Dynamic import for web-specific implementation
+  GR55HWView = require("./GR55HWView.web").GR55HWView;
+} else {
+  // Import native implementation for all other platforms
+  GR55HWView = require("./GR55HWView.native").GR55HWView;
 }
+
+export { GR55HWView };

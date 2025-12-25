@@ -1,7 +1,11 @@
 /**
  * Platform-specific exports for GR55 Hardware View
- * This file will export the appropriate implementation based on the platform
+ * React Native will automatically resolve to .web.tsx or .native.tsx based on platform
  */
 
+// Export the platform-specific component
+// React Native's Metro bundler will automatically choose:
+// - GR55HWView.web.tsx on web platform
+// - GR55HWView.native.tsx on native platforms
 export { GR55HWView } from "./GR55HWView";
 export * from "./GR55HWView.types";
