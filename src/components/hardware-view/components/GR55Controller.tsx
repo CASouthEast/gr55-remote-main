@@ -267,6 +267,7 @@ export function GR55Controller({
                   label="1"
                   isActive={state.activePedal === 1}
                   onClick={() => actions.setActivePedal(1)}
+                  subLabel="BANK ▲"
                 />
               </View>
               <View style={styles.pedalColumn}>
@@ -274,7 +275,7 @@ export function GR55Controller({
                   label="2"
                   isActive={state.activePedal === 2}
                   onClick={() => actions.setActivePedal(2)}
-                  subLabel="BANK ▲"
+                  subLabel="BANK ▼"
                 />
               </View>
               <View style={styles.pedalColumn}>
@@ -282,7 +283,7 @@ export function GR55Controller({
                   label="3"
                   isActive={state.activePedal === 3}
                   onClick={() => actions.setActivePedal(3)}
-                  subLabel="BANK ▼"
+                  subLabel="PHRASE LOOP"
                 />
               </View>
               <View style={styles.pedalColumn}>
@@ -290,7 +291,7 @@ export function GR55Controller({
                   label="CTL"
                   isActive={state.activePedal === 4}
                   onClick={() => actions.setActivePedal(4)}
-                  subLabel="PHRASE LOOP"
+                  subLabel="REC/PLAY/DUB"
                 />
               </View>
             </View>
