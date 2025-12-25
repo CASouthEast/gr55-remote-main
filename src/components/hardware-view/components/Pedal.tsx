@@ -131,13 +131,7 @@ export function ExpressionPedal({ className }: { className?: string }) {
     >
       <div className="h-full w-full bg-zinc-900 rounded border border-zinc-700 relative overflow-hidden shadow-inner group cursor-ns-resize">
         {/* Rubber Tread Pattern */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px)",
-          }}
-        />
+        <div className="absolute inset-0 opacity-30 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#000_10px,#000_20px)]" />
 
         {/* Pedal Surface (Visual only, simple animation) */}
         <MotionDiv

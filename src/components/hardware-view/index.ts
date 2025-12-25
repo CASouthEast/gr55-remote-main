@@ -9,3 +9,10 @@
 // - GR55HWView.native.tsx on native platforms
 export { GR55HWView } from "./GR55HWView";
 export * from "./GR55HWView.types";
+
+// Export the web-specific controller component
+export { GR55Controller } from "./components/GR55Controller";
+
+// Export utility functions and constants
+export * from "./utils/constants";
+export { cn } from "./utils/cn";

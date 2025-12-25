@@ -18,11 +18,11 @@ graph TD
     B -->|Web| C[GR55HWView.web.tsx]
     B -->|Native| D[GR55HWView.native.tsx]
 
-    C --> E[GR55Controller]
-    E --> F[Display Component]
-    E --> G[Button Components]
-    E --> H[DataWheel Component]
-    E --> I[Pedal Components]
+    C --> E[GR55Controller - Superior Design]
+    E --> F[Display Component - Enhanced]
+    E --> G[Button Components - Enhanced]
+    E --> H[DataWheel Component - Enhanced]
+    E --> I[Pedal Components - Enhanced]
 
     D --> J[Native Fallback UI]
     J --> K[Hardware Image]
@@ -32,11 +32,33 @@ graph TD
     M --> D
     N[Shared Utils] --> C
     N --> D
+    O[Superior Design Files] --> E
 ```
+
+### Design Source Priority
+
+**Primary Design Source**: `./Docs/Design/src/` - Contains the superior, complete design implementation
+
+- Full Tailwind CSS styling matching GR55HWDesign.png
+- Authentic hardware appearance with proper 3D effects
+- Complete component hierarchy with all interactive elements
+- Framer Motion animations for tactile feedback
+
+**Secondary Source**: `./GR55HWView/` - Used for basic structure and integration patterns
+
+- Provides React Native compatibility patterns
+- Basic component interfaces and state management
+- Platform detection and conditional rendering approaches
+
+**Integration Strategy**:
+
+1. Use `./Docs/Design/src/` components as the visual foundation
+2. Adapt them for React Native compatibility using patterns from `./GR55HWView/`
+3. Maintain the superior visual design while ensuring cross-platform functionality
 
 ### Directory Structure
 
-The components will be reorganized into the main application structure:
+The components will be reorganized into the main application structure using the superior design files:
 
 ```
 src/
@@ -46,16 +68,27 @@ src/
 │       ├── GR55HWView.native.tsx       # Native fallback implementation
 │       ├── GR55HWView.types.ts         # Shared TypeScript types
 │       ├── components/
-│       │   ├── Buttons.tsx             # Button components (web-only)
-│       │   ├── Display.tsx             # LCD display component (web-only)
-│       │   ├── DataWheel.tsx           # Data wheel component (web-only)
-│       │   ├── Pedal.tsx               # Pedal components (web-only)
+│       │   ├── GR55Controller.tsx      # Main controller (from superior design)
+│       │   ├── Buttons.tsx             # Enhanced button components
+│       │   ├── Display.tsx             # Enhanced LCD display component
+│       │   ├── DataWheel.tsx           # Enhanced data wheel component
+│       │   ├── Pedal.tsx               # Enhanced pedal components
 │       │   └── NativeFallback.tsx      # Native platform components
 │       └── utils/
-│           ├── cn.ts                   # Class name utility (web-only)
-│           └── constants.ts            # Shared constants
+│           ├── cn.ts                   # Class name utility (enhanced)
+│           ├── constants.ts            # Shared constants
+│           └── tailwindCompat.ts       # Tailwind to React Native compatibility
 └── screens/
     └── GR55HWViewPage.tsx              # Updated main screen component
+
+Reference Sources:
+├── Docs/Design/src/                    # Superior design files (PRIMARY)
+│   ├── Component.tsx                   # Complete GR55Controller implementation
+│   ├── components/                     # Enhanced component implementations
+│   └── utils.ts                        # Tailwind utilities
+└── GR55HWView/                         # Basic integration patterns (SECONDARY)
+    ├── Component.tsx                   # Basic structure reference
+    └── components/                     # Basic component patterns
 ```
 
 ### Platform-Specific Implementation Strategy
@@ -307,6 +340,11 @@ _For any_ component lifecycle, the system should efficiently manage resources an
 
 _For any_ user interaction (pedals, buttons, data wheel), the system should provide appropriate visual feedback and execute expected actions
 **Validates: Requirements 5.2, 5.3, 5.4**
+
+### Property 11: Enhanced Visual Design Preservation
+
+_For any_ component rendering, the visual design should match the authentic Roland GR-55 hardware appearance as shown in GR55HWDesign.png with proper 3D effects, realistic styling, and accurate proportions
+**Validates: Requirements 4.1, 4.3, 4.4**
 
 ## Error Handling
 
