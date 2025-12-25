@@ -17,7 +17,6 @@ import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 import { PopoverAwareScrollView } from "../PopoverAwareScrollView";
 import { RefreshControl } from "../RefreshControl";
 import { useTheme } from "../Theme";
-import { ThemedText } from "../ThemedText";
 import { PatchAssignsTabParamList } from "../navigation";
 import { RemoteFieldDynamic } from "../remote-fields/RemoteFieldDynamic";
 import { RemoteFieldPicker } from "../remote-fields/RemoteFieldPicker";
@@ -225,31 +224,6 @@ function Assign8Wrapper() {
   return <PatchAssignScreen assignKey="Assign8" />;
 }
 
-// Custom tab label component
-function AssignTabLabel({
-  assigned,
-  children,
-  color,
-  focused,
-}: {
-  assigned: boolean;
-  children: React.ReactNode;
-  focused: boolean;
-  color: string;
-}) {
-  return (
-    <ThemedText
-      style={[
-        tabLabelStyles.label,
-        { color },
-        assigned && tabLabelStyles.labelAssigned,
-      ]}
-    >
-      {children}
-    </ThemedText>
-  );
-}
-
 const tabs: {
   key: keyof PatchAssignsTabParamList;
   title: string;
@@ -429,19 +403,5 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     backgroundColor: "#ffffff",
-  },
-});
-
-const tabLabelStyles = StyleSheet.create({
-  label: {
-    textAlign: "center",
-    textTransform: "uppercase",
-    fontSize: 18,
-    margin: 4,
-    backgroundColor: "transparent",
-  },
-  labelAssigned: {
-    fontWeight: "bold",
-    fontSize: 18,
   },
 });

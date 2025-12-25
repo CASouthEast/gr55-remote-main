@@ -1,5 +1,5 @@
 import type { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 

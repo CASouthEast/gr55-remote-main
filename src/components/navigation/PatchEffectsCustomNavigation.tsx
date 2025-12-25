@@ -1,5 +1,5 @@
 import type { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
@@ -15,22 +15,7 @@ import { PatchEffectsTabParamList } from "../navigation";
 
 // Wrapper components to provide navigation props with proper route structure
 function PatchEffectsStructureWrapper() {
-  const navigation = useNavigation();
-
-  const mockProps: MaterialTopTabScreenProps<
-    PatchEffectsTabParamList,
-    "Struct"
-  > = {
-    navigation: navigation as any,
-    route: {
-      key: "Struct-" + Date.now(),
-      name: "Struct",
-      params: {},
-      path: undefined,
-    },
-  };
-
-  return <PatchEffectsStructureScreen {...mockProps} />;
+  return <PatchEffectsStructureScreen />;
 }
 
 function PatchEffectsAmpWrapper() {

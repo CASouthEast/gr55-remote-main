@@ -1,8 +1,3 @@
-import type {
-  MaterialTopTabScreenProps,
-  MaterialTopTabNavigationProp,
-} from "@react-navigation/material-top-tabs";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState, useContext, useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 
