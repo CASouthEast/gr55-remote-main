@@ -89,6 +89,9 @@ export function useTopTabNavigatorDefaults() {
               // Web-specific styles for better visibility
               boxShadow: "none",
               borderBottom: `1px solid ${theme.colors.navigation.tabBar.border}`,
+              // Ensure proper contrast ratios
+              minHeight: "48px",
+              position: "relative" as any,
             }),
           },
           tabBarLabelStyle: {
@@ -96,12 +99,20 @@ export function useTopTabNavigatorDefaults() {
             fontWeight: "600" as const,
             textTransform: "none" as const,
             margin: 0,
+            color: theme.colors.navigation.tabBar.inactiveText,
             ...(Platform.OS === "web" && {
               // Web-specific text styling - cast to any to avoid TypeScript issues
               userSelect: "none" as any,
               cursor: "pointer" as any,
               fontFamily:
                 "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" as any,
+              // Enhanced contrast and readability
+              textShadow: "none" as any,
+              fontSmoothing: "antialiased" as any,
+              WebkitFontSmoothing: "antialiased" as any,
+              MozOsxFontSmoothing: "grayscale" as any,
+              // Ensure minimum contrast ratio for accessibility
+              textDecoration: "none" as any,
             }),
           },
           tabBarActiveTintColor: theme.colors.navigation.tabBar.activeText,
@@ -109,6 +120,11 @@ export function useTopTabNavigatorDefaults() {
           tabBarIndicatorStyle: {
             backgroundColor: theme.colors.navigation.tabBar.indicator,
             height: 3,
+            ...(Platform.OS === "web" && {
+              // Enhanced indicator visibility on web
+              borderRadius: "1.5px" as any,
+              transition: "all 0.2s ease" as any,
+            }),
           },
           tabBarScrollEnabled: true,
           tabBarItemStyle: {
@@ -116,18 +132,32 @@ export function useTopTabNavigatorDefaults() {
             paddingHorizontal: 12,
             ...(Platform.OS === "web" && {
               // Web-specific hover and focus states - cast to any to avoid TypeScript issues
+              cursor: "pointer" as any,
+              transition: "background-color 0.2s ease, color 0.2s ease" as any,
+              outline: "none" as any,
               ":hover": {
                 backgroundColor: theme.colors.navigation.tabBar.hoverBackground,
               } as any,
               ":active": {
                 backgroundColor: theme.colors.navigation.tabBar.pressBackground,
               } as any,
+              ":focus": {
+                outline:
+                  `2px solid ${theme.colors.navigation.tabBar.activeText}` as any,
+                outlineOffset: "-2px" as any,
+                backgroundColor: theme.colors.navigation.tabBar.hoverBackground,
+              } as any,
+              // Ensure proper contrast for accessibility
+              minHeight: "48px" as any,
             }),
           },
           ...(Platform.OS === "web" && {
             // Additional web accessibility - cast to any to avoid TypeScript issues
             tabBarAccessibilityRole: "tablist" as any,
             tabBarItemAccessibilityRole: "tab" as any,
+            // Enhanced keyboard navigation
+            tabBarKeyboardHidesTabBar: false as any,
+            tabBarAllowFontScaling: true as any,
           }),
         },
         // TESTING: Comment out custom tab bar to use native React Navigation component

@@ -1,5 +1,6 @@
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Platform } from "react-native";
 
 import GR55HWViewPage from "../../screens/GR55HWViewPage";
 import { LibraryPatchListScreen } from "../../screens/LibraryPatchListScreen";
@@ -26,6 +27,17 @@ export function RootTabNavigator() {
                 return null;
               }
             : undefined,
+        // Enhanced accessibility for web
+        ...(Platform.OS === "web" && {
+          tabBarAccessibilityRole: "tablist",
+          tabBarItemStyle: {
+            // Ensure proper focus indicators
+            ":focus": {
+              outline: "2px solid #007AFF",
+              outlineOffset: "-2px",
+            },
+          },
+        }),
       })}
     >
       <RootTab.Screen
@@ -37,6 +49,10 @@ export function RootTabNavigator() {
           tabBarIcon: ({ color }) => (
             <Entypo name="sound-mix" size={24} color={color} />
           ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Patch editing section",
+            tabBarAccessibilityHint: "Navigate to patch editing interface",
+          }),
         }}
       />
       <RootTab.Screen
@@ -47,6 +63,10 @@ export function RootTabNavigator() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="library" size={24} color={color} />
           ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Patch library",
+            tabBarAccessibilityHint: "Browse and manage saved patches",
+          }),
         }}
       />
       <RootTab.Screen
@@ -57,6 +77,10 @@ export function RootTabNavigator() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="hardware-chip" size={24} color={color} />
           ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Hardware view",
+            tabBarAccessibilityHint: "View hardware interface and controls",
+          }),
         }}
       />
       <RootTab.Screen
@@ -68,6 +92,11 @@ export function RootTabNavigator() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={24} color={color} />
           ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Application setup",
+            tabBarAccessibilityHint:
+              "Configure application settings and preferences",
+          }),
         }}
       />
     </RootTab.Navigator>

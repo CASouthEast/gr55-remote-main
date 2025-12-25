@@ -5,6 +5,6 @@
     "^@motiz88/react-native-midi$": "<rootDir>/__mocks__/@motiz88/react-native-midi.ts"
   },
   "transformIgnorePatterns": [
-    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@motiz88/react-native-midi)"
+    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|@motiz88/react-native-midi|@rneui/.*|@miblanchard/.*)"
   ]
 }
