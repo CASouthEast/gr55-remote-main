@@ -34,6 +34,9 @@ export function GR55Controller({
     ...initialState,
   });
 
+  // Separate state for CTL pedal (independent from pedals 1-3)
+  const [ctlPedalActive, setCtlPedalActive] = useState(false);
+
   // State update handler that notifies parent component
   const handleStateChange = useCallback(
     (newState: Partial<GR55State>) => {
@@ -43,6 +46,11 @@ export function GR55Controller({
     },
     [state, onStateChange]
   );
+
+  // Independent toggle handler for CTL pedal
+  const handleCtlPedalToggle = useCallback(() => {
+    setCtlPedalActive(!ctlPedalActive);
+  }, [ctlPedalActive]);
 
   // Action handlers for different controls
   const actions: GR55Actions = useMemo(
@@ -238,10 +246,20 @@ export function GR55Controller({
                     <View style={styles.pedalColumn}>
                       <Pedal
                         label="CTL"
-                        isActive={state.activePedal === 4}
-                        onClick={() => actions.setActivePedal(4)}
+                        isActive={ctlPedalActive}
+                        onClick={handleCtlPedalToggle}
                         subLabel="REC/PLAY/DUB"
                       />
+                    </View>
+                    {/* Audio Player next to CTL pedal */}
+                    <View style={styles.audioPlayerColumn}>
+                      <Text style={styles.audioPlayerLabel}>AUDIO PLAYER</Text>
+                      <Button
+                        label=""
+                        variant="rect"
+                        style={styles.audioPlayerButton}
+                      />
+                      <Text style={styles.usbMemoryLabel}>USB MEMORY</Text>
                     </View>
                   </View>
                 </View>
@@ -282,24 +300,16 @@ export function GR55Controller({
                   <Button label="ENTER" variant="rect" />
                   <Button label="WRITE" variant="rect" />
                 </View>
-
-                {/* Audio Player positioned to align with CTL pedal */}
-                <View style={styles.audioPlayer}>
-                  <Text style={styles.audioPlayerLabel}>AUDIO PLAYER</Text>
-                  <Button
-                    label=""
-                    variant="rect"
-                    style={styles.audioPlayerButton}
-                  />
-                  <Text style={styles.usbMemoryLabel}>USB MEMORY</Text>
-                </View>
               </View>
             </View>
           </View>
 
           {/* Branding Logos */}
           <View style={styles.branding}>
-            <Text style={styles.grLogo}>GR</Text>
+            <View style={styles.grLogoContainer}>
+              <Text style={styles.grLogoG}>G</Text>
+              <Text style={styles.grLogoR}>R</Text>
+            </View>
             <Text style={styles.cosmBadge}>COSM</Text>
           </View>
         </View>
@@ -537,6 +547,10 @@ const styles = StyleSheet.create({
     marginTop: "auto",
     alignItems: "center",
   },
+  audioPlayerColumn: {
+    alignItems: "center",
+    gap: 8,
+  },
   audioPlayerLabel: {
     fontSize: 10,
     fontWeight: "700",
@@ -621,17 +635,31 @@ const styles = StyleSheet.create({
   branding: {
     position: "absolute",
     right: 24,
-    bottom: 72, // Adjusted for tighter layout
+    bottom: 8,
     alignItems: "flex-end",
     opacity: 0.8,
   },
-  grLogo: {
+  grLogoContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    height: 100,
+  },
+  grLogoG: {
     fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
     fontStyle: "italic",
-    fontSize: 88, // Slightly reduced from 96
+    fontSize: 88,
     fontWeight: "900",
-    color: "#71717a", // zinc-500
+    color: "#ff8c00", // Orange
     letterSpacing: -2,
+    marginBottom: 24,
+  },
+  grLogoR: {
+    fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
+    fontStyle: "italic",
+    fontSize: 88,
+    fontWeight: "900",
+    color: "#ff8c00", // Orange
+    letterSpacing: -4,
   },
   cosmBadge: {
     fontWeight: "700",
