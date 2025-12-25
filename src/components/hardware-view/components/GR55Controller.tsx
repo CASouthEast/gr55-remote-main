@@ -207,6 +207,44 @@ export function GR55Controller({
                     </View>
                   </View>
                 </View>
+
+                {/* Pedals Section */}
+                <View style={styles.pedalSection}>
+                  <View style={styles.pedals}>
+                    <View style={styles.pedalColumn}>
+                      <Pedal
+                        label="1"
+                        isActive={state.activePedal === 1}
+                        onClick={() => actions.setActivePedal(1)}
+                        subLabel="BANK ▲"
+                      />
+                    </View>
+                    <View style={styles.pedalColumn}>
+                      <Pedal
+                        label="2"
+                        isActive={state.activePedal === 2}
+                        onClick={() => actions.setActivePedal(2)}
+                        subLabel="BANK ▼"
+                      />
+                    </View>
+                    <View style={styles.pedalColumn}>
+                      <Pedal
+                        label="3"
+                        isActive={state.activePedal === 3}
+                        onClick={() => actions.setActivePedal(3)}
+                        subLabel="PHRASE LOOP"
+                      />
+                    </View>
+                    <View style={styles.pedalColumn}>
+                      <Pedal
+                        label="CTL"
+                        isActive={state.activePedal === 4}
+                        onClick={() => actions.setActivePedal(4)}
+                        subLabel="REC/PLAY/DUB"
+                      />
+                    </View>
+                  </View>
+                </View>
               </View>
 
               {/* Right Column: Wheel & Nav with enhanced positioning */}
@@ -237,7 +275,7 @@ export function GR55Controller({
                   </View>
                   <View style={styles.navButtonGroup}>
                     <Text style={styles.navButtonLabel}>EDIT</Text>
-                    <Button label="EDIT" variant="rect" />
+                    <Button label="" variant="rect" />
                   </View>
 
                   <Button label="EXIT" variant="rect" />
@@ -259,48 +297,10 @@ export function GR55Controller({
             </View>
           </View>
 
-          {/* Enhanced Bottom Pedal Area with optimized spacing */}
-          <View style={styles.pedalArea}>
-            <View style={styles.pedals}>
-              <View style={styles.pedalColumn}>
-                <Pedal
-                  label="1"
-                  isActive={state.activePedal === 1}
-                  onClick={() => actions.setActivePedal(1)}
-                  subLabel="BANK ▲"
-                />
-              </View>
-              <View style={styles.pedalColumn}>
-                <Pedal
-                  label="2"
-                  isActive={state.activePedal === 2}
-                  onClick={() => actions.setActivePedal(2)}
-                  subLabel="BANK ▼"
-                />
-              </View>
-              <View style={styles.pedalColumn}>
-                <Pedal
-                  label="3"
-                  isActive={state.activePedal === 3}
-                  onClick={() => actions.setActivePedal(3)}
-                  subLabel="PHRASE LOOP"
-                />
-              </View>
-              <View style={styles.pedalColumn}>
-                <Pedal
-                  label="CTL"
-                  isActive={state.activePedal === 4}
-                  onClick={() => actions.setActivePedal(4)}
-                  subLabel="REC/PLAY/DUB"
-                />
-              </View>
-            </View>
-
-            {/* Branding Logos */}
-            <View style={styles.branding}>
-              <Text style={styles.grLogo}>GR</Text>
-              <Text style={styles.cosmBadge}>COSM</Text>
-            </View>
+          {/* Branding Logos */}
+          <View style={styles.branding}>
+            <Text style={styles.grLogo}>GR</Text>
+            <Text style={styles.cosmBadge}>COSM</Text>
           </View>
         </View>
 
@@ -421,6 +421,12 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   styleSection: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#52525b", // zinc-600
+    position: "relative",
+  },
+  pedalSection: {
     paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: "#52525b", // zinc-600
