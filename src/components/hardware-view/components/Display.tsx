@@ -1,12 +1,11 @@
 import React from "react";
-
-import { cn } from "../utils";
+import { View, Text, StyleSheet, Platform } from "react-native";
 
 interface DisplayProps {
   patchName: string;
   bank: string;
   mode: string;
-  className?: string;
+  style?: any;
 }
 
 /**
@@ -14,59 +13,214 @@ interface DisplayProps {
  * Maintains the visual design and layout from GR55HWDesign.png
  * Adapted for React Native compatibility
  */
-export function Display({ patchName, bank, mode, className }: DisplayProps) {
+export function Display({ patchName, bank, mode, style }: DisplayProps) {
   return (
-    <div
-      className={cn(
-        "bg-[#e0e7ff] border-[12px] border-zinc-800 rounded-lg shadow-inner relative overflow-hidden",
-        className
-      )}
-    >
+    <View style={[styles.container, style]}>
       {/* Inner Bezel Shadow */}
-      <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] pointer-events-none z-10" />
+      <View style={styles.innerBezel} />
 
       {/* LCD Screen Content */}
-      <div className="h-full w-full p-6 flex flex-col justify-between font-mono text-blue-900 bg-[#dbeafe]">
+      <View style={styles.screenContent}>
         {/* Top Status Bar */}
-        <div className="flex justify-between border-b-2 border-blue-900/20 pb-2">
-          <div className="flex gap-4">
-            <span className="bg-blue-900 text-white px-2 text-xs font-bold rounded-sm">
-              GUITAR
-            </span>
-            <span className="font-bold text-sm">PCM1</span>
-            <span className="font-bold text-sm text-blue-900/50">PCM2</span>
-            <span className="font-bold text-sm text-blue-900/50">MODEL</span>
-          </div>
-          <div className="text-sm font-bold">BPM: 120</div>
-        </div>
+        <View style={styles.statusBar}>
+          <View style={styles.statusLeft}>
+            <View style={styles.guitarBadge}>
+              <Text style={styles.guitarBadgeText}>GUITAR</Text>
+            </View>
+            <Text style={styles.statusText}>PCM1</Text>
+            <Text style={[styles.statusText, styles.statusTextInactive]}>
+              PCM2
+            </Text>
+            <Text style={[styles.statusText, styles.statusTextInactive]}>
+              MODEL
+            </Text>
+          </View>
+          <Text style={styles.bpmText}>BPM: 120</Text>
+        </View>
 
         {/* Main Patch Info */}
-        <div className="flex items-end gap-4 my-auto">
-          <div className="text-6xl font-black tracking-tighter leading-none">
-            {bank}
-          </div>
-          <div className="flex flex-col pb-2">
-            <span className="text-xs font-bold uppercase tracking-widest opacity-60">
-              {mode}
-            </span>
-            <h1 className="text-4xl font-bold tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[300px]">
+        <View style={styles.mainInfo}>
+          <Text style={styles.bankText}>{bank}</Text>
+          <View style={styles.patchInfo}>
+            <Text style={styles.modeText}>{mode}</Text>
+            <Text style={styles.patchNameText} numberOfLines={1}>
               {patchName}
-            </h1>
-          </div>
-        </div>
+            </Text>
+          </View>
+        </View>
 
         {/* Bottom Parameters */}
-        <div className="grid grid-cols-4 gap-2 text-xs font-bold pt-2 border-t-2 border-blue-900/20">
-          <div className="bg-blue-200 p-1 text-center rounded">MFX</div>
-          <div className="bg-blue-100 p-1 text-center rounded text-blue-900/30">
-            AMP
-          </div>
-          <div className="bg-blue-100 p-1 text-center rounded text-blue-900/30">
-            MOD
-          </div>
-          <div className="bg-blue-200 p-1 text-center rounded">DLY</div>
-        </div>
-      </div>
-    </div>
+        <View style={styles.parameters}>
+          <View style={[styles.parameterButton, styles.parameterButtonActive]}>
+            <Text style={styles.parameterText}>MFX</Text>
+          </View>
+          <View
+            style={[styles.parameterButton, styles.parameterButtonInactive]}
+          >
+            <Text style={[styles.parameterText, styles.parameterTextInactive]}>
+              AMP
+            </Text>
+          </View>
+          <View
+            style={[styles.parameterButton, styles.parameterButtonInactive]}
+          >
+            <Text style={[styles.parameterText, styles.parameterTextInactive]}>
+              MOD
+            </Text>
+          </View>
+          <View style={[styles.parameterButton, styles.parameterButtonActive]}>
+            <Text style={styles.parameterText}>DLY</Text>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#e0e7ff", // indigo-100
+    borderWidth: 12,
+    borderColor: "#27272a", // zinc-800
+    borderRadius: 8,
+    position: "relative",
+    overflow: "hidden",
+    ...Platform.select({
+      web: {
+        boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+      },
+      default: {
+        // React Native doesn't support inset shadows
+        backgroundColor: "#c7d2fe", // Slightly darker for inset effect
+      },
+    }),
+  },
+  innerBezel: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10,
+    pointerEvents: "none",
+    ...Platform.select({
+      web: {
+        boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.5)",
+      },
+      default: {
+        // Visual approximation for React Native
+        borderWidth: 2,
+        borderColor: "rgba(0, 0, 0, 0.2)",
+      },
+    }),
+  },
+  screenContent: {
+    height: "100%",
+    width: "100%",
+    padding: 24,
+    justifyContent: "space-between",
+    backgroundColor: "#dbeafe", // blue-100
+  },
+  statusBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 2,
+    borderBottomColor: "rgba(30, 58, 138, 0.2)", // blue-900/20
+    paddingBottom: 8,
+  },
+  statusLeft: {
+    flexDirection: "row",
+    gap: 16,
+    alignItems: "center",
+  },
+  guitarBadge: {
+    backgroundColor: "#1e3a8a", // blue-900
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 2,
+  },
+  guitarBadgeText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  statusText: {
+    fontWeight: "700",
+    fontSize: 14,
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  statusTextInactive: {
+    color: "rgba(30, 58, 138, 0.5)", // blue-900/50
+  },
+  bpmText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  mainInfo: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 16,
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
+  bankText: {
+    fontSize: 60,
+    fontWeight: "900",
+    letterSpacing: -2,
+    lineHeight: 60,
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  patchInfo: {
+    paddingBottom: 8,
+    flex: 1,
+  },
+  modeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    opacity: 0.6,
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  patchNameText: {
+    fontSize: 32,
+    fontWeight: "700",
+    letterSpacing: -1,
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    maxWidth: 300,
+  },
+  parameters: {
+    flexDirection: "row",
+    gap: 8,
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: "rgba(30, 58, 138, 0.2)", // blue-900/20
+  },
+  parameterButton: {
+    flex: 1,
+    padding: 4,
+    alignItems: "center",
+    borderRadius: 4,
+  },
+  parameterButtonActive: {
+    backgroundColor: "#bfdbfe", // blue-200
+  },
+  parameterButtonInactive: {
+    backgroundColor: "#e0e7ff", // blue-100
+  },
+  parameterText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  parameterTextInactive: {
+    color: "rgba(30, 58, 138, 0.3)", // blue-900/30
+  },
+});

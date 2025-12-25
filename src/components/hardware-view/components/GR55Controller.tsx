@@ -1,11 +1,11 @@
 /**
- * GR55Controller - Main Web Controller Component
+ * GR55Controller - Main Component
  *
- * Implements the complete layout logic and state management for the guitar synthesizer.
- * Organizes sub-components into the specific grid layout from the GR55HWDesign.png schematic.
- * This is the web-specific implementation with full interactive functionality.
+ * Implements the layout logic and state management for the guitar synthesizer.
+ * Organizes sub-components into the specific grid layout from the schematic.
  */
 import React, { useState, useCallback, useMemo } from "react";
+import { View, Text, StyleSheet, Platform } from "react-native";
 
 import { GR55State, GR55Actions } from "../GR55HWView.types";
 import { Button, SoundStyleButton } from "./Buttons";
@@ -21,12 +21,14 @@ interface GR55ControllerProps {
 
 /**
  * Main GR55 Controller component that manages the complete hardware interface
- * Maintains state and coordinates all sub-components
+ * Maintains state and coordinates all sub-components with enhanced visual design
  */
 export function GR55Controller({
   initialState,
   onStateChange,
 }: GR55ControllerProps) {
+  console.log("GR55Controller: Component loading...");
+
   const [state, setState] = useState<GR55State>({
     ...DEFAULT_GR55_STATE,
     ...initialState,
@@ -126,63 +128,64 @@ export function GR55Controller({
     [state.activeStyle, state.activePedal, actions]
   );
 
+  console.log("GR55Controller: Rendering main view...");
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-200 p-4 md:p-8 overflow-x-auto">
+    <View style={styles.container}>
       {/* Main Chassis */}
-      <div className="relative bg-[#1e2024] p-1 rounded-[2rem] shadow-2xl border-4 border-[#353940] min-w-[1000px] max-w-[1200px] flex">
+      <View style={styles.chassis}>
         {/* Top Edge Labels (Ports) */}
-        <div className="absolute -top-6 left-20 right-20 flex justify-between text-[10px] font-bold text-zinc-600 uppercase tracking-wider w-[80%]">
-          <span>USB MEMORY</span>
-          <div className="flex gap-8">
-            <span>DC IN</span>
-            <span>POWER</span>
-            <span>USB COMPUTER</span>
-            <span>MIDI IN/OUT</span>
-            <span>PHONES</span>
-            <span>L/MONO OUTPUT R</span>
-            <span>GUITAR OUT</span>
-            <span>GK IN</span>
-          </div>
-        </div>
+        <View style={styles.portLabels}>
+          <Text style={styles.portLabel}>USB MEMORY</Text>
+          <View style={styles.portLabelsRight}>
+            <Text style={styles.portLabel}>DC IN</Text>
+            <Text style={styles.portLabel}>POWER</Text>
+            <Text style={styles.portLabel}>USB COMPUTER</Text>
+            <Text style={styles.portLabel}>MIDI IN/OUT</Text>
+            <Text style={styles.portLabel}>PHONES</Text>
+            <Text style={styles.portLabel}>L/MONO OUTPUT R</Text>
+            <Text style={styles.portLabel}>GUITAR OUT</Text>
+            <Text style={styles.portLabel}>GK IN</Text>
+          </View>
+        </View>
 
         {/* Left Main Section */}
-        <div className="flex-1 flex flex-col border-r-2 border-black/50 bg-[#25282e]">
+        <View style={styles.leftSection}>
           {/* Top Control Panel Area */}
-          <div className="flex-1 p-6 flex flex-col gap-6 relative">
+          <View style={styles.controlPanel}>
             {/* Header / Logo */}
-            <div className="flex justify-between items-baseline border-b border-zinc-600 pb-2 mb-2">
-              <h1 className="text-3xl font-black italic tracking-tighter text-zinc-100 font-sans">
-                Roland <span className="font-normal text-2xl ml-2">GR-55</span>{" "}
-                <span className="text-sm font-normal not-italic ml-2 text-zinc-400 tracking-widest">
-                  GUITAR SYNTHESIZER
-                </span>
-              </h1>
-            </div>
+            <View style={styles.header}>
+              <Text style={styles.rolandTitle}>
+                Roland <Text style={styles.modelNumber}>GR-55</Text>{" "}
+                <Text style={styles.subtitle}>GUITAR SYNTHESIZER</Text>
+              </Text>
+            </View>
 
-            <div className="flex gap-8 h-full">
+            <View style={styles.mainContent}>
               {/* Left Column: Screen & Style Buttons */}
-              <div className="flex-[3] flex flex-col gap-4">
+              <View style={styles.leftColumn}>
                 {/* Display */}
                 <Display
                   patchName={state.patchName}
                   bank={state.bank}
                   mode={state.activeStyle}
-                  className="h-64 w-full"
                 />
 
                 {/* Sound Style Buttons */}
-                <div className="relative pt-4 border-t border-zinc-600">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#25282e] px-2 text-xs font-bold text-zinc-400">
-                    SOUND STYLE
-                  </div>
-                  <div className="flex justify-between items-center gap-2">
+                <View style={styles.styleSection}>
+                  <View style={styles.styleSectionHeader}>
+                    <Text style={styles.sectionLabel}>SOUND STYLE</Text>
+                  </View>
+                  <View style={styles.styleButtons}>
                     {/* V-LINK Logo/Button */}
-                    <div className="flex flex-col items-center mr-4">
-                      <span className="italic font-black text-white bg-black px-1 text-xs skew-x-[-10deg] mb-1">
-                        V-LINK
-                      </span>
-                      <Button label="" variant="rect" className="h-6 w-10" />
-                    </div>
+                    <View style={styles.vLinkSection}>
+                      <Text style={styles.vLinkLabel}>V-LINK</Text>
+                      <Button
+                        label=""
+                        variant="rect"
+                        style={styles.vLinkButton}
+                      />
+                    </View>
 
                     {DEFAULT_STYLES.map((style) => (
                       <SoundStyleButton
@@ -198,24 +201,22 @@ export function GR55Controller({
                     ))}
 
                     {/* EZ Edit Section */}
-                    <div className="ml-4">
+                    <View style={styles.ezEditSection}>
                       <Button label="EZ EDIT" variant="rect" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </View>
+                  </View>
+                </View>
+              </View>
 
               {/* Right Column: Wheel & Nav */}
-              <div className="flex-1 flex flex-col items-center gap-6 pt-2">
+              <View style={styles.rightColumn}>
                 {/* Output Level */}
-                <div className="flex flex-col items-center gap-2 w-full">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase">
-                    Output Level
-                  </span>
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 border-2 border-zinc-600 shadow-lg relative cursor-pointer rotate-45">
-                    <div className="w-1 h-4 bg-white absolute top-1 left-1/2 -translate-x-1/2 rounded-full" />
-                  </div>
-                </div>
+                <View style={styles.outputLevel}>
+                  <Text style={styles.outputLevelLabel}>Output Level</Text>
+                  <View style={styles.outputLevelKnob}>
+                    <View style={styles.outputLevelIndicator} />
+                  </View>
+                </View>
 
                 {/* Data Wheel */}
                 <DataWheel
@@ -224,7 +225,7 @@ export function GR55Controller({
                 />
 
                 {/* Nav Buttons Grid */}
-                <div className="grid grid-cols-3 gap-x-4 gap-y-6 w-full px-2">
+                <View style={styles.navButtons}>
                   <Button label="PAGE" subLabel="◄" variant="rect" />
                   <Button label="PAGE" subLabel="►" variant="rect" />
                   <Button label="EDIT" variant="rect" />
@@ -232,94 +233,423 @@ export function GR55Controller({
                   <Button label="EXIT" variant="rect" />
                   <Button label="ENTER" variant="rect" />
                   <Button label="WRITE" variant="rect" />
-                </div>
+                </View>
 
                 {/* Audio Player */}
-                <div className="mt-auto flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-zinc-400 mb-1">
-                    AUDIO PLAYER
-                  </span>
-                  <Button label="" variant="rect" className="w-14" />
-                  <span className="text-[10px] bg-black text-white px-1 mt-1">
-                    USB MEMORY
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+                <View style={styles.audioPlayer}>
+                  <Text style={styles.audioPlayerLabel}>AUDIO PLAYER</Text>
+                  <Button
+                    label=""
+                    variant="rect"
+                    style={styles.audioPlayerButton}
+                  />
+                  <Text style={styles.usbMemoryLabel}>USB MEMORY</Text>
+                </View>
+              </View>
+            </View>
+          </View>
 
           {/* Bottom Pedal Area */}
-          <div className="bg-[#1a1c21] p-6 border-t-2 border-black/50 flex justify-around items-end pb-8 relative">
+          <View style={styles.pedalArea}>
             {/* Bank Select Up/Down */}
-            <div className="absolute left-16 top-10 flex flex-col gap-8">
-              <div className="flex flex-col items-center cursor-pointer active:scale-95">
-                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[15px] border-t-zinc-400" />
-                <span className="text-[10px] font-bold text-white mt-1 bg-black px-1">
-                  BANK
-                </span>
-              </div>
-            </div>
-            <div className="absolute left-16 bottom-16 flex flex-col gap-8">
-              <div className="flex flex-col items-center cursor-pointer active:scale-95">
-                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[15px] border-b-zinc-400" />
-                <span className="text-[10px] font-bold text-white mt-1 bg-black px-1 text-center leading-tight">
-                  BANK
-                  <br />
-                  SELECT
-                </span>
-              </div>
-            </div>
+            <View style={styles.bankSelectUp}>
+              <View style={styles.bankArrowUp} />
+              <Text style={styles.bankLabel}>BANK</Text>
+            </View>
+            <View style={styles.bankSelectDown}>
+              <View style={styles.bankArrowDown} />
+              <Text style={styles.bankSelectLabel}>BANK{"\n"}SELECT</Text>
+            </View>
 
-            <Pedal
-              label="1"
-              isActive={state.activePedal === 1}
-              onClick={() => actions.setActivePedal(1)}
-            />
-            <Pedal
-              label="2"
-              isActive={state.activePedal === 2}
-              onClick={() => actions.setActivePedal(2)}
-              subLabel="BANK ▲"
-            />
-            <Pedal
-              label="3"
-              isActive={state.activePedal === 3}
-              onClick={() => actions.setActivePedal(3)}
-              subLabel="BANK ▼"
-            />
-            <Pedal
-              label="CTL"
-              isActive={state.activePedal === 4}
-              onClick={() => actions.setActivePedal(4)}
-              subLabel="PHRASE LOOP"
-            />
+            <View style={styles.pedals}>
+              <Pedal
+                label="1"
+                isActive={state.activePedal === 1}
+                onClick={() => actions.setActivePedal(1)}
+              />
+              <Pedal
+                label="2"
+                isActive={state.activePedal === 2}
+                onClick={() => actions.setActivePedal(2)}
+                subLabel="BANK ▲"
+              />
+              <Pedal
+                label="3"
+                isActive={state.activePedal === 3}
+                onClick={() => actions.setActivePedal(3)}
+                subLabel="BANK ▼"
+              />
+              <Pedal
+                label="CTL"
+                isActive={state.activePedal === 4}
+                onClick={() => actions.setActivePedal(4)}
+                subLabel="PHRASE LOOP"
+              />
+            </View>
 
             {/* Branding Logos */}
-            <div className="absolute right-6 bottom-20 flex flex-col items-end opacity-80">
-              <span className="font-serif italic text-6xl font-black text-zinc-500 tracking-tighter">
-                GR
-              </span>
-              <span className="font-bold text-white bg-black px-1 italic skew-x-[-10deg] border border-zinc-600">
-                COSM
-              </span>
-            </div>
-          </div>
-        </div>
+            <View style={styles.branding}>
+              <Text style={styles.grLogo}>GR</Text>
+              <Text style={styles.cosmBadge}>COSM</Text>
+            </View>
+          </View>
+        </View>
 
         {/* Right Expression Pedal Section */}
-        <div className="w-32 bg-[#25282e] border-l-2 border-black/50 p-2 pl-0">
+        <View style={styles.rightSection}>
           <ExpressionPedal />
-        </div>
+        </View>
 
         {/* USB Side Port */}
-        <div className="absolute -left-1 top-32 bottom-32 w-1 bg-zinc-800 border-l border-zinc-600 flex items-center justify-center">
-          <span className="text-[10px] text-zinc-500 -rotate-90 whitespace-nowrap tracking-widest">
-            USB MEMORY
-          </span>
-        </div>
-      </div>
-    </div>
+        <View style={styles.usbSidePort}>
+          <Text style={styles.usbSideLabel}>USB MEMORY</Text>
+        </View>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#e4e4e7", // zinc-200
+    alignItems: "center",
+    justifyContent: "center",
+    padding: Platform.OS === "web" ? 32 : 16,
+    ...(Platform.OS === "web" && {
+      minHeight: "100vh" as any,
+      width: "100vw" as any,
+    }),
+  },
+  chassis: {
+    position: "relative",
+    backgroundColor: "#1e2024",
+    padding: 4,
+    borderRadius: 32,
+    borderWidth: 4,
+    borderColor: "#353940",
+    minWidth: Platform.OS === "web" ? 1000 : 350,
+    maxWidth: Platform.OS === "web" ? 1200 : 400,
+    flexDirection: "row",
+    ...Platform.select({
+      web: {
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      },
+      default: {
+        elevation: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.25,
+        shadowRadius: 25,
+      },
+    }),
+  },
+  portLabels: {
+    position: "absolute",
+    top: -24,
+    left: 80,
+    right: 80,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+  },
+  portLabelsRight: {
+    flexDirection: "row",
+    gap: 32,
+  },
+  portLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#52525b", // zinc-600
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
+  leftSection: {
+    flex: 1,
+    flexDirection: "column",
+    borderRightWidth: 2,
+    borderRightColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "#25282e",
+  },
+  controlPanel: {
+    flex: 1,
+    padding: 24,
+    gap: 24,
+  },
+  header: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#52525b", // zinc-600
+    paddingBottom: 8,
+    marginBottom: 8,
+  },
+  rolandTitle: {
+    fontSize: 30,
+    fontWeight: "900",
+    fontStyle: "italic",
+    letterSpacing: -0.75,
+    color: "#f4f4f5", // zinc-100
+  },
+  modelNumber: {
+    fontSize: 24,
+    fontWeight: "400",
+    marginLeft: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: "400",
+    fontStyle: "normal",
+    marginLeft: 8,
+    color: "#a1a1aa", // zinc-400
+    letterSpacing: 2.4,
+  },
+  mainContent: {
+    flexDirection: "row",
+    gap: 32,
+    flex: 1,
+  },
+  leftColumn: {
+    flex: 3,
+    gap: 16,
+  },
+  styleSection: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#52525b", // zinc-600
+    position: "relative",
+  },
+  styleSectionHeader: {
+    position: "absolute",
+    top: -12,
+    left: "50%",
+    transform: [{ translateX: -50 }],
+    backgroundColor: "#25282e",
+    paddingHorizontal: 8,
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#a1a1aa", // zinc-400
+    textTransform: "uppercase",
+  },
+  styleButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
+  },
+  vLinkSection: {
+    alignItems: "center",
+    marginRight: 16,
+  },
+  vLinkLabel: {
+    fontStyle: "italic",
+    fontWeight: "900",
+    color: "#ffffff",
+    backgroundColor: "#000000",
+    paddingHorizontal: 4,
+    fontSize: 12,
+    transform: [{ skewX: "-10deg" }],
+    marginBottom: 4,
+  },
+  vLinkButton: {
+    height: 24,
+    width: 40,
+  },
+  ezEditSection: {
+    marginLeft: 16,
+  },
+  rightColumn: {
+    flex: 1,
+    alignItems: "center",
+    gap: 24,
+    paddingTop: 8,
+  },
+  outputLevel: {
+    alignItems: "center",
+    gap: 8,
+    width: "100%",
+  },
+  outputLevelLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#a1a1aa", // zinc-400
+    textTransform: "uppercase",
+  },
+  outputLevelKnob: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#27272a", // zinc-800
+    borderWidth: 2,
+    borderColor: "#52525b", // zinc-600
+    justifyContent: "center",
+    alignItems: "center",
+    transform: [{ rotate: "45deg" }],
+    ...Platform.select({
+      web: {
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
+      },
+      default: {
+        elevation: 4,
+      },
+    }),
+  },
+  outputLevelIndicator: {
+    width: 4,
+    height: 16,
+    backgroundColor: "#ffffff",
+    borderRadius: 2,
+    position: "absolute",
+    top: 4,
+  },
+  navButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
+    width: "100%",
+    paddingHorizontal: 8,
+    justifyContent: "space-between",
+  },
+  audioPlayer: {
+    marginTop: "auto",
+    alignItems: "center",
+  },
+  audioPlayerLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#a1a1aa", // zinc-400
+    marginBottom: 4,
+  },
+  audioPlayerButton: {
+    width: 56,
+  },
+  usbMemoryLabel: {
+    fontSize: 10,
+    backgroundColor: "#000000",
+    color: "#ffffff",
+    paddingHorizontal: 4,
+    marginTop: 4,
+  },
+  pedalArea: {
+    backgroundColor: "#1a1c21",
+    padding: 24,
+    borderTopWidth: 2,
+    borderTopColor: "rgba(0,0,0,0.5)",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "flex-end",
+    paddingBottom: 32,
+    position: "relative",
+  },
+  bankSelectUp: {
+    position: "absolute",
+    left: 64,
+    top: 40,
+    alignItems: "center",
+  },
+  bankSelectDown: {
+    position: "absolute",
+    left: 64,
+    bottom: 64,
+    alignItems: "center",
+  },
+  bankArrowUp: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 15,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "#a1a1aa", // zinc-400
+  },
+  bankArrowDown: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 15,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: "#a1a1aa", // zinc-400
+  },
+  bankLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#ffffff",
+    marginTop: 4,
+    backgroundColor: "#000000",
+    paddingHorizontal: 4,
+  },
+  bankSelectLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#ffffff",
+    marginTop: 4,
+    backgroundColor: "#000000",
+    paddingHorizontal: 4,
+    textAlign: "center",
+    lineHeight: 12,
+  },
+  pedals: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    flex: 1,
+    paddingHorizontal: 40,
+  },
+  branding: {
+    position: "absolute",
+    right: 24,
+    bottom: 80,
+    alignItems: "flex-end",
+    opacity: 0.8,
+  },
+  grLogo: {
+    fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
+    fontStyle: "italic",
+    fontSize: 96,
+    fontWeight: "900",
+    color: "#71717a", // zinc-500
+    letterSpacing: -2,
+  },
+  cosmBadge: {
+    fontWeight: "700",
+    color: "#ffffff",
+    backgroundColor: "#000000",
+    paddingHorizontal: 4,
+    fontStyle: "italic",
+    transform: [{ skewX: "-10deg" }],
+    borderWidth: 1,
+    borderColor: "#52525b", // zinc-600
+  },
+  rightSection: {
+    width: 128,
+    backgroundColor: "#25282e",
+    borderLeftWidth: 2,
+    borderLeftColor: "rgba(0,0,0,0.5)",
+    padding: 8,
+    paddingLeft: 0,
+  },
+  usbSidePort: {
+    position: "absolute",
+    left: -4,
+    top: 128,
+    bottom: 128,
+    width: 4,
+    backgroundColor: "#27272a", // zinc-800
+    borderLeftWidth: 1,
+    borderLeftColor: "#52525b", // zinc-600
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  usbSideLabel: {
+    fontSize: 10,
+    color: "#71717a", // zinc-500
+    transform: [{ rotate: "-90deg" }],
+    letterSpacing: 2.4,
+    textTransform: "uppercase",
+  },
+});
 
 export default GR55Controller;

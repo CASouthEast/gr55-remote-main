@@ -1,32 +1,25 @@
 import React, { useRef, useState } from "react";
+import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
 
-import { cn } from "../utils";
+import { getMotionComponent, getLucideIcon } from "../utils/tailwindCompat";
 
-// Conditional import for framer-motion (web only)
-let motion: any;
-try {
-  motion = require("framer-motion").motion;
-} catch {
-  // Fallback for native platforms - use regular div
-  motion = {
-    div: "div" as any,
-  };
-}
+// Conditional imports for web-only libraries
+const MotionView = getMotionComponent("div");
+const Triangle = getLucideIcon("Triangle");
 
 interface DataWheelProps {
   onRotate?: (direction: "left" | "right") => void;
   onPress?: (direction: "up" | "down" | "left" | "right") => void;
-  className?: string;
+  style?: any;
 }
 
 /**
  * Large rotary encoder with directional buttons integrated.
  * Replicates the complex navigation wheel of the GR-55.
- * Adapted for React Native with conditional framer-motion support.
  */
-export function DataWheel({ onRotate, onPress, className }: DataWheelProps) {
+export function DataWheel({ onRotate, onPress, style }: DataWheelProps) {
   const [rotation, setRotation] = useState(0);
-  const wheelRef = useRef<HTMLDivElement>(null);
+  const wheelRef = useRef<any>(null);
 
   // Wheel drag logic (only available on web with framer-motion)
   const handleWheelDrag = (event: any, info: any) => {
@@ -36,129 +29,270 @@ export function DataWheel({ onRotate, onPress, className }: DataWheelProps) {
     else onRotate?.("left");
   };
 
-  const MotionDiv = motion?.div || "div";
-
-  // Animation props only for web
-  const wheelAnimationProps = motion?.div
-    ? {
-        drag: true,
-        dragConstraints: wheelRef,
-        dragElastic: 0,
-        dragMomentum: false,
-        onDrag: handleWheelDrag,
-        animate: { rotate: rotation },
-      }
-    : {};
-
-  // Fallback click handlers for native platforms
+  // Fallback click handler for native platforms
   const handleWheelClick = () => {
-    if (!motion?.div) {
-      // Simple rotation increment for native platforms
+    if (Platform.OS !== "web") {
       const newRotation = rotation + 30;
       setRotation(newRotation);
       onRotate?.("right");
     }
   };
 
+  // Animation props only for web
+  const wheelAnimationProps =
+    Platform.OS === "web"
+      ? {
+          drag: true,
+          dragConstraints: wheelRef,
+          dragElastic: 0,
+          dragMomentum: false,
+          onDrag: handleWheelDrag,
+          animate: { rotate: rotation },
+        }
+      : {};
+
+  // Fallback triangle icon for native platforms
+  const TriangleIcon = ({
+    iconStyle,
+    rotation: iconRotation,
+  }: {
+    iconStyle: any;
+    rotation: number;
+  }) => {
+    if (Triangle && Platform.OS === "web") {
+      return (
+        <Triangle
+          style={[iconStyle, { transform: `rotate(${iconRotation}deg)` }]}
+          fill="currentColor"
+        />
+      );
+    }
+    // SVG fallback for native platforms
+    return (
+      <View
+        style={[
+          iconStyle,
+          {
+            transform: [{ rotate: `${iconRotation}deg` }],
+            width: 12,
+            height: 12,
+            backgroundColor: "#a1a1aa", // Approximation for triangle
+          },
+        ]}
+      />
+    );
+  };
+
+  const WheelComponent = Platform.OS === "web" ? MotionView : TouchableOpacity;
+  const wheelProps =
+    Platform.OS === "web"
+      ? { ref: wheelRef, ...wheelAnimationProps, onPress: handleWheelClick }
+      : { onPress: handleWheelClick, activeOpacity: 0.9 };
+
   return (
-    <div
-      className={cn(
-        "relative w-32 h-32 flex items-center justify-center",
-        className
-      )}
-    >
+    <View style={[styles.container, style]}>
       {/* Directional Buttons Ring */}
-      <div className="absolute inset-0 rounded-full border border-zinc-700 bg-zinc-900 shadow-xl" />
+      <View style={styles.buttonRing} />
 
       {/* Up Button */}
-      <button
-        type="button"
-        title="Navigate up"
-        onClick={() => onPress?.("up")}
-        className="absolute top-1 left-1/2 -translate-x-1/2 w-8 h-6 bg-zinc-800 hover:bg-zinc-700 rounded-t-lg flex items-center justify-center shadow-sm active:translate-y-0.5 transition-transform"
+      <TouchableOpacity
+        onPress={() => onPress?.("up")}
+        style={[styles.directionButton, styles.upButton]}
+        activeOpacity={0.7}
       >
-        <svg
-          className="w-3 h-3 text-zinc-400"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M12 6l-6 12h12z" />
-        </svg>
-      </button>
+        <TriangleIcon iconStyle={styles.triangleIcon} rotation={0} />
+      </TouchableOpacity>
 
       {/* Down Button */}
-      <button
-        type="button"
-        title="Navigate down"
-        onClick={() => onPress?.("down")}
-        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-6 bg-zinc-800 hover:bg-zinc-700 rounded-b-lg flex items-center justify-center shadow-sm active:-translate-y-0.5 transition-transform"
+      <TouchableOpacity
+        onPress={() => onPress?.("down")}
+        style={[styles.directionButton, styles.downButton]}
+        activeOpacity={0.7}
       >
-        <svg
-          className="w-3 h-3 text-zinc-400"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M12 18l6-12H6z" />
-        </svg>
-      </button>
+        <TriangleIcon iconStyle={styles.triangleIcon} rotation={180} />
+      </TouchableOpacity>
 
       {/* Left Button */}
-      <button
-        type="button"
-        title="Navigate left"
-        onClick={() => onPress?.("left")}
-        className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-8 bg-zinc-800 hover:bg-zinc-700 rounded-l-lg flex items-center justify-center shadow-sm active:translate-x-0.5 transition-transform"
+      <TouchableOpacity
+        onPress={() => onPress?.("left")}
+        style={[styles.directionButton, styles.leftButton]}
+        activeOpacity={0.7}
       >
-        <svg
-          className="w-3 h-3 text-zinc-400"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M6 12l12 6V6z" />
-        </svg>
-      </button>
+        <TriangleIcon iconStyle={styles.triangleIcon} rotation={-90} />
+      </TouchableOpacity>
 
       {/* Right Button */}
-      <button
-        type="button"
-        title="Navigate right"
-        onClick={() => onPress?.("right")}
-        className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-8 bg-zinc-800 hover:bg-zinc-700 rounded-r-lg flex items-center justify-center shadow-sm active:-translate-x-0.5 transition-transform"
+      <TouchableOpacity
+        onPress={() => onPress?.("right")}
+        style={[styles.directionButton, styles.rightButton]}
+        activeOpacity={0.7}
       >
-        <svg
-          className="w-3 h-3 text-zinc-400"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M18 12L6 6v12z" />
-        </svg>
-      </button>
+        <TriangleIcon iconStyle={styles.triangleIcon} rotation={90} />
+      </TouchableOpacity>
 
       {/* Center Wheel */}
-      <MotionDiv
-        ref={wheelRef}
-        {...wheelAnimationProps}
-        onClick={handleWheelClick}
-        className={cn(
-          "w-20 h-20 rounded-full bg-zinc-800 border-4 border-zinc-900 shadow-[0_4px_10px_rgba(0,0,0,0.5)] flex items-center justify-center z-10",
-          motion?.div ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"
-        )}
-        style={{
-          background:
-            "conic-gradient(from 180deg, #27272a 0%, #3f3f46 50%, #27272a 100%)",
-          transform: motion?.div ? undefined : `rotate(${rotation}deg)`,
-        }}
+      <WheelComponent
+        style={[
+          styles.centerWheel,
+          Platform.OS !== "web" && {
+            transform: [{ rotate: `${rotation}deg` }],
+          },
+        ]}
+        {...wheelProps}
       >
         {/* Wheel Texture */}
-        <div className="absolute w-16 h-16 rounded-full border-2 border-dashed border-zinc-600 opacity-30" />
-        <div className="w-12 h-12 rounded-full bg-zinc-900/50 shadow-inner" />
+        <View style={styles.wheelTexture} />
+        <View style={styles.wheelCenter} />
         {/* Spinner Divot */}
-        <div className="absolute top-2 w-3 h-3 rounded-full bg-zinc-950 shadow-inner border border-zinc-700" />
-      </MotionDiv>
-    </div>
+        <View style={styles.spinnerDivot} />
+      </WheelComponent>
+    </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    position: "relative",
+    width: 128,
+    height: 128,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonRing: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 64,
+    borderWidth: 1,
+    borderColor: "#52525b", // zinc-700
+    backgroundColor: "#18181b", // zinc-900
+    ...Platform.select({
+      web: {
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      },
+      default: {
+        elevation: 20,
+      },
+    }),
+  },
+  directionButton: {
+    position: "absolute",
+    backgroundColor: "#27272a", // zinc-800
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      web: {
+        boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
+      },
+      default: {
+        elevation: 2,
+      },
+    }),
+  },
+  upButton: {
+    top: 4,
+    left: "50%",
+    marginLeft: -16,
+    width: 32,
+    height: 24,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  downButton: {
+    bottom: 4,
+    left: "50%",
+    marginLeft: -16,
+    width: 32,
+    height: 24,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  leftButton: {
+    left: 4,
+    top: "50%",
+    marginTop: -16,
+    width: 24,
+    height: 32,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  rightButton: {
+    right: 4,
+    top: "50%",
+    marginTop: -16,
+    width: 24,
+    height: 32,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  triangleIcon: {
+    width: 12,
+    height: 12,
+    color: "#a1a1aa", // zinc-400
+  },
+  centerWheel: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#27272a", // zinc-800
+    borderWidth: 4,
+    borderColor: "#18181b", // zinc-900
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+    ...Platform.select({
+      web: {
+        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
+        cursor: "grab",
+      } as any,
+      default: {
+        elevation: 10,
+      },
+    }),
+  },
+  wheelTexture: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: "#52525b", // zinc-600
+    borderStyle: "dashed",
+    opacity: 0.3,
+  },
+  wheelCenter: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "rgba(24, 24, 27, 0.5)", // zinc-900/50
+    ...Platform.select({
+      web: {
+        boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+      },
+      default: {
+        // React Native doesn't support inset shadows, so we'll use a darker background
+        backgroundColor: "#0f0f0f",
+      },
+    }),
+  },
+  spinnerDivot: {
+    position: "absolute",
+    top: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#0c0a09", // zinc-950
+    borderWidth: 1,
+    borderColor: "#52525b", // zinc-700
+    ...Platform.select({
+      web: {
+        boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+      },
+      default: {
+        backgroundColor: "#000000",
+      },
+    }),
+  },
+});

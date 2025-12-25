@@ -4,9 +4,7 @@
  */
 
 // Export the platform-specific component
-// React Native's Metro bundler will automatically choose:
-// - GR55HWView.web.tsx on web platform
-// - GR55HWView.native.tsx on native platforms
+// React Native's Metro bundler will automatically choose the right implementation
 export { GR55HWView } from "./GR55HWView";
 export * from "./GR55HWView.types";
 
