@@ -6,7 +6,7 @@ This implementation plan converts the GR55 hardware view design into a series of
 
 ## Tasks
 
-- [ ] 1. Create git branch and setup project structure
+- [-] 1. Create git branch and setup project structure
 
   - Create new branch "GR55HWView" from "Enhancements" branch
   - Create directory structure under src/components/hardware-view/
