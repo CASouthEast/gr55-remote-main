@@ -171,21 +171,17 @@ export function GR55Controller({
                   mode={state.activeStyle}
                 />
 
-                {/* Sound Style Buttons */}
+                {/* Enhanced Sound Style Buttons with better alignment */}
                 <View style={styles.styleSection}>
                   <View style={styles.styleSectionHeader}>
                     <Text style={styles.sectionLabel}>SOUND STYLE</Text>
                   </View>
                   <View style={styles.styleButtons}>
-                    {/* V-LINK Logo/Button */}
-                    <View style={styles.vLinkSection}>
-                      <Text style={styles.vLinkLabel}>V-LINK</Text>
-                      <Button
-                        label=""
-                        variant="rect"
-                        style={styles.vLinkButton}
-                      />
-                    </View>
+                    <SoundStyleButton
+                      label="V-LINK"
+                      active={false}
+                      onClick={() => {}}
+                    />
 
                     {DEFAULT_STYLES.map((style) => (
                       <SoundStyleButton
@@ -200,15 +196,20 @@ export function GR55Controller({
                       />
                     ))}
 
-                    {/* EZ Edit Section */}
+                    {/* EZ Edit Section with enhanced alignment */}
                     <View style={styles.ezEditSection}>
-                      <Button label="EZ EDIT" variant="rect" />
+                      <Text style={styles.ezEditLabel}>EZ EDIT</Text>
+                      <Button
+                        label=""
+                        variant="rect"
+                        style={styles.ezEditButton}
+                      />
                     </View>
                   </View>
                 </View>
               </View>
 
-              {/* Right Column: Wheel & Nav */}
+              {/* Right Column: Wheel & Nav with enhanced positioning */}
               <View style={styles.rightColumn}>
                 {/* Output Level */}
                 <View style={styles.outputLevel}>
@@ -224,18 +225,27 @@ export function GR55Controller({
                   onPress={handleDataWheelPress}
                 />
 
-                {/* Nav Buttons Grid */}
+                {/* Enhanced Nav Buttons Grid with better alignment */}
                 <View style={styles.navButtons}>
-                  <Button label="PAGE" subLabel="◄" variant="rect" />
-                  <Button label="PAGE" subLabel="►" variant="rect" />
-                  <Button label="EDIT" variant="rect" />
+                  <View style={styles.navButtonGroup}>
+                    <Text style={styles.navButtonLabel}>PAGE</Text>
+                    <Button label="◄" variant="rect" />
+                  </View>
+                  <View style={styles.navButtonGroup}>
+                    <Text style={styles.navButtonLabel}>PAGE</Text>
+                    <Button label="►" variant="rect" />
+                  </View>
+                  <View style={styles.navButtonGroup}>
+                    <Text style={styles.navButtonLabel}>EDIT</Text>
+                    <Button label="EDIT" variant="rect" />
+                  </View>
 
                   <Button label="EXIT" variant="rect" />
                   <Button label="ENTER" variant="rect" />
                   <Button label="WRITE" variant="rect" />
                 </View>
 
-                {/* Audio Player */}
+                {/* Audio Player positioned to align with CTL pedal */}
                 <View style={styles.audioPlayer}>
                   <Text style={styles.audioPlayerLabel}>AUDIO PLAYER</Text>
                   <Button
@@ -249,42 +259,40 @@ export function GR55Controller({
             </View>
           </View>
 
-          {/* Bottom Pedal Area */}
+          {/* Enhanced Bottom Pedal Area with optimized spacing */}
           <View style={styles.pedalArea}>
-            {/* Bank Select Up/Down */}
-            <View style={styles.bankSelectUp}>
-              <View style={styles.bankArrowUp} />
-              <Text style={styles.bankLabel}>BANK</Text>
-            </View>
-            <View style={styles.bankSelectDown}>
-              <View style={styles.bankArrowDown} />
-              <Text style={styles.bankSelectLabel}>BANK{"\n"}SELECT</Text>
-            </View>
-
             <View style={styles.pedals}>
-              <Pedal
-                label="1"
-                isActive={state.activePedal === 1}
-                onClick={() => actions.setActivePedal(1)}
-              />
-              <Pedal
-                label="2"
-                isActive={state.activePedal === 2}
-                onClick={() => actions.setActivePedal(2)}
-                subLabel="BANK ▲"
-              />
-              <Pedal
-                label="3"
-                isActive={state.activePedal === 3}
-                onClick={() => actions.setActivePedal(3)}
-                subLabel="BANK ▼"
-              />
-              <Pedal
-                label="CTL"
-                isActive={state.activePedal === 4}
-                onClick={() => actions.setActivePedal(4)}
-                subLabel="PHRASE LOOP"
-              />
+              <View style={styles.pedalColumn}>
+                <Pedal
+                  label="1"
+                  isActive={state.activePedal === 1}
+                  onClick={() => actions.setActivePedal(1)}
+                />
+              </View>
+              <View style={styles.pedalColumn}>
+                <Pedal
+                  label="2"
+                  isActive={state.activePedal === 2}
+                  onClick={() => actions.setActivePedal(2)}
+                  subLabel="BANK ▲"
+                />
+              </View>
+              <View style={styles.pedalColumn}>
+                <Pedal
+                  label="3"
+                  isActive={state.activePedal === 3}
+                  onClick={() => actions.setActivePedal(3)}
+                  subLabel="BANK ▼"
+                />
+              </View>
+              <View style={styles.pedalColumn}>
+                <Pedal
+                  label="CTL"
+                  isActive={state.activePedal === 4}
+                  onClick={() => actions.setActivePedal(4)}
+                  subLabel="PHRASE LOOP"
+                />
+              </View>
             </View>
 
             {/* Branding Logos */}
@@ -437,26 +445,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  vLinkSection: {
-    alignItems: "center",
-    marginRight: 16,
-  },
-  vLinkLabel: {
-    fontStyle: "italic",
-    fontWeight: "900",
-    color: "#ffffff",
-    backgroundColor: "#000000",
-    paddingHorizontal: 4,
-    fontSize: 12,
-    transform: [{ skewX: "-10deg" }],
-    marginBottom: 4,
-  },
-  vLinkButton: {
-    height: 24,
-    width: 40,
-  },
   ezEditSection: {
     marginLeft: 16,
+    alignItems: "center",
+    paddingTop: 8,
+  },
+  ezEditLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#f4f4f5", // zinc-100
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+    marginBottom: 10,
+  },
+  ezEditButton: {
+    width: 64,
+    height: 32,
   },
   rightColumn: {
     flex: 1,
@@ -511,6 +515,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     justifyContent: "space-between",
   },
+  navButtonGroup: {
+    alignItems: "center",
+    gap: 4,
+  },
+  navButtonLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#a1a1aa", // zinc-400
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
   audioPlayer: {
     marginTop: "auto",
     alignItems: "center",
@@ -533,25 +548,23 @@ const styles = StyleSheet.create({
   },
   pedalArea: {
     backgroundColor: "#1a1c21",
-    padding: 24,
+    padding: 20, // Reduced from 24 for tighter spacing
     borderTopWidth: 2,
     borderTopColor: "rgba(0,0,0,0.5)",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "flex-end",
-    paddingBottom: 32,
+    paddingBottom: 28, // Reduced from 32
     position: "relative",
   },
+  pedalColumn: {
+    alignItems: "center",
+    gap: 8,
+  },
   bankSelectUp: {
-    position: "absolute",
-    left: 64,
-    top: 40,
     alignItems: "center",
   },
   bankSelectDown: {
-    position: "absolute",
-    left: 64,
-    bottom: 64,
     alignItems: "center",
   },
   bankArrowUp: {
@@ -601,14 +614,14 @@ const styles = StyleSheet.create({
   branding: {
     position: "absolute",
     right: 24,
-    bottom: 80,
+    bottom: 72, // Adjusted for tighter layout
     alignItems: "flex-end",
     opacity: 0.8,
   },
   grLogo: {
     fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
     fontStyle: "italic",
-    fontSize: 96,
+    fontSize: 88, // Slightly reduced from 96
     fontWeight: "900",
     color: "#71717a", // zinc-500
     letterSpacing: -2,

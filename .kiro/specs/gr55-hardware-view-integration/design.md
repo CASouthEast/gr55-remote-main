@@ -176,145 +176,375 @@ Reference Sources:
 
 ## Components and Interfaces
 
-### Core Component Interface
+### Enhanced Core Component Interface
 
 ```typescript
-// GR55HWView.types.ts
-export interface GR55State {
+// GR55HWView.types.ts - Enhanced for real-time integration
+export interface GR55EnhancedState {
+  // Device connection
+  isConnected: boolean;
+  connectionStatus: "disconnected" | "connecting" | "connected" | "error";
+
+  // Current active pedal (1-4) with mutual exclusivity
   activePedal: number;
+  pedalLEDs: {
+    pedal1: boolean;
+    pedal2: boolean;
+    pedal3: boolean;
+    ctl: boolean; // Independent from 1,2,3
+  };
+
+  // Current patch information from device
   patchName: string;
-  activeStyle: "LEAD" | "RHYTHM" | "OTHER" | "USER";
   bank: string;
+
+  // Active sound style selection with LED states
+  activeStyle: "LEAD" | "RHYTHM" | "OTHER" | "USER";
+  styleLEDs: {
+    lead: boolean;
+    rhythm: boolean;
+    other: boolean;
+    user: boolean;
+    vlink: boolean;
+  };
+
+  // Tone source information
+  toneSource: {
+    guitar: boolean;
+    pcm: boolean;
+    activeTone: "guitar" | "pcm" | "both";
+  };
+
+  // Effects status (real device state)
+  effects: {
+    // Row 1 in display
+    mfx: boolean;
+    delay: boolean;
+    chorus: boolean;
+    reverb: boolean;
+    // Row 2 in display
+    amp: boolean;
+    ns: boolean;
+    mod: boolean;
+    eq: boolean;
+  };
+
+  // Control states
+  controls: {
+    ezEdit: boolean;
+    exit: boolean;
+    enter: boolean;
+    write: boolean;
+    pageLeft: boolean;
+    pageRight: boolean;
+    edit: boolean;
+  };
+
+  // Physical controls
+  outputLevel: number; // 0-127, rotatable with start/stop
+  dataWheel: number; // Rotary position
+  expressionPedal: number; // 0-127, slider representation
+  expSwitch: boolean; // With LED indicator
+
+  // Bank selection
+  bankSelect: {
+    up: boolean;
+    down: boolean;
+  };
 }
 
-export interface GR55Actions {
+export interface GR55EnhancedActions {
+  // Device connection
+  connect: () => Promise<void>;
+  disconnect: () => void;
+
+  // Control actions
   setActivePedal: (pedal: number) => void;
   setPatchName: (name: string) => void;
-  setActiveStyle: (style: GR55State["activeStyle"]) => void;
+  setActiveStyle: (style: GR55EnhancedState["activeStyle"]) => void;
+
+  // Physical control actions
+  setOutputLevel: (level: number) => void;
+  setDataWheel: (position: number) => void;
+  setExpressionPedal: (value: number) => void;
+
+  // Effect control actions
+  toggleEffect: (effect: keyof GR55EnhancedState["effects"]) => void;
+
+  // Bank control actions
+  bankUp: () => void;
+  bankDown: () => void;
 }
 
-export interface GR55HWViewProps {
-  initialState?: Partial<GR55State>;
-  onStateChange?: (state: GR55State) => void;
+export interface GR55HWViewEnhancedProps {
+  initialState?: Partial<GR55EnhancedState>;
+  onStateChange?: (state: GR55EnhancedState) => void;
+  onMIDICommand?: (command: MIDICommand) => void;
+  deviceConnected?: boolean;
 }
 
-export interface StyleButtonConfig {
-  id: string;
-  label: string;
-  patch: string;
+export interface MIDICommand {
+  type: "cc" | "sysex" | "note";
+  channel?: number;
+  controller?: number;
+  value?: number;
+  data?: Uint8Array;
+}
+
+export interface LayoutAlignment {
+  // Horizontal alignment groups
+  topRowHeadings: AlignmentGroup;
+  buttonRow: AlignmentGroup;
+  pageControls: AlignmentGroup;
+  footPedals: AlignmentGroup;
+  audioPlayer: AlignmentGroup;
+  display: DisplayLayout;
+}
+
+interface AlignmentGroup {
+  [key: string]: { x: number; y: number };
+}
+
+interface DisplayLayout {
+  topRow: { height: number; y: number };
+  midRow: { height: number; y: number };
+  bottomArea: { height: number; y: number; rows: 2 };
 }
 ```
 
-### Platform-Specific Components
+### Enhanced Platform-Specific Components
 
-**Web Implementation (GR55HWView.web.tsx):**
+**Enhanced Web Implementation (GR55HWView.web.tsx):**
 
 ```typescript
-import React, { useState } from "react";
-import { GR55Controller } from "./components/GR55Controller";
-import { GR55HWViewProps, GR55State } from "./GR55HWView.types";
+import React, { useState, useEffect, useCallback } from "react";
+import { GR55EnhancedController } from "./components/GR55EnhancedController";
+import { MIDIIntegrationLayer } from "./utils/midiIntegration";
+import { GR55HWViewEnhancedProps, GR55EnhancedState } from "./GR55HWView.types";
 
-export function GR55HWView({ initialState, onStateChange }: GR55HWViewProps) {
-  const [state, setState] = useState<GR55State>({
+export function GR55HWView({
+  initialState,
+  onStateChange,
+  onMIDICommand,
+  deviceConnected = false,
+}: GR55HWViewEnhancedProps) {
+  const [state, setState] = useState<GR55EnhancedState>({
+    isConnected: deviceConnected,
+    connectionStatus: deviceConnected ? "connected" : "disconnected",
     activePedal: 1,
+    pedalLEDs: { pedal1: true, pedal2: false, pedal3: false, ctl: false },
     patchName: "LEAD GUITAR",
-    activeStyle: "LEAD",
     bank: "01-1",
+    activeStyle: "LEAD",
+    styleLEDs: {
+      lead: true,
+      rhythm: false,
+      other: false,
+      user: false,
+      vlink: false,
+    },
+    toneSource: { guitar: true, pcm: false, activeTone: "guitar" },
+    effects: {
+      mfx: true,
+      delay: false,
+      chorus: true,
+      reverb: false,
+      amp: true,
+      ns: false,
+      mod: false,
+      eq: true,
+    },
+    controls: {
+      ezEdit: false,
+      exit: false,
+      enter: false,
+      write: false,
+      pageLeft: false,
+      pageRight: false,
+      edit: false,
+    },
+    outputLevel: 64,
+    dataWheel: 0,
+    expressionPedal: 0,
+    expSwitch: false,
+    bankSelect: { up: false, down: false },
     ...initialState,
   });
 
-  const handleStateChange = (newState: Partial<GR55State>) => {
-    const updatedState = { ...state, ...newState };
-    setState(updatedState);
-    onStateChange?.(updatedState);
-  };
+  // MIDI integration
+  const midiLayer = new MIDIIntegrationLayer();
+
+  const handleStateChange = useCallback(
+    (newState: Partial<GR55EnhancedState>) => {
+      const updatedState = { ...state, ...newState };
+      setState(updatedState);
+      onStateChange?.(updatedState);
+
+      // Send MIDI commands for control changes
+      if (onMIDICommand) {
+        // Generate appropriate MIDI commands based on state changes
+        const commands = midiLayer.generateMIDICommands(state, newState);
+        commands.forEach((command) => onMIDICommand(command));
+      }
+    },
+    [state, onStateChange, onMIDICommand, midiLayer]
+  );
+
+  // Real-time device state synchronization
+  useEffect(() => {
+    if (state.isConnected) {
+      const syncInterval = setInterval(() => {
+        // Poll device state and update if changed
+        midiLayer.pollDeviceState().then((deviceState) => {
+          if (deviceState) {
+            handleStateChange(deviceState);
+          }
+        });
+      }, 50); // 20Hz update rate for sub-100ms response
+
+      return () => clearInterval(syncInterval);
+    }
+  }, [state.isConnected, handleStateChange, midiLayer]);
 
   return (
     <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-4">
       <div className="scale-[0.8] md:scale-100 origin-center">
-        <GR55Controller state={state} onStateChange={handleStateChange} />
+        <GR55EnhancedController
+          state={state}
+          onStateChange={handleStateChange}
+          layoutAlignment={ENHANCED_LAYOUT_CONFIG}
+        />
       </div>
-      <p className="text-zinc-500 mt-4 text-sm font-mono">
-        Roland GR-55 Interactive Demo
-      </p>
+      <div className="mt-4 text-center">
+        <p className="text-zinc-500 text-sm font-mono">
+          Roland GR-55 Enhanced Interactive Interface
+        </p>
+        <p className="text-zinc-400 text-xs">
+          Status: {state.connectionStatus} | Patch: {state.bank}{" "}
+          {state.patchName}
+        </p>
+      </div>
     </div>
   );
 }
+
+// Enhanced layout configuration with precise alignment
+const ENHANCED_LAYOUT_CONFIG: LayoutAlignment = {
+  topRowHeadings: {
+    vlink: { x: 50, y: 20 },
+    lead: { x: 150, y: 20 },
+    rhythm: { x: 250, y: 20 },
+    other: { x: 350, y: 20 },
+    user: { x: 450, y: 20 },
+    ezEdit: { x: 550, y: 20 },
+    exit: { x: 650, y: 20 },
+    enter: { x: 750, y: 20 },
+    write: { x: 850, y: 20 },
+  },
+  buttonRow: {
+    vlink: { x: 50, y: 60 },
+    lead: { x: 150, y: 60 },
+    rhythm: { x: 250, y: 60 },
+    other: { x: 350, y: 60 },
+    user: { x: 450, y: 60 },
+    ez: { x: 550, y: 60 },
+    exit: { x: 650, y: 60 },
+    enter: { x: 750, y: 60 },
+    write: { x: 850, y: 60 },
+  },
+  pageControls: {
+    pageLeft: { x: 200, y: 300 },
+    pageRight: { x: 300, y: 300 },
+    edit: { x: 400, y: 300 },
+  },
+  footPedals: {
+    pedal1: { x: 150, y: 400 },
+    pedal2: { x: 250, y: 400 },
+    pedal3: { x: 350, y: 400 },
+    ctl: { x: 450, y: 400 },
+    bankDown: { x: 180, y: 380 }, // Right of pedal 1, top aligned
+    bankUp: { x: 280, y: 400 }, // Right of pedal 2
+  },
+  audioPlayer: {
+    button: { x: 450, y: 350 }, // Aligned with CTL pedal
+    topText: { x: 450, y: 330 },
+    bottomText: { x: 450, y: 370 },
+  },
+  display: {
+    topRow: { height: 30, y: 150 }, // Guitar, PCM indicators
+    midRow: { height: 40, y: 180 }, // Patch name
+    bottomArea: { height: 60, y: 220, rows: 2 }, // Extended for effects
+  },
+};
 ```
 
-**Native Implementation (GR55HWView.native.tsx):**
+### Enhanced Component Architecture
+
+**Enhanced GR55Controller Component:**
 
 ```typescript
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { GR55HWViewProps, GR55State } from "./GR55HWView.types";
+// components/GR55EnhancedController.tsx
+import React from "react";
+import { EnhancedDisplay } from "./EnhancedDisplay";
+import { EnhancedButtons } from "./EnhancedButtons";
+import { EnhancedPedals } from "./EnhancedPedals";
+import { EnhancedControls } from "./EnhancedControls";
+import { GR55EnhancedState, LayoutAlignment } from "../GR55HWView.types";
 
-export function GR55HWView({ initialState, onStateChange }: GR55HWViewProps) {
-  const [state, setState] = useState<GR55State>({
-    activePedal: 1,
-    patchName: "LEAD GUITAR",
-    activeStyle: "LEAD",
-    bank: "01-1",
-    ...initialState,
-  });
+interface GR55EnhancedControllerProps {
+  state: GR55EnhancedState;
+  onStateChange: (newState: Partial<GR55EnhancedState>) => void;
+  layoutAlignment: LayoutAlignment;
+}
 
+export function GR55EnhancedController({
+  state,
+  onStateChange,
+  layoutAlignment,
+}: GR55EnhancedControllerProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Roland GR-55 Hardware View</Text>
-      <Text style={styles.subtitle}>
-        Full interactive hardware view available on web platform
-      </Text>
-
-      {/* Static hardware image */}
-      <Image
-        source={require("../../../assets/gr55-hardware.png")}
-        style={styles.hardwareImage}
-        resizeMode="contain"
+    <div className="relative w-[1000px] h-[600px] bg-gradient-to-b from-zinc-800 to-zinc-900 rounded-lg shadow-2xl">
+      {/* Enhanced Display with two-row effects */}
+      <EnhancedDisplay
+        state={state}
+        layout={layoutAlignment.display}
+        className="absolute"
+        style={{
+          left: 300,
+          top: layoutAlignment.display.topRow.y,
+          width: 400,
+          height:
+            layoutAlignment.display.topRow.height +
+            layoutAlignment.display.midRow.height +
+            layoutAlignment.display.bottomArea.height,
+        }}
       />
 
-      {/* Basic controls */}
-      <View style={styles.controlsContainer}>
-        <Text style={styles.currentPatch}>
-          Current Patch: {state.bank} {state.patchName}
-        </Text>
+      {/* Enhanced Button Array with precise alignment */}
+      <EnhancedButtons
+        state={state}
+        onStateChange={onStateChange}
+        layout={layoutAlignment}
+        className="absolute"
+      />
 
-        <View style={styles.styleButtons}>
-          {["LEAD", "RHYTHM", "OTHER", "USER"].map((style) => (
-            <TouchableOpacity
-              key={style}
-              style={[
-                styles.styleButton,
-                state.activeStyle === style && styles.activeStyleButton,
-              ]}
-              onPress={() => {
-                const newState = {
-                  ...state,
-                  activeStyle: style as GR55State["activeStyle"],
-                };
-                setState(newState);
-                onStateChange?.(newState);
-              }}
-            >
-              <Text style={styles.styleButtonText}>{style}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    </View>
+      {/* Enhanced Pedals with LED indicators */}
+      <EnhancedPedals
+        state={state}
+        onStateChange={onStateChange}
+        layout={layoutAlignment.footPedals}
+        className="absolute"
+      />
+
+      {/* Enhanced Rotatable Controls */}
+      <EnhancedControls
+        state={state}
+        onStateChange={onStateChange}
+        layout={layoutAlignment}
+        className="absolute"
+      />
+    </div>
   );
-}
-```
-
-### Updated Main Screen Component
-
-```typescript
-// src/screens/GR55HWViewPage.tsx
-import React from "react";
-import { Platform } from "react-native";
-import { GR55HWView } from "../components/hardware-view/GR55HWView";
-
-export default function GR55HWViewPage() {
-  return <GR55HWView />;
 }
 ```
 
@@ -571,10 +801,114 @@ _For any_ patch or effects change, the extended display should show accurate ton
 _For any_ rotatable control (output level, data wheel) or slider control (expression pedal), the control should provide appropriate visual feedback and send corresponding device commands
 **Validates: Requirements 11.13, 11.14, 11.18, 12.8**
 
+## Correctness Properties
+
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
+
+### Property 1: Component Structure Integrity
+
+_For any_ build process, all GR55HWView components should be located within the src directory structure and use relative import paths
+**Validates: Requirements 1.1, 1.2**
+
+### Property 2: Platform-Specific Component Loading
+
+_For any_ platform (web or native), the system should load the correct platform-specific implementation without cross-contamination
+**Validates: Requirements 2.1, 2.2, 2.3**
+
+### Property 3: Dependency Isolation
+
+_For any_ build target, web-specific dependencies should only be included in web builds and excluded from native builds
+**Validates: Requirements 3.2, 3.3**
+
+### Property 4: State Synchronization
+
+_For any_ user interaction with controls, the interface state and display should update consistently to reflect the changes
+**Validates: Requirements 4.3, 5.1**
+
+### Property 5: Cross-Platform Styling Compatibility
+
+_For any_ component, styling should use React Native compatible approaches and avoid web-only CSS classes in cross-platform code
+**Validates: Requirements 2.4, 4.4**
+
+### Property 6: Navigation Integration
+
+_For any_ navigation to the Hardware tab, the system should display the appropriate hardware view for the current platform
+**Validates: Requirements 6.1, 6.4**
+
+### Property 7: Performance Requirements
+
+_For any_ hardware view initialization, the loading process should complete within 2 seconds and interactions should respond within 100ms
+**Validates: Requirements 7.1, 7.2**
+
+### Property 8: Error Handling Robustness
+
+_For any_ error condition (dependency failures, platform detection failures, component errors), the system should gracefully handle the error and provide appropriate fallbacks
+**Validates: Requirements 9.1, 9.2, 9.3**
+
+### Property 9: Memory Management
+
+_For any_ component lifecycle, the system should efficiently manage resources and prevent memory leaks during mount/unmount cycles
+**Validates: Requirements 7.4**
+
+### Property 10: Interactive Feedback Consistency
+
+_For any_ user interaction (pedals, buttons, data wheel), the system should provide appropriate visual feedback and execute expected actions
+**Validates: Requirements 5.2, 5.3, 5.4**
+
+### Property 11: Enhanced Visual Design Preservation
+
+_For any_ component rendering, the visual design should match the authentic Roland GR-55 hardware appearance as shown in GR55HWDesign.png with proper 3D effects, realistic styling, and accurate proportions
+**Validates: Requirements 4.1, 4.3, 4.4**
+
+### Property 12: Layout Alignment Consistency
+
+_For any_ hardware view rendering, all horizontally aligned elements (V-link icon, button headings, buttons, page controls) should maintain consistent horizontal positioning within 2px tolerance
+**Validates: Requirements 11.1, 11.2, 11.4**
+
+### Property 13: LED State Accuracy
+
+_For any_ device state change, all LED indicators should accurately reflect the real GR55 device state and update within 100ms
+**Validates: Requirements 11.3, 11.10, 11.11, 12.2**
+
+### Property 14: Mutual Exclusivity of Foot Pedal LEDs
+
+_For any_ foot pedal activation, exactly one of LEDs 1, 2, 3 should be active while CTL LED operates independently
+**Validates: Requirements 11.10, 11.11**
+
+### Property 15: Real-Time Data Synchronization
+
+_For any_ GR55 device state change, the hardware view should update all visual indicators to match device state within 100ms
+**Validates: Requirements 12.2, 12.4, 12.5, 12.6**
+
+### Property 16: Bidirectional Control Integration
+
+_For any_ user interaction with hardware view controls, appropriate MIDI commands should be sent to the GR55 device and visual feedback should be provided within 50ms
+**Validates: Requirements 12.3, 12.7, 12.8**
+
+### Property 17: Enhanced Display Content Accuracy
+
+_For any_ patch or effects change, the extended display should show accurate tone source indicators (top row), patch name (mid row), and two-row effects status (bottom area) matching device state
+**Validates: Requirements 11.15, 11.16, 11.17, 12.5, 12.6**
+
+### Property 18: Interactive Control Responsiveness
+
+_For any_ rotatable control (output level, data wheel) or slider control (expression pedal), the control should provide visual feedback within 16ms and send corresponding device commands within 50ms
+**Validates: Requirements 11.13, 11.14, 11.18, 12.8**
+
 ### Property 19: Connection State Management
 
-_For any_ connection state change (connected, disconnected, error), the system should handle the transition gracefully and update all dependent components appropriately
+_For any_ connection state change (connected, disconnected, error), the system should handle the transition gracefully, update all dependent components appropriately, and attempt reconnection when appropriate
 **Validates: Requirements 12.1, 12.10**
+
+### Property 20: Spacing and Positioning Accuracy
+
+_For any_ layout rendering, spacing between page controls and foot pedals should be reduced compared to other elements, and bank buttons should be positioned correctly relative to their corresponding pedals
+**Validates: Requirements 11.5, 11.6, 11.7, 11.8**
+
+### Property 21: Control Visual Consistency
+
+_For any_ LED element, the styling should be consistent with the Lead button style, and all rotatable controls should have distinct start and stop positions
+**Validates: Requirements 11.9, 11.12, 11.13**
 
 ## Error Handling
 
