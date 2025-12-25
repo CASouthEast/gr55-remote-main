@@ -1,6 +1,7 @@
 import { NavigationProp } from "@react-navigation/native";
 
 export type RootTabParamList = {
+  Connect: object;
   PatchDrawer: object;
   LibraryPatchList: object;
   SetupStack: object;

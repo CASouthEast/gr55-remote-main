@@ -2,6 +2,7 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Platform } from "react-native";
 
+import { ConnectScreen } from "../../screens/ConnectScreen";
 import GR55HWViewPage from "../../screens/GR55HWViewPage";
 import { LibraryPatchListScreen } from "../../screens/LibraryPatchListScreen";
 import { useUserOptions } from "../UserOptions";
@@ -40,6 +41,20 @@ export function RootTabNavigator() {
         }),
       })}
     >
+      <RootTab.Screen
+        name="Connect"
+        component={ConnectScreen}
+        options={{
+          title: "Connect",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="link" size={24} color={color} />
+          ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "Connect to device",
+            tabBarAccessibilityHint: "Configure MIDI connection to GR-55",
+          }),
+        }}
+      />
       <RootTab.Screen
         name="PatchDrawer"
         component={PatchSectionWithTopNavigation}

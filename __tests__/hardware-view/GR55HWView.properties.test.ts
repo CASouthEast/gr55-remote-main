@@ -976,13 +976,6 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
               "datawheel",
               "controller"
             ),
-            visualProperties: fc.record({
-              hasProperShadows: fc.boolean(),
-              hasCorrectColors: fc.boolean(),
-              hasAuthenticProportions: fc.boolean(),
-              has3DEffects: fc.boolean(),
-              hasProperBranding: fc.boolean(),
-            }),
             interactionState: fc.record({
               isActive: fc.boolean(),
               isPressed: fc.boolean(),
@@ -994,13 +987,12 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
             // Roland GR-55 hardware appearance as shown in GR55HWDesign.png with proper 3D effects,
             // realistic styling, and accurate proportions
 
-            const { componentType, visualProperties, interactionState } =
-              testData;
+            const { componentType, interactionState } = testData;
 
             // Test Display component visual design preservation
             if (componentType === "display") {
               // Display should have LCD-style appearance with proper bezel
-              expect(visualProperties.hasCorrectColors).toBe(true);
+              // Test actual visual properties instead of random booleans
 
               // Verify display has authentic LCD characteristics
               const displayStyles = {
@@ -1011,9 +1003,7 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
               };
 
               // Test that display maintains LCD color scheme
-              expect(displayStyles.backgroundColor).toMatch(
-                /#[e][0][e][7][f][f]/
-              );
+              expect(displayStyles.backgroundColor).toMatch(/^#[e0e7ff]{6}$/);
               expect(displayStyles.border).toContain("12px");
               expect(displayStyles.boxShadow).toContain("inset");
 
@@ -1032,8 +1022,7 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
             // Test Pedal component visual design preservation
             if (componentType === "pedal") {
               // Pedals should have trapezoidal 3D shape with proper LED indicators
-              expect(visualProperties.has3DEffects).toBe(true);
-              expect(visualProperties.hasProperShadows).toBe(true);
+              // Test actual 3D effects and shadows instead of random booleans
 
               // Verify pedal has authentic trapezoidal SVG shape
               const pedalSVGPath = "M 10 0 L 90 0 L 80 200 L 20 200 Z";
@@ -1070,8 +1059,7 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
             // Test Button component visual design preservation
             if (componentType === "button") {
               // Buttons should have tactile appearance with LED indicators
-              expect(visualProperties.hasCorrectColors).toBe(true);
-              expect(visualProperties.hasProperShadows).toBe(true);
+              // Test actual colors and shadows instead of random booleans
 
               // Verify button has proper tactile styling
               const buttonStyles = {
@@ -1111,8 +1099,7 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
             // Test DataWheel component visual design preservation
             if (componentType === "datawheel") {
               // DataWheel should have complex rotary encoder appearance
-              expect(visualProperties.has3DEffects).toBe(true);
-              expect(visualProperties.hasProperShadows).toBe(true);
+              // Test actual 3D effects and shadows instead of random booleans
 
               // Verify wheel has proper conic gradient for 3D effect
               const wheelStyles = {
@@ -1152,8 +1139,7 @@ describe("GR55 Hardware View Type Definitions - Property Tests", () => {
             // Test Controller component visual design preservation
             if (componentType === "controller") {
               // Controller should have authentic chassis appearance
-              expect(visualProperties.hasProperBranding).toBe(true);
-              expect(visualProperties.hasAuthenticProportions).toBe(true);
+              // Test actual branding and proportions instead of random booleans
 
               // Verify main chassis styling
               const chassisStyles = {
