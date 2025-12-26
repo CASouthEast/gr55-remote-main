@@ -186,6 +186,24 @@ export function GR55Controller({
     return styleBanks.findIndex((b) => b === bankLabel);
   }, [currentPatch, styleBanks]);
 
+  const currentBankLabel = useMemo(() => {
+    const label = currentPatch?.identity.patchNumberLabel?.split("-")[0];
+    if (label) return label;
+    const fallback = state.bank?.split("-")[0];
+    return fallback;
+  }, [currentPatch, state.bank]);
+
+  const remoteActivePedal = useMemo(() => {
+    const patchNumberLabel = currentPatch?.identity.patchNumberLabel;
+    if (!patchNumberLabel) return undefined;
+    const match = patchNumberLabel.match(/-(\d+)$/);
+    if (!match) return undefined;
+    const ordinal = parseInt(match[1], 10);
+    return ordinal >= 1 && ordinal <= 3 ? ordinal : undefined;
+  }, [currentPatch]);
+
+  const activePedal = remoteActivePedal ?? state.activePedal;
+
   const gotoStyleIndex = useCallback(
     (idx: number) => {
       const target = stylePatches[idx];
@@ -254,9 +272,8 @@ export function GR55Controller({
   // Select ordinal (1/2/3) within current UI bank for active style
   const selectOrdinalInCurrentBank = useCallback(
     (ordinal: 1 | 2 | 3) => {
-      const bankLabel = currentPatch?.identity.patchNumberLabel?.split("-")[0];
-      if (!bankLabel) return;
-      const targetLabel = `${bankLabel}-${ordinal}`;
+      if (!currentBankLabel) return;
+      const targetLabel = `${currentBankLabel}-${ordinal}`;
       const target = stylePatches.find(
         (p) => p.identity.patchNumberLabel === targetLabel
       );
@@ -267,8 +284,22 @@ export function GR55Controller({
         });
       }
     },
-    [currentPatch, stylePatches, setSelectedPatch]
+    [currentBankLabel, stylePatches, setSelectedPatch]
   );
+
+  const bankSlots = useMemo(() => {
+    if (!currentBankLabel) return null;
+    return ([1, 2, 3] as const).map((ordinal) => {
+      const target = stylePatches.find(
+        (p) => p.identity.patchNumberLabel === `${currentBankLabel}-${ordinal}`
+      );
+      const name =
+        target?.data?.name ??
+        (target?.status === "pending" ? "(loading…)" : undefined) ??
+        "—";
+      return { ordinal, name };
+    });
+  }, [currentBankLabel, stylePatches]);
 
   // Double-click detection per pedal (simple time-window approach)
   const pedal1Clicks = React.useRef<{ count: number; timeout?: any }>({
@@ -389,7 +420,8 @@ export function GR55Controller({
                     <View style={styles.pedalColumn}>
                       <Pedal
                         label="1"
-                        isActive={state.activePedal === 1}
+                        isActive={activePedal === 1}
+                        topLabel={bankSlots?.[0]?.name}
                         onClick={() => {
                           actions.setActivePedal(1);
                           const ref = pedal1Clicks.current;
@@ -413,7 +445,8 @@ export function GR55Controller({
                     <View style={styles.pedalColumn}>
                       <Pedal
                         label="2"
-                        isActive={state.activePedal === 2}
+                        isActive={activePedal === 2}
+                        topLabel={bankSlots?.[1]?.name}
                         onClick={() => {
                           actions.setActivePedal(2);
                           const ref = pedal2Clicks.current;
@@ -437,7 +470,8 @@ export function GR55Controller({
                     <View style={styles.pedalColumn}>
                       <Pedal
                         label="3"
-                        isActive={state.activePedal === 3}
+                        isActive={activePedal === 3}
+                        topLabel={bankSlots?.[2]?.name}
                         onClick={() => {
                           actions.setActivePedal(3);
                           selectOrdinalInCurrentBank(3);
@@ -449,6 +483,7 @@ export function GR55Controller({
                       <Pedal
                         label="CTL"
                         isActive={ctlPedalActive}
+                        topLabel="MFX"
                         onClick={handleCtlPedalToggle}
                         subLabel="REC/PLAY/DUB"
                       />

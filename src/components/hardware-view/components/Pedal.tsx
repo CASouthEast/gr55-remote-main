@@ -19,6 +19,7 @@ interface PedalProps {
   isActive?: boolean;
   onClick?: () => void;
   style?: any;
+  topLabel?: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export function Pedal({
   subLabel,
   isActive,
   onClick,
+  topLabel,
   style,
 }: PedalProps) {
   // Animation props only for web
@@ -42,6 +44,11 @@ export function Pedal({
 
   return (
     <View style={[styles.container, style]}>
+      {topLabel !== undefined && (
+        <Text style={styles.topLabel} numberOfLines={1}>
+          {topLabel}
+        </Text>
+      )}
       <View style={styles.pedalWrapper}>
         {/* Pedal Base / Bezel */}
         <View style={styles.svgContainer}>
@@ -282,6 +289,14 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textAlign: "center",
     lineHeight: 10,
+  },
+  topLabel: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#f97316", // GR orange
+    textAlign: "center",
+    marginBottom: 4,
+    maxWidth: 140,
   },
   expressionContainer: {
     position: "relative",
