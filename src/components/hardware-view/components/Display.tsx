@@ -88,6 +88,34 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
     </Pressable>
   );
 
+  const renderParameterButton = (label: string, isActive: boolean) => (
+    <Pressable
+      onPress={() => {}}
+      style={({ pressed }) => [
+        styles.parameterButton,
+        pressed && styles.parameterButtonPressed,
+        isActive
+          ? styles.parameterButtonActive
+          : styles.parameterButtonInactive,
+      ]}
+    >
+      {({ pressed }) => (
+        <Text
+          style={
+            pressed
+              ? styles.parameterTextPressed
+              : [
+                  styles.parameterText,
+                  !isActive && styles.parameterTextInactive,
+                ]
+          }
+        >
+          {label}
+        </Text>
+      )}
+    </Pressable>
+  );
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.innerBezel} />
@@ -115,145 +143,17 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
 
         <View style={styles.parameters}>
           <View style={styles.parameterRow}>
-            <View
-              style={[
-                styles.parameterButton,
-                mfxOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !mfxOn && styles.parameterTextInactive,
-                ]}
-              >
-                MFX
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                delayOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !delayOn && styles.parameterTextInactive,
-                ]}
-              >
-                DELAY
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                chorusOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !chorusOn && styles.parameterTextInactive,
-                ]}
-              >
-                CHORUS
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                reverbOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !reverbOn && styles.parameterTextInactive,
-                ]}
-              >
-                REVERB
-              </Text>
-            </View>
+            {renderParameterButton("MFX", mfxOn)}
+            {renderParameterButton("DELAY", delayOn)}
+            {renderParameterButton("CHORUS", chorusOn)}
+            {renderParameterButton("REVERB", reverbOn)}
           </View>
 
           <View style={styles.parameterRow}>
-            <View
-              style={[
-                styles.parameterButton,
-                ampOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !ampOn && styles.parameterTextInactive,
-                ]}
-              >
-                AMP
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                nsOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !nsOn && styles.parameterTextInactive,
-                ]}
-              >
-                NS
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                modOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !modOn && styles.parameterTextInactive,
-                ]}
-              >
-                MOD
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.parameterButton,
-                eqOn
-                  ? styles.parameterButtonActive
-                  : styles.parameterButtonInactive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.parameterText,
-                  !eqOn && styles.parameterTextInactive,
-                ]}
-              >
-                EQ
-              </Text>
-            </View>
+            {renderParameterButton("AMP", ampOn)}
+            {renderParameterButton("NS", nsOn)}
+            {renderParameterButton("MOD", modOn)}
+            {renderParameterButton("EQ", eqOn)}
           </View>
         </View>
       </View>
@@ -416,6 +316,9 @@ const styles = StyleSheet.create({
   parameterButtonInactive: {
     backgroundColor: "#e0e7ff", // blue-100
   },
+  parameterButtonPressed: {
+    backgroundColor: "#1e3a8a", // blue-900
+  },
   parameterText: {
     fontSize: 12,
     fontWeight: "700",
@@ -424,5 +327,11 @@ const styles = StyleSheet.create({
   },
   parameterTextInactive: {
     color: "rgba(30, 58, 138, 0.3)", // blue-900/30
+  },
+  parameterTextPressed: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#ffffff",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
 });
