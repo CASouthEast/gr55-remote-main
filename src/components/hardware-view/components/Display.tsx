@@ -87,6 +87,40 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
     GR55.temporaryPatch.sendsAndEq.eqSwitch
   );
 
+  // Assign switches (1..8)
+  const [assign1On, setAssign1On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign1.switch
+  );
+  const [assign2On, setAssign2On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign2.switch
+  );
+  const [assign3On, setAssign3On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign3.switch
+  );
+  const [assign4On, setAssign4On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign4.switch
+  );
+  const [assign5On, setAssign5On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign5.switch
+  );
+  const [assign6On, setAssign6On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign6.switch
+  );
+  const [assign7On, setAssign7On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign7.switch
+  );
+  const [assign8On, setAssign8On] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.assign8.switch
+  );
+
   const renderStatusChip = (
     label: string,
     isMuted: boolean,
@@ -206,6 +240,37 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
             {renderParameterButton("MOD", modOn, () => setModOn(!modOn))}
             {renderParameterButton("EQ", eqOn, () => setEqOn(!eqOn))}
           </View>
+
+          {/* Assigns section */}
+          <View style={styles.assignsSection}>
+            <Text style={styles.assignsHeading}>Assigns</Text>
+            <View style={styles.assignsRow}>
+              {renderParameterButton("1", assign1On, () =>
+                setAssign1On(!assign1On)
+              )}
+              {renderParameterButton("2", assign2On, () =>
+                setAssign2On(!assign2On)
+              )}
+              {renderParameterButton("3", assign3On, () =>
+                setAssign3On(!assign3On)
+              )}
+              {renderParameterButton("4", assign4On, () =>
+                setAssign4On(!assign4On)
+              )}
+              {renderParameterButton("5", assign5On, () =>
+                setAssign5On(!assign5On)
+              )}
+              {renderParameterButton("6", assign6On, () =>
+                setAssign6On(!assign6On)
+              )}
+              {renderParameterButton("7", assign7On, () =>
+                setAssign7On(!assign7On)
+              )}
+              {renderParameterButton("8", assign8On, () =>
+                setAssign8On(!assign8On)
+              )}
+            </View>
+          </View>
         </View>
       </View>
     </View>
@@ -252,7 +317,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     padding: 24,
-    minHeight: 240,
+    minHeight: 300,
     justifyContent: "space-between",
     backgroundColor: "#dbeafe", // blue-100
   },
@@ -362,6 +427,26 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(30, 58, 138, 0.2)", // blue-900/20
   },
   parameterRow: {
+    flexDirection: "row",
+    gap: 8,
+    width: "100%",
+  },
+  assignsSection: {
+    flexDirection: "column",
+    gap: 6,
+    paddingTop: 8,
+    borderTopWidth: 1, // thin divider between parameters and assigns
+    borderTopColor: "rgba(30, 58, 138, 0.2)",
+  },
+  assignsHeading: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+    opacity: 0.6,
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  assignsRow: {
     flexDirection: "row",
     gap: 8,
     width: "100%",
