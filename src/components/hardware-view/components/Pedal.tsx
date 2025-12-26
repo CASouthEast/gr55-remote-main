@@ -13,6 +13,25 @@ import { getMotionComponent } from "../utils/tailwindCompat";
 // Conditional import for framer-motion (web only)
 const MotionView = getMotionComponent("div");
 
+// Helper function to get color based on level (green to red gradient)
+function getLevelColor(level: number): string {
+  if (level < 50) {
+    // Green to yellow (0-50)
+    const ratio = level / 50;
+    const r = Math.round(255 * ratio);
+    const g = 255;
+    const b = 0;
+    return `rgb(${r}, ${g}, ${b})`;
+  } else {
+    // Yellow to red (50-100)
+    const ratio = (level - 50) / 50;
+    const r = 255;
+    const g = Math.round(255 * (1 - ratio));
+    const b = 0;
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+}
+
 interface PedalProps {
   label: string;
   subLabel?: string;
@@ -109,6 +128,8 @@ interface ExpressionPedalProps {
   expSwStatus?: boolean;
   expSwFunction?: string;
   onExpSwToggle?: () => void;
+  patchLevel?: number;
+  onPatchLevelChange?: (level: number) => void;
 }
 
 /**
@@ -119,6 +140,8 @@ export function ExpressionPedal({
   expSwStatus,
   expSwFunction,
   onExpSwToggle,
+  patchLevel = 0,
+  onPatchLevelChange,
 }: ExpressionPedalProps) {
   // Animation props only for web
   const expressionAnimationProps =
@@ -129,10 +152,70 @@ export function ExpressionPedal({
         }
       : {};
 
+  // Web-only: drag on the pedal surface to adjust patch level
+  const [isDragging, setIsDragging] = React.useState(false);
+  const overlaySizeRef = React.useRef<number | null>(null);
+
+  // Calculate level bar height (120 is the fixed container height from styles)
+  const LEVEL_BAR_CONTAINER_HEIGHT = 120;
+  const LEVEL_BAR_PADDING = 4;
+  const levelBarHeight = React.useMemo(() => {
+    const usable = LEVEL_BAR_CONTAINER_HEIGHT - LEVEL_BAR_PADDING;
+    return Math.max(2, Math.round((patchLevel / 100) * usable));
+  }, [patchLevel]);
+  const updateLevelFromClientY = React.useCallback(
+    (clientY: number, target: HTMLElement) => {
+      const rect = target.getBoundingClientRect();
+      const relative = 1 - (clientY - rect.top) / rect.height; // top = 100, bottom = 0
+      const clamped = Math.max(0, Math.min(1, relative));
+      onPatchLevelChange?.(Math.round(clamped * 100));
+    },
+    [onPatchLevelChange]
+  );
+  const onPointerDown = React.useCallback(
+    (e: any) => {
+      if (Platform.OS !== "web") return;
+      setIsDragging(true);
+      try {
+        e.currentTarget?.setPointerCapture?.(e.pointerId);
+      } catch {
+        // Ignore pointer capture errors
+      }
+      updateLevelFromClientY(e.clientY, e.currentTarget as HTMLElement);
+    },
+    [updateLevelFromClientY]
+  );
+  const onPointerMove = React.useCallback(
+    (e: any) => {
+      if (Platform.OS !== "web" || !isDragging) return;
+      updateLevelFromClientY(e.clientY, e.currentTarget as HTMLElement);
+    },
+    [isDragging, updateLevelFromClientY]
+  );
+  const onPointerUp = React.useCallback((e: any) => {
+    if (Platform.OS !== "web") return;
+    setIsDragging(false);
+    try {
+      e.currentTarget?.releasePointerCapture?.(e.pointerId);
+    } catch {
+      // Ignore pointer capture errors
+    }
+  }, []);
+
   const PedalComponent = Platform.OS === "web" ? MotionView : TouchableOpacity;
   const pedalProps =
     Platform.OS === "web"
-      ? { ...expressionAnimationProps }
+      ? {
+          ...expressionAnimationProps,
+          onPointerDown,
+          onPointerMove,
+          onPointerUp,
+          role: "slider",
+          "aria-valuemin": 0,
+          "aria-valuemax": 100,
+          "aria-valuenow": Math.round(patchLevel),
+          "aria-label": "Expression pedal level",
+        }
       : { activeOpacity: 0.9 };
 
   return (
@@ -180,6 +263,51 @@ export function ExpressionPedal({
           {/* Curved shape simulation */}
           <View style={styles.curvedShape} />
         </PedalComponent>
+
+        {/* Level Overlay */}
+        <View
+          style={styles.levelOverlay}
+          onLayout={(e) =>
+            (overlaySizeRef.current = e.nativeEvent.layout.height)
+          }
+          onStartShouldSetResponder={() => true}
+          onResponderGrant={(e) => {
+            const h = overlaySizeRef.current ?? 0;
+            const y = e.nativeEvent.locationY;
+            const ratio = 1 - y / Math.max(h, 1);
+            const clamped = Math.max(0, Math.min(1, ratio));
+            onPatchLevelChange?.(Math.round(clamped * 100));
+          }}
+          onResponderMove={(e) => {
+            const h = overlaySizeRef.current ?? 0;
+            const y = e.nativeEvent.locationY;
+            const ratio = 1 - y / Math.max(h, 1);
+            const clamped = Math.max(0, Math.min(1, ratio));
+            onPatchLevelChange?.(Math.round(clamped * 100));
+          }}
+          onResponderRelease={() => {
+            // no-op; keep final value
+          }}
+        >
+          {/* Level Value Display */}
+          <Text style={styles.levelValue}>{Math.round(patchLevel)}</Text>
+
+          {/* Level Bar Container */}
+          <View style={styles.levelBarContainer}>
+            {/* Gradient Level Indicator */}
+            <View
+              style={[
+                styles.levelBar,
+                {
+                  height: levelBarHeight,
+                  backgroundColor: getLevelColor(patchLevel),
+                },
+              ]}
+            />
+          </View>
+
+          {/* Drag to adjust level (web/native) */}
+        </View>
       </View>
     </View>
   );
@@ -490,5 +618,41 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(255, 255, 255, 0.05)",
       },
     }),
+  },
+  levelOverlay: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    right: 8,
+    bottom: 8,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+  },
+  levelValue: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: "#ffffff",
+    textAlign: "center",
+    textShadowColor: "rgba(0, 0, 0, 0.8)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  levelBarContainer: {
+    width: 24,
+    height: 120,
+    backgroundColor: "#0a0a0a",
+    borderWidth: 1,
+    borderColor: "#52525b",
+    borderRadius: 4,
+    justifyContent: "flex-end",
+    overflow: "hidden",
+    paddingTop: 2,
+    paddingBottom: 2,
+  },
+  levelBar: {
+    width: "100%",
+    borderRadius: 2,
+    minHeight: 2,
   },
 });

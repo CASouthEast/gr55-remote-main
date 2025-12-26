@@ -59,6 +59,12 @@ export function GR55Controller({
     GR55.temporaryPatch.common.expSw.function
   );
 
+  // Patch Level from GR-55
+  const [patchLevel, setPatchLevel] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.patchLevel
+  );
+
   // State update handler that notifies parent component
   const handleStateChange = useCallback(
     (newState: Partial<GR55State>) => {
@@ -582,6 +588,8 @@ export function GR55Controller({
             expSwStatus={expSwStatus}
             expSwFunction={expSwFunction}
             onExpSwToggle={handleExpSwToggle}
+            patchLevel={patchLevel}
+            onPatchLevelChange={setPatchLevel}
           />
         </View>
 
