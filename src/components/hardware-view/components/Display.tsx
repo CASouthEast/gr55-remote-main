@@ -19,52 +19,65 @@ interface DisplayProps {
  */
 export function Display({ patchName, bank, mode, style }: DisplayProps) {
   // Live tone switches so the top bar mirrors the active sources on the current patch
-  const [pcm1Muted] = useRemoteField(
+  const [pcm1Muted, setPcm1Muted] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.patchPCMTone1.muteSwitch
   );
-  const [pcm2Muted] = useRemoteField(
+  const [pcm2Muted, setPcm2Muted] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.patchPCMTone2.muteSwitch
   );
-  const [modelMuted] = useRemoteField(
+  const [modelMuted, setModelMuted] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.modelingTone.muteSwitch
   );
-  const [normalPuMuted] = useRemoteField(
+  const [normalPuMuted, setNormalPuMuted] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.common.normalPuMute
   );
 
   // Effect switches for bottom parameter rows
-  const [mfxOn] = useRemoteField(PATCH, GR55.temporaryPatch.mfx.mfxSwitch);
-  const [delayOn] = useRemoteField(
+  const [mfxOn, setMfxOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.mfx.mfxSwitch
+  );
+  const [delayOn, setDelayOn] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.sendsAndEq.delaySwitch
   );
-  const [chorusOn] = useRemoteField(
+  const [chorusOn, setChorusOn] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.sendsAndEq.chorusSwitch
   );
-  const [reverbOn] = useRemoteField(
+  const [reverbOn, setReverbOn] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.sendsAndEq.reverbSwitch
   );
-  const [ampOn] = useRemoteField(PATCH, GR55.temporaryPatch.ampModNs.ampSwitch);
-  const [nsOn] = useRemoteField(
+  const [ampOn, setAmpOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.ampModNs.ampSwitch
+  );
+  const [nsOn, setNsOn] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.modelingTone.nsSwitch
   );
-  const [modOn] = useRemoteField(PATCH, GR55.temporaryPatch.ampModNs.modSwitch);
-  const [eqOn] = useRemoteField(PATCH, GR55.temporaryPatch.sendsAndEq.eqSwitch);
+  const [modOn, setModOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.ampModNs.modSwitch
+  );
+  const [eqOn, setEqOn] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.sendsAndEq.eqSwitch
+  );
 
   const renderStatusChip = (
     label: string,
     isMuted: boolean,
+    onPress: () => void,
     isGuitar?: boolean
   ) => (
     <Pressable
-      onPress={() => {}}
+      onPress={onPress}
       style={({ pressed }) => [
         styles.statusChip,
         pressed && styles.statusChipPressed,
@@ -88,9 +101,13 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
     </Pressable>
   );
 
-  const renderParameterButton = (label: string, isActive: boolean) => (
+  const renderParameterButton = (
+    label: string,
+    isActive: boolean,
+    onPress: () => void
+  ) => (
     <Pressable
-      onPress={() => {}}
+      onPress={onPress}
       style={({ pressed }) => [
         styles.parameterButton,
         pressed && styles.parameterButtonPressed,
@@ -123,10 +140,21 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
       <View style={styles.screenContent}>
         <View style={styles.statusBar}>
           <View style={styles.statusLeft}>
-            {renderStatusChip("GUITAR", normalPuMuted, true)}
-            {renderStatusChip("PCM1", pcm1Muted)}
-            {renderStatusChip("PCM2", pcm2Muted)}
-            {renderStatusChip("MODEL", modelMuted)}
+            {renderStatusChip(
+              "GUITAR",
+              normalPuMuted,
+              () => setNormalPuMuted(!normalPuMuted),
+              true
+            )}
+            {renderStatusChip("PCM1", pcm1Muted, () =>
+              setPcm1Muted(!pcm1Muted)
+            )}
+            {renderStatusChip("PCM2", pcm2Muted, () =>
+              setPcm2Muted(!pcm2Muted)
+            )}
+            {renderStatusChip("MODEL", modelMuted, () =>
+              setModelMuted(!modelMuted)
+            )}
           </View>
           <Text style={styles.bpmText}>BPM: 120</Text>
         </View>
@@ -143,17 +171,23 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
 
         <View style={styles.parameters}>
           <View style={styles.parameterRow}>
-            {renderParameterButton("MFX", mfxOn)}
-            {renderParameterButton("DELAY", delayOn)}
-            {renderParameterButton("CHORUS", chorusOn)}
-            {renderParameterButton("REVERB", reverbOn)}
+            {renderParameterButton("MFX", mfxOn, () => setMfxOn(!mfxOn))}
+            {renderParameterButton("DELAY", delayOn, () =>
+              setDelayOn(!delayOn)
+            )}
+            {renderParameterButton("CHORUS", chorusOn, () =>
+              setChorusOn(!chorusOn)
+            )}
+            {renderParameterButton("REVERB", reverbOn, () =>
+              setReverbOn(!reverbOn)
+            )}
           </View>
 
           <View style={styles.parameterRow}>
-            {renderParameterButton("AMP", ampOn)}
-            {renderParameterButton("NS", nsOn)}
-            {renderParameterButton("MOD", modOn)}
-            {renderParameterButton("EQ", eqOn)}
+            {renderParameterButton("AMP", ampOn, () => setAmpOn(!ampOn))}
+            {renderParameterButton("NS", nsOn, () => setNsOn(!nsOn))}
+            {renderParameterButton("MOD", modOn, () => setModOn(!modOn))}
+            {renderParameterButton("EQ", eqOn, () => setEqOn(!eqOn))}
           </View>
         </View>
       </View>
