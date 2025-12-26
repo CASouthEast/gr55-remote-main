@@ -1,5 +1,13 @@
-import React from "react";
-import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Pressable,
+  TextInput,
+  FlatList,
+} from "react-native";
 
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
@@ -20,6 +28,8 @@ interface DisplayProps {
  * Adapted for React Native compatibility
  */
 export function Display({ patchName, bank, mode, style }: DisplayProps) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   // Current patch selection and description
   const { selectedPatch } = useRolandRemotePatchSelection();
   const { patches } = useRolandGR55RemotePatchDescriptions();
@@ -35,6 +45,37 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
   //   ? `${selectedPatch.bankSelectMSB}:${selectedPatch.pc}`
   //   : undefined;
   const patchDescription = currentPatch?.data?.name ?? undefined;
+  const filteredPatches = useMemo(() => {
+    if (!patches) {
+      return [] as typeof patches;
+    }
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      return patches;
+    }
+    return patches.filter((p) => {
+      const name = p.data?.name?.toLowerCase?.() ?? "";
+      const label = `${p.identity.styleLabel} ${p.identity.patchNumberLabel}`
+        .toLowerCase()
+        .trim();
+      return name.includes(q) || label.includes(q);
+    });
+  }, [patches, searchQuery]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || !isPickerOpen) {
+      return;
+    }
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsPickerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, [isPickerOpen]);
   // Live tone switches so the top bar mirrors the active sources on the current patch
   const [pcm1Muted, setPcm1Muted] = useRemoteField(
     PATCH,
@@ -214,11 +255,75 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
           <Text style={styles.bankText}>{uiLocation ?? bank}</Text>
           <View style={styles.patchInfo}>
             <Text style={styles.modeText}>{soundType ?? mode}</Text>
-            <Text style={styles.patchNameText} numberOfLines={1}>
-              {patchDescription ?? patchName}
-            </Text>
+            <Pressable onPress={() => setIsPickerOpen(true)}>
+              <Text style={styles.patchNameText} numberOfLines={1}>
+                {patchDescription ?? patchName}
+              </Text>
+            </Pressable>
           </View>
         </View>
+
+        {isPickerOpen && (
+          <Pressable
+            style={styles.popoverBackdrop}
+            onPress={() => setIsPickerOpen(false)}
+          >
+            <Pressable
+              onPress={(e) => e.stopPropagation?.()}
+              style={styles.popover}
+            >
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search patches"
+                placeholderTextColor="rgba(30, 58, 138, 0.5)"
+                style={styles.searchInput}
+                autoFocus
+              />
+              <FlatList
+                data={filteredPatches}
+                keyExtractor={(item) =>
+                  `${item.identity.bankMSB}-${item.identity.pc}`
+                }
+                showsVerticalScrollIndicator={false}
+                style={styles.popoverList}
+                contentContainerStyle={styles.popoverListContent}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => {
+                      setIsPickerOpen(false);
+                      setSearchQuery("");
+                      setSelectedPatch({
+                        bankSelectMSB: item.identity.bankMSB,
+                        pc: item.identity.pc,
+                      });
+                    }}
+                    style={({ pressed }) => [
+                      styles.popoverItem,
+                      pressed && styles.popoverItemPressed,
+                      selectedPatch?.bankSelectMSB === item.identity.bankMSB &&
+                      selectedPatch?.pc === item.identity.pc
+                        ? styles.popoverItemActive
+                        : null,
+                    ]}
+                  >
+                    <Text style={styles.popoverItemLabel}>
+                      {item.identity.styleLabel}{" "}
+                      {item.identity.patchNumberLabel}
+                    </Text>
+                    {item.data ? (
+                      <Text style={styles.popoverItemName} numberOfLines={1}>
+                        {item.data.name}
+                      </Text>
+                    ) : item.status === "pending" ? (
+                      <Text style={styles.popoverItemName}>Loading…</Text>
+                    ) : null}
+                  </Pressable>
+                )}
+              />
+            </Pressable>
+          </Pressable>
+        )}
 
         <View style={styles.parameters}>
           <View style={styles.parameterRow}>
@@ -418,6 +523,75 @@ const styles = StyleSheet.create({
     color: "#1e3a8a", // blue-900
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
     maxWidth: 300,
+  },
+  popoverBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 20,
+    backgroundColor: "rgba(219, 234, 254, 0.6)", // blue-100/60 within LCD
+  },
+  popover: {
+    width: "90%",
+    maxWidth: 360,
+    maxHeight: 260,
+    backgroundColor: "#e0e7ff", // indigo-100
+    borderColor: "#1e3a8a", // blue-900
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 12,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "rgba(30, 58, 138, 0.2)",
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: "#1e3a8a",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    backgroundColor: "#f8fafc",
+  },
+  popoverList: {
+    width: "100%",
+  },
+  popoverListContent: {
+    gap: 6,
+  },
+  popoverItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    backgroundColor: "#f1f5f9",
+  },
+  popoverItemPressed: {
+    backgroundColor: "#dbeafe",
+  },
+  popoverItemActive: {
+    borderWidth: 1,
+    borderColor: "#1e3a8a",
+    backgroundColor: "#dbeafe",
+  },
+  popoverItemLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1e3a8a",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  popoverItemName: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#0f172a",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   parameters: {
     flexDirection: "column",
