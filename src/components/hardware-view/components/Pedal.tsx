@@ -13,25 +13,6 @@ import { getMotionComponent } from "../utils/tailwindCompat";
 // Conditional import for framer-motion (web only)
 const MotionView = getMotionComponent("div");
 
-// Helper function to get color based on level (green to red gradient)
-function getLevelColor(level: number): string {
-  if (level < 50) {
-    // Green to yellow (0-50)
-    const ratio = level / 50;
-    const r = Math.round(255 * ratio);
-    const g = 255;
-    const b = 0;
-    return `rgb(${r}, ${g}, ${b})`;
-  } else {
-    // Yellow to red (50-100)
-    const ratio = (level - 50) / 50;
-    const r = 255;
-    const g = Math.round(255 * (1 - ratio));
-    const b = 0;
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-}
-
 interface PedalProps {
   label: string;
   subLabel?: string;
@@ -157,7 +138,7 @@ export function ExpressionPedal({
   const overlaySizeRef = React.useRef<number | null>(null);
 
   // Calculate level bar height (120 is the fixed container height from styles)
-  const LEVEL_BAR_CONTAINER_HEIGHT = 120;
+  const LEVEL_BAR_CONTAINER_HEIGHT = 600;
   const LEVEL_BAR_PADDING = 4;
   const levelBarHeight = React.useMemo(() => {
     const usable = LEVEL_BAR_CONTAINER_HEIGHT - LEVEL_BAR_PADDING;
@@ -294,13 +275,14 @@ export function ExpressionPedal({
 
           {/* Level Bar Container */}
           <View style={styles.levelBarContainer}>
-            {/* Gradient Level Indicator */}
+            {/* Full Gradient Background */}
+            <View style={styles.levelBarGradient} />
+            {/* Overlay that shrinks as level increases */}
             <View
               style={[
-                styles.levelBar,
+                styles.levelBarOverlay,
                 {
-                  height: levelBarHeight,
-                  backgroundColor: getLevelColor(patchLevel),
+                  height: LEVEL_BAR_CONTAINER_HEIGHT - levelBarHeight,
                 },
               ]}
             />
@@ -640,8 +622,7 @@ const styles = StyleSheet.create({
   },
   levelBarContainer: {
     width: 24,
-    height: 120,
-    backgroundColor: "#0a0a0a",
+    height: 600,
     borderWidth: 1,
     borderColor: "#52525b",
     borderRadius: 4,
@@ -649,10 +630,48 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     paddingTop: 2,
     paddingBottom: 2,
+    backgroundColor: "#0a0a0a",
+    position: "relative",
+  },
+  levelBarGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    ...Platform.select({
+      web: {
+        backgroundImage:
+          "linear-gradient(to top, #00ff00, #ffff00, #ff8800, #ff0000)",
+      },
+      default: {
+        backgroundColor: "#00ff00",
+      },
+    }),
+  },
+  levelBarOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#0a0a0a",
+    zIndex: 1,
   },
   levelBar: {
     width: "100%",
     borderRadius: 2,
     minHeight: 2,
+    ...Platform.select({
+      web: {
+        backgroundImage:
+          "linear-gradient(to top, #00ff00, #ffff00, #ff8800, #ff0000)",
+        backgroundSize: "100% 600px",
+        backgroundPosition: "0 100%",
+        backgroundRepeat: "no-repeat",
+      },
+      default: {
+        backgroundColor: "#00ff00",
+      },
+    }),
   },
 });

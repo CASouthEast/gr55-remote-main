@@ -152,8 +152,8 @@ export function DataWheel({ onRotate, onPress, style }: DataWheelProps) {
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    width: 128,
-    height: 128,
+    width: 220,
+    height: 220,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 64,
+    borderRadius: 111,
     borderWidth: 1,
     borderColor: "#52525b", // zinc-700
     backgroundColor: "#18181b", // zinc-900
@@ -233,9 +233,9 @@ const styles = StyleSheet.create({
     color: "#a1a1aa", // zinc-400
   },
   centerWheel: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 141,
+    height: 141,
+    borderRadius: 70,
     backgroundColor: "#27272a", // zinc-800
     borderWidth: 4,
     borderColor: "#18181b", // zinc-900
@@ -254,18 +254,18 @@ const styles = StyleSheet.create({
   },
   wheelTexture: {
     position: "absolute",
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 102,
+    height: 102,
+    borderRadius: 51,
     borderWidth: 2,
     borderColor: "#52525b", // zinc-600
     borderStyle: "dashed",
     opacity: 0.3,
   },
   wheelCenter: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 77,
+    height: 77,
+    borderRadius: 38,
     backgroundColor: "rgba(24, 24, 27, 0.5)", // zinc-900/50
     ...Platform.select({
       web: {
@@ -279,10 +279,10 @@ const styles = StyleSheet.create({
   },
   spinnerDivot: {
     position: "absolute",
-    top: 8,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    top: 13,
+    width: 19,
+    height: 19,
+    borderRadius: 10,
     backgroundColor: "#0c0a09", // zinc-950
     borderWidth: 1,
     borderColor: "#52525b", // zinc-700
