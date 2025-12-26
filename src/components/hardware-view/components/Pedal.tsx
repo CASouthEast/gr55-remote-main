@@ -104,10 +104,22 @@ export function Pedal({
   );
 }
 
+interface ExpressionPedalProps {
+  style?: any;
+  expSwStatus?: boolean;
+  expSwFunction?: string;
+  onExpSwToggle?: () => void;
+}
+
 /**
  * The large Expression Pedal on the right side.
  */
-export function ExpressionPedal({ style }: { style?: any }) {
+export function ExpressionPedal({
+  style,
+  expSwStatus,
+  expSwFunction,
+  onExpSwToggle,
+}: ExpressionPedalProps) {
   // Animation props only for web
   const expressionAnimationProps =
     Platform.OS === "web"
@@ -125,6 +137,35 @@ export function ExpressionPedal({ style }: { style?: any }) {
 
   return (
     <View style={[styles.expressionContainer, style]}>
+      {/* EXP SW Button */}
+      <View style={styles.expSwButtonContainer}>
+        {expSwFunction !== undefined && (
+          <Text style={styles.expSwTopLabel} numberOfLines={1}>
+            {expSwFunction}
+          </Text>
+        )}
+        <TouchableOpacity
+          style={[
+            styles.expSwButton,
+            expSwStatus ? styles.expSwButtonActive : styles.expSwButtonInactive,
+          ]}
+          onPress={onExpSwToggle}
+          activeOpacity={0.8}
+        >
+          {/* LED Indicator */}
+          <View
+            style={[
+              styles.expSwLed,
+              expSwStatus ? styles.ledActive : styles.ledInactive,
+            ]}
+          />
+        </TouchableOpacity>
+        <View style={styles.expSwSubLabelContainer}>
+          <Text style={styles.expSwSubLabel}>EXP SW</Text>
+        </View>
+      </View>
+
+      {/* Expression Pedal */}
       <View style={styles.expressionPedal}>
         {/* Rubber Tread Pattern */}
         <View style={styles.rubberTread} />
@@ -133,20 +174,12 @@ export function ExpressionPedal({ style }: { style?: any }) {
         <PedalComponent style={styles.pedalSurface} {...pedalProps}>
           {/* Logo Emboss */}
           <View style={styles.logoEmboss}>
-            <Text style={styles.logoText}>Roland</Text>
+            <Text style={styles.logoText}>EXP</Text>
           </View>
 
           {/* Curved shape simulation */}
           <View style={styles.curvedShape} />
         </PedalComponent>
-      </View>
-
-      {/* Side Label */}
-      <View style={styles.sideLabel}>
-        <Text style={styles.sideLabelText}>EXP PEDAL {"\n"} SW ON/OFF</Text>
-      </View>
-      <View style={styles.sideLabelArrow}>
-        <Text style={styles.sideLabelArrowText}>►</Text>
       </View>
     </View>
   );
@@ -308,9 +341,69 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: "#18181b", // zinc-900
     padding: 8,
+    flexDirection: "column",
+    gap: 8,
+  },
+  expSwButtonContainer: {
+    alignItems: "center",
+    gap: 4,
+  },
+  expSwTopLabel: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#f97316", // GR orange
+    textAlign: "center",
+    maxWidth: 100,
+  },
+  expSwButton: {
+    width: 64,
+    height: 32,
+    backgroundColor: "#27272a", // zinc-800
+    borderWidth: 2,
+    borderColor: "#52525b", // zinc-600
+    borderRadius: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      web: {
+        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        cursor: "pointer",
+      },
+      default: {
+        elevation: 4,
+      },
+    }),
+  },
+  expSwButtonActive: {
+    // Active state uses same background as base
+  },
+  expSwButtonInactive: {
+    // Inactive state uses same background as base
+  },
+  expSwLed: {
+    width: 16,
+    height: 8,
+    marginTop: 6,
+    borderRadius: 2,
+  },
+  expSwSubLabelContainer: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#52525b", // zinc-700
+  },
+  expSwSubLabel: {
+    fontSize: 9,
+    fontWeight: "700",
+    color: "#d4d4d8", // zinc-300
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
+    textAlign: "center",
   },
   expressionPedal: {
-    height: "100%",
+    flex: 1,
     width: "100%",
     backgroundColor: "#18181b", // zinc-900
     borderRadius: 4,
@@ -397,30 +490,5 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(255, 255, 255, 0.05)",
       },
     }),
-  },
-  sideLabel: {
-    position: "absolute",
-    left: -64,
-    top: 40,
-    width: 48,
-  },
-  sideLabelText: {
-    fontSize: 10,
-    color: "#71717a", // zinc-500
-    fontWeight: "700",
-    textTransform: "uppercase",
-    textAlign: "right",
-    lineHeight: 12,
-  },
-  sideLabelArrow: {
-    position: "absolute",
-    left: -16,
-    top: 48,
-  },
-  sideLabelArrowText: {
-    fontSize: 10,
-    color: "#71717a", // zinc-500
-    fontWeight: "700",
-    textTransform: "uppercase",
   },
 });

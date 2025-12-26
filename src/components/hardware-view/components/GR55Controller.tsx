@@ -12,7 +12,10 @@ import { Button, SoundStyleButton } from "./Buttons";
 import { DataWheel } from "./DataWheel";
 import { Display } from "./Display";
 import { Pedal, ExpressionPedal } from "./Pedal";
+import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
+import { useRemoteField } from "../../../hooks/useRemoteField";
 import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
+import { RolandGR55AddressMapAbsolute as GR55 } from "../../../lib/roland-gr55/RolandGR55AddressMap";
 import { useRolandGR55RemotePatchDescriptions } from "../../../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
 import { DEFAULT_STYLES, DEFAULT_GR55_STATE } from "../utils/constants";
 
@@ -36,8 +39,25 @@ export function GR55Controller({
     ...initialState,
   });
 
-  // Separate state for CTL pedal (independent from pedals 1-3)
-  const [ctlPedalActive, setCtlPedalActive] = useState(false);
+  // CTL pedal state and function from GR-55
+  const [ctlStatus, setCtlStatus] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.ctl.status
+  );
+  const [ctlFunction] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.ctl.function
+  );
+
+  // EXP SW state and function from GR-55
+  const [expSwStatus, setExpSwStatus] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.expSw.status
+  );
+  const [expSwFunction] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.expSw.function
+  );
 
   // State update handler that notifies parent component
   const handleStateChange = useCallback(
@@ -49,10 +69,15 @@ export function GR55Controller({
     [state, onStateChange]
   );
 
-  // Independent toggle handler for CTL pedal
+  // CTL pedal toggle handler
   const handleCtlPedalToggle = useCallback(() => {
-    setCtlPedalActive(!ctlPedalActive);
-  }, [ctlPedalActive]);
+    setCtlStatus(!ctlStatus);
+  }, [ctlStatus, setCtlStatus]);
+
+  // EXP SW toggle handler
+  const handleExpSwToggle = useCallback(() => {
+    setExpSwStatus(!expSwStatus);
+  }, [expSwStatus, setExpSwStatus]);
 
   // Action handlers for different controls
   const actions: GR55Actions = useMemo(
@@ -344,7 +369,7 @@ export function GR55Controller({
       <View style={styles.chassis}>
         {/* Top Edge Labels (Ports) */}
         <View style={styles.portLabels}>
-          <Text style={styles.portLabel}>USB MEMORY</Text>
+          <Text style={styles.portLabel}>Connections : </Text>
           <View style={styles.portLabelsRight}>
             <Text style={styles.portLabel}>DC IN</Text>
             <Text style={styles.portLabel}>POWER</Text>
@@ -482,8 +507,8 @@ export function GR55Controller({
                     <View style={styles.pedalColumn}>
                       <Pedal
                         label="CTL"
-                        isActive={ctlPedalActive}
-                        topLabel="MFX"
+                        isActive={ctlStatus}
+                        topLabel={ctlFunction}
                         onClick={handleCtlPedalToggle}
                         subLabel="REC/PLAY/DUB"
                       />
@@ -497,6 +522,15 @@ export function GR55Controller({
                         style={styles.audioPlayerButton}
                       />
                       <Text style={styles.usbMemoryLabel}>USB MEMORY</Text>
+
+                      {/* Branding Logos */}
+                      <View style={styles.branding}>
+                        <View style={styles.grLogoContainer}>
+                          <Text style={styles.grLogoG}>G</Text>
+                          <Text style={styles.grLogoR}>R</Text>
+                        </View>
+                        <Text style={styles.cosmBadge}>COSM</Text>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -540,20 +574,15 @@ export function GR55Controller({
               </View>
             </View>
           </View>
-
-          {/* Branding Logos */}
-          <View style={styles.branding}>
-            <View style={styles.grLogoContainer}>
-              <Text style={styles.grLogoG}>G</Text>
-              <Text style={styles.grLogoR}>R</Text>
-            </View>
-            <Text style={styles.cosmBadge}>COSM</Text>
-          </View>
         </View>
 
         {/* Right Expression Pedal Section */}
         <View style={styles.rightSection}>
-          <ExpressionPedal />
+          <ExpressionPedal
+            expSwStatus={expSwStatus}
+            expSwFunction={expSwFunction}
+            onExpSwToggle={handleExpSwToggle}
+          />
         </View>
 
         {/* USB Side Port */}
@@ -870,33 +899,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   branding: {
-    position: "absolute",
-    right: 24,
-    bottom: 8,
-    alignItems: "flex-end",
+    marginTop: 40,
+    alignItems: "center",
     opacity: 0.8,
   },
   grLogoContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    height: 100,
+    height: 65,
   },
   grLogoG: {
     fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
     fontStyle: "italic",
-    fontSize: 88,
+    fontSize: 57,
     fontWeight: "900",
     color: "#ff8c00", // Orange
-    letterSpacing: -2,
-    marginBottom: 24,
+    letterSpacing: -1.3,
+    marginBottom: 16,
   },
   grLogoR: {
     fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
     fontStyle: "italic",
-    fontSize: 88,
+    fontSize: 57,
     fontWeight: "900",
     color: "#ff8c00", // Orange
-    letterSpacing: -4,
+    letterSpacing: -2.6,
   },
   cosmBadge: {
     fontWeight: "700",
