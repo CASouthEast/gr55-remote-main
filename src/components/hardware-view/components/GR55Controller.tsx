@@ -12,6 +12,8 @@ import { Button, SoundStyleButton } from "./Buttons";
 import { DataWheel } from "./DataWheel";
 import { Display } from "./Display";
 import { Pedal, ExpressionPedal } from "./Pedal";
+import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
+import { useRolandGR55RemotePatchDescriptions } from "../../../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
 import { DEFAULT_STYLES, DEFAULT_GR55_STATE } from "../utils/constants";
 
 interface GR55ControllerProps {
@@ -138,6 +140,173 @@ export function GR55Controller({
 
   console.log("GR55Controller: Rendering main view...");
 
+  // Determine current patch sound type from remote selection and descriptions
+  const { selectedPatch, setSelectedPatch } = useRolandRemotePatchSelection();
+  const { patches } = useRolandGR55RemotePatchDescriptions();
+  const currentPatch = patches?.find(
+    (p) =>
+      selectedPatch &&
+      p.identity.bankMSB === selectedPatch.bankSelectMSB &&
+      p.identity.pc === selectedPatch.pc
+  );
+  const remoteSoundType = currentPatch?.identity.styleLabel as
+    | GR55State["activeStyle"]
+    | undefined;
+  const ledActiveStyle = remoteSoundType ?? state.activeStyle;
+
+  // Style-scoped patch navigation helpers
+  const stylePatches = useMemo(
+    () =>
+      patches?.filter((p) => p.identity.styleLabel === ledActiveStyle) ?? [],
+    [patches, ledActiveStyle]
+  );
+  const styleBanks = useMemo(() => {
+    const seen = new Set<string>();
+    const order: string[] = [];
+    stylePatches.forEach((p) => {
+      const bankLabel = p.identity.patchNumberLabel.split("-")[0];
+      if (!seen.has(bankLabel)) {
+        seen.add(bankLabel);
+        order.push(bankLabel);
+      }
+    });
+    return order;
+  }, [stylePatches]);
+  const currentStyleIndex = useMemo(() => {
+    if (!selectedPatch) return -1;
+    return stylePatches.findIndex(
+      (p) =>
+        p.identity.bankMSB === selectedPatch.bankSelectMSB &&
+        p.identity.pc === selectedPatch.pc
+    );
+  }, [stylePatches, selectedPatch]);
+  const currentBankIndex = useMemo(() => {
+    const bankLabel = currentPatch?.identity.patchNumberLabel?.split("-")[0];
+    if (!bankLabel) return -1;
+    return styleBanks.findIndex((b) => b === bankLabel);
+  }, [currentPatch, styleBanks]);
+
+  const gotoStyleIndex = useCallback(
+    (idx: number) => {
+      const target = stylePatches[idx];
+      if (!target) return;
+      setSelectedPatch({
+        bankSelectMSB: target.identity.bankMSB,
+        pc: target.identity.pc,
+      });
+    },
+    [stylePatches, setSelectedPatch]
+  );
+
+  const gotoNextPatch = useCallback(() => {
+    if (stylePatches.length === 0) return;
+    const next =
+      currentStyleIndex >= 0
+        ? (currentStyleIndex + 1) % stylePatches.length
+        : 0;
+    gotoStyleIndex(next);
+  }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
+
+  const gotoPrevPatch = useCallback(() => {
+    if (stylePatches.length === 0) return;
+    const prev =
+      currentStyleIndex >= 0
+        ? (currentStyleIndex - 1 + stylePatches.length) % stylePatches.length
+        : stylePatches.length - 1;
+    gotoStyleIndex(prev);
+  }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
+
+  const gotoBank = useCallback(
+    (bankLabel: string) => {
+      const target =
+        stylePatches.find(
+          (p) => p.identity.patchNumberLabel === `${bankLabel}-1`
+        ) ||
+        stylePatches.find((p) =>
+          p.identity.patchNumberLabel.startsWith(`${bankLabel}-`)
+        );
+      if (target) {
+        setSelectedPatch({
+          bankSelectMSB: target.identity.bankMSB,
+          pc: target.identity.pc,
+        });
+      }
+    },
+    [stylePatches, setSelectedPatch]
+  );
+
+  const gotoNextBank = useCallback(() => {
+    if (styleBanks.length === 0) return;
+    const nextIdx =
+      currentBankIndex >= 0 ? (currentBankIndex + 1) % styleBanks.length : 0;
+    gotoBank(styleBanks[nextIdx]);
+  }, [styleBanks, currentBankIndex, gotoBank]);
+
+  const gotoPrevBank = useCallback(() => {
+    if (styleBanks.length === 0) return;
+    const prevIdx =
+      currentBankIndex >= 0
+        ? (currentBankIndex - 1 + styleBanks.length) % styleBanks.length
+        : styleBanks.length - 1;
+    gotoBank(styleBanks[prevIdx]);
+  }, [styleBanks, currentBankIndex, gotoBank]);
+
+  // Select ordinal (1/2/3) within current UI bank for active style
+  const selectOrdinalInCurrentBank = useCallback(
+    (ordinal: 1 | 2 | 3) => {
+      const bankLabel = currentPatch?.identity.patchNumberLabel?.split("-")[0];
+      if (!bankLabel) return;
+      const targetLabel = `${bankLabel}-${ordinal}`;
+      const target = stylePatches.find(
+        (p) => p.identity.patchNumberLabel === targetLabel
+      );
+      if (target) {
+        setSelectedPatch({
+          bankSelectMSB: target.identity.bankMSB,
+          pc: target.identity.pc,
+        });
+      }
+    },
+    [currentPatch, stylePatches, setSelectedPatch]
+  );
+
+  // Double-click detection per pedal (simple time-window approach)
+  const pedal1Clicks = React.useRef<{ count: number; timeout?: any }>({
+    count: 0,
+  });
+  const pedal2Clicks = React.useRef<{ count: number; timeout?: any }>({
+    count: 0,
+  });
+
+  const selectStylePatch = useCallback(
+    (styleId: GR55State["activeStyle"]) => {
+      if (!patches || patches.length === 0) {
+        actions.setActiveStyle(styleId);
+        return;
+      }
+      const currentUiLabel = currentPatch?.identity.patchNumberLabel;
+      let target = patches.find(
+        (p) =>
+          p.identity.styleLabel === styleId &&
+          (currentUiLabel
+            ? p.identity.patchNumberLabel === currentUiLabel
+            : true)
+      );
+      if (!target) {
+        target = patches.find((p) => p.identity.styleLabel === styleId);
+      }
+      if (target) {
+        setSelectedPatch({
+          bankSelectMSB: target.identity.bankMSB,
+          pc: target.identity.pc,
+        });
+      } else {
+        actions.setActiveStyle(styleId);
+      }
+    },
+    [patches, currentPatch, actions, setSelectedPatch]
+  );
+
   return (
     <View style={styles.container}>
       {/* Main Chassis */}
@@ -195,11 +364,9 @@ export function GR55Controller({
                       <SoundStyleButton
                         key={style.id}
                         label={style.label}
-                        active={state.activeStyle === style.id}
+                        active={ledActiveStyle === style.id}
                         onClick={() =>
-                          actions.setActiveStyle(
-                            style.id as GR55State["activeStyle"]
-                          )
+                          selectStylePatch(style.id as GR55State["activeStyle"])
                         }
                       />
                     ))}
@@ -223,7 +390,23 @@ export function GR55Controller({
                       <Pedal
                         label="1"
                         isActive={state.activePedal === 1}
-                        onClick={() => actions.setActivePedal(1)}
+                        onClick={() => {
+                          actions.setActivePedal(1);
+                          const ref = pedal1Clicks.current;
+                          ref.count += 1;
+                          if (ref.timeout) {
+                            clearTimeout(ref.timeout);
+                          }
+                          ref.timeout = setTimeout(() => {
+                            if (ref.count >= 2) {
+                              gotoNextBank();
+                            } else {
+                              selectOrdinalInCurrentBank(1);
+                            }
+                            ref.count = 0;
+                            ref.timeout = undefined;
+                          }, 250);
+                        }}
                         subLabel="BANK ▲"
                       />
                     </View>
@@ -231,7 +414,23 @@ export function GR55Controller({
                       <Pedal
                         label="2"
                         isActive={state.activePedal === 2}
-                        onClick={() => actions.setActivePedal(2)}
+                        onClick={() => {
+                          actions.setActivePedal(2);
+                          const ref = pedal2Clicks.current;
+                          ref.count += 1;
+                          if (ref.timeout) {
+                            clearTimeout(ref.timeout);
+                          }
+                          ref.timeout = setTimeout(() => {
+                            if (ref.count >= 2) {
+                              gotoPrevBank();
+                            } else {
+                              selectOrdinalInCurrentBank(2);
+                            }
+                            ref.count = 0;
+                            ref.timeout = undefined;
+                          }, 250);
+                        }}
                         subLabel="BANK ▼"
                       />
                     </View>
@@ -239,7 +438,10 @@ export function GR55Controller({
                       <Pedal
                         label="3"
                         isActive={state.activePedal === 3}
-                        onClick={() => actions.setActivePedal(3)}
+                        onClick={() => {
+                          actions.setActivePedal(3);
+                          selectOrdinalInCurrentBank(3);
+                        }}
                         subLabel="PHRASE LOOP"
                       />
                     </View>

@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
+import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "../../../lib/roland-gr55/RolandGR55AddressMap";
+import { useRolandGR55RemotePatchDescriptions } from "../../../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
 
 interface DisplayProps {
   patchName: string;
@@ -18,6 +20,21 @@ interface DisplayProps {
  * Adapted for React Native compatibility
  */
 export function Display({ patchName, bank, mode, style }: DisplayProps) {
+  // Current patch selection and description
+  const { selectedPatch } = useRolandRemotePatchSelection();
+  const { patches } = useRolandGR55RemotePatchDescriptions();
+  const currentPatch = patches?.find(
+    (p) =>
+      selectedPatch &&
+      p.identity.bankMSB === selectedPatch.bankSelectMSB &&
+      p.identity.pc === selectedPatch.pc
+  );
+  const soundType = currentPatch?.identity.styleLabel;
+  const uiLocation = currentPatch?.identity.patchNumberLabel;
+  const rawLocation = selectedPatch
+    ? `${selectedPatch.bankSelectMSB}:${selectedPatch.pc}`
+    : undefined;
+  const patchDescription = currentPatch?.data?.name ?? undefined;
   // Live tone switches so the top bar mirrors the active sources on the current patch
   const [pcm1Muted, setPcm1Muted] = useRemoteField(
     PATCH,
@@ -160,11 +177,11 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
         </View>
 
         <View style={styles.mainInfo}>
-          <Text style={styles.bankText}>{bank}</Text>
+          <Text style={styles.bankText}>{uiLocation ?? bank}</Text>
           <View style={styles.patchInfo}>
-            <Text style={styles.modeText}>{mode}</Text>
+            <Text style={styles.modeText}>{soundType ?? mode}</Text>
             <Text style={styles.patchNameText} numberOfLines={1}>
-              {patchName}
+              {patchDescription ?? patchName}
             </Text>
           </View>
         </View>
@@ -308,6 +325,17 @@ const styles = StyleSheet.create({
   patchInfo: {
     paddingBottom: 8,
     flex: 1,
+  },
+  patchMeta: {
+    marginTop: 4,
+    gap: 2,
+  },
+  patchMetaText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    opacity: 0.8,
   },
   modeText: {
     fontSize: 12,

@@ -23,7 +23,7 @@ export function GR55HWView({ initialState, onStateChange }: GR55HWViewProps) {
       {/* Footer with platform info */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Roland GR-55 Interactive Demo - Web Platform
+          Roland GR-55 Interactive Hardware View
         </Text>
       </View>
     </View>
