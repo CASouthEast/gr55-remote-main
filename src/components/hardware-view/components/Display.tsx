@@ -31,9 +31,9 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
   );
   const soundType = currentPatch?.identity.styleLabel;
   const uiLocation = currentPatch?.identity.patchNumberLabel;
-  const rawLocation = selectedPatch
-    ? `${selectedPatch.bankSelectMSB}:${selectedPatch.pc}`
-    : undefined;
+  // const rawLocation = selectedPatch
+  //   ? `${selectedPatch.bankSelectMSB}:${selectedPatch.pc}`
+  //   : undefined;
   const patchDescription = currentPatch?.data?.name ?? undefined;
   // Live tone switches so the top bar mirrors the active sources on the current patch
   const [pcm1Muted, setPcm1Muted] = useRemoteField(

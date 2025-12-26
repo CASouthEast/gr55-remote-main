@@ -203,14 +203,14 @@ export function GR55Controller({
     });
     return order;
   }, [stylePatches]);
-  const currentStyleIndex = useMemo(() => {
-    if (!selectedPatch) return -1;
-    return stylePatches.findIndex(
-      (p) =>
-        p.identity.bankMSB === selectedPatch.bankSelectMSB &&
-        p.identity.pc === selectedPatch.pc
-    );
-  }, [stylePatches, selectedPatch]);
+  // const currentStyleIndex = useMemo(() => {
+  //   if (!selectedPatch) return -1;
+  //   return stylePatches.findIndex(
+  //     (p) =>
+  //       p.identity.bankMSB === selectedPatch.bankSelectMSB &&
+  //       p.identity.pc === selectedPatch.pc
+  //   );
+  // }, [stylePatches, selectedPatch]);
   const currentBankIndex = useMemo(() => {
     const bankLabel = currentPatch?.identity.patchNumberLabel?.split("-")[0];
     if (!bankLabel) return -1;
@@ -235,35 +235,35 @@ export function GR55Controller({
 
   const activePedal = remoteActivePedal ?? state.activePedal;
 
-  const gotoStyleIndex = useCallback(
-    (idx: number) => {
-      const target = stylePatches[idx];
-      if (!target) return;
-      setSelectedPatch({
-        bankSelectMSB: target.identity.bankMSB,
-        pc: target.identity.pc,
-      });
-    },
-    [stylePatches, setSelectedPatch]
-  );
+  // const gotoStyleIndex = useCallback(
+  //   (idx: number) => {
+  //     const target = stylePatches[idx];
+  //     if (!target) return;
+  //     setSelectedPatch({
+  //       bankSelectMSB: target.identity.bankMSB,
+  //       pc: target.identity.pc,
+  //     });
+  //   },
+  //   [stylePatches, setSelectedPatch]
+  // );
 
-  const gotoNextPatch = useCallback(() => {
-    if (stylePatches.length === 0) return;
-    const next =
-      currentStyleIndex >= 0
-        ? (currentStyleIndex + 1) % stylePatches.length
-        : 0;
-    gotoStyleIndex(next);
-  }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
+  // const gotoNextPatch = useCallback(() => {
+  //   if (stylePatches.length === 0) return;
+  //   const next =
+  //     currentStyleIndex >= 0
+  //       ? (currentStyleIndex + 1) % stylePatches.length
+  //       : 0;
+  //   gotoStyleIndex(next);
+  // }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
 
-  const gotoPrevPatch = useCallback(() => {
-    if (stylePatches.length === 0) return;
-    const prev =
-      currentStyleIndex >= 0
-        ? (currentStyleIndex - 1 + stylePatches.length) % stylePatches.length
-        : stylePatches.length - 1;
-    gotoStyleIndex(prev);
-  }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
+  // const gotoPrevPatch = useCallback(() => {
+  //   if (stylePatches.length === 0) return;
+  //   const prev =
+  //     currentStyleIndex >= 0
+  //       ? (currentStyleIndex - 1 + stylePatches.length) % stylePatches.length
+  //       : stylePatches.length - 1;
+  //   gotoStyleIndex(prev);
+  // }, [stylePatches.length, currentStyleIndex, gotoStyleIndex]);
 
   const gotoBank = useCallback(
     (bankLabel: string) => {
