@@ -9,6 +9,7 @@ import {
   FlatList,
 } from "react-native";
 
+import { PreviewPane, HoveredItem } from "./PreviewPane";
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
 import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
@@ -20,6 +21,7 @@ interface DisplayProps {
   bank: string;
   mode: string;
   style?: any;
+  onHoverChange?: (item: HoveredItem) => void;
 }
 
 /**
@@ -27,9 +29,16 @@ interface DisplayProps {
  * Maintains the visual design and layout from GR55HWDesign.png
  * Adapted for React Native compatibility
  */
-export function Display({ patchName, bank, mode, style }: DisplayProps) {
+export function Display({
+  patchName,
+  bank,
+  mode,
+  style,
+  onHoverChange,
+}: DisplayProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hoveredItem, setHoveredItem] = useState<HoveredItem>(null);
   const flatListRef = React.useRef<FlatList>(null);
   // Current patch selection and description
   const { selectedPatch, setSelectedPatch } = useRolandRemotePatchSelection();
@@ -98,20 +107,10 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
     }
   }, [isPickerOpen, scrollToIndex]);
 
-  useEffect(() => {
-    if (Platform.OS !== "web" || !isPickerOpen) {
-      return;
-    }
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsPickerOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, [isPickerOpen]);
+  const updateHoveredItem = (item: HoveredItem) => {
+    setHoveredItem(item);
+    onHoverChange?.(item);
+  };
   // Live tone switches so the top bar mirrors the active sources on the current patch
   const [pcm1Muted, setPcm1Muted] = useRemoteField(
     PATCH,
@@ -206,6 +205,10 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
   ) => (
     <Pressable
       onPress={onPress}
+      onHoverIn={() =>
+        Platform.OS === "web" && updateHoveredItem({ type: "tone", id: label })
+      }
+      onHoverOut={() => Platform.OS === "web" && updateHoveredItem(null)}
       style={({ pressed }) => [
         styles.statusChip,
         pressed && styles.statusChipPressed,
@@ -232,10 +235,15 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
   const renderParameterButton = (
     label: string,
     isActive: boolean,
-    onPress: () => void
+    onPress: () => void,
+    type: "effect" | "assign" = "effect"
   ) => (
     <Pressable
       onPress={onPress}
+      onHoverIn={() =>
+        Platform.OS === "web" && updateHoveredItem({ type, id: label })
+      }
+      onHoverOut={() => Platform.OS === "web" && updateHoveredItem(null)}
       style={({ pressed }) => [
         styles.parameterButton,
         pressed && styles.parameterButtonPressed,
@@ -402,29 +410,53 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
           <View style={styles.assignsSection}>
             <Text style={styles.assignsHeading}>Assigns</Text>
             <View style={styles.assignsRow}>
-              {renderParameterButton("1", assign1On, () =>
-                setAssign1On(!assign1On)
+              {renderParameterButton(
+                "1",
+                assign1On,
+                () => setAssign1On(!assign1On),
+                "assign"
               )}
-              {renderParameterButton("2", assign2On, () =>
-                setAssign2On(!assign2On)
+              {renderParameterButton(
+                "2",
+                assign2On,
+                () => setAssign2On(!assign2On),
+                "assign"
               )}
-              {renderParameterButton("3", assign3On, () =>
-                setAssign3On(!assign3On)
+              {renderParameterButton(
+                "3",
+                assign3On,
+                () => setAssign3On(!assign3On),
+                "assign"
               )}
-              {renderParameterButton("4", assign4On, () =>
-                setAssign4On(!assign4On)
+              {renderParameterButton(
+                "4",
+                assign4On,
+                () => setAssign4On(!assign4On),
+                "assign"
               )}
-              {renderParameterButton("5", assign5On, () =>
-                setAssign5On(!assign5On)
+              {renderParameterButton(
+                "5",
+                assign5On,
+                () => setAssign5On(!assign5On),
+                "assign"
               )}
-              {renderParameterButton("6", assign6On, () =>
-                setAssign6On(!assign6On)
+              {renderParameterButton(
+                "6",
+                assign6On,
+                () => setAssign6On(!assign6On),
+                "assign"
               )}
-              {renderParameterButton("7", assign7On, () =>
-                setAssign7On(!assign7On)
+              {renderParameterButton(
+                "7",
+                assign7On,
+                () => setAssign7On(!assign7On),
+                "assign"
               )}
-              {renderParameterButton("8", assign8On, () =>
-                setAssign8On(!assign8On)
+              {renderParameterButton(
+                "8",
+                assign8On,
+                () => setAssign8On(!assign8On),
+                "assign"
               )}
             </View>
           </View>
@@ -440,7 +472,10 @@ const styles = StyleSheet.create({
     borderColor: "#27272a", // zinc-800
     borderRadius: 8,
     position: "relative",
-    overflow: "hidden",
+    overflow: Platform.select({
+      web: "visible",
+      default: "hidden",
+    }) as any,
     ...Platform.select({
       web: {
         boxShadow: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",

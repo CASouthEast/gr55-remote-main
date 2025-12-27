@@ -12,6 +12,7 @@ import { Button, SoundStyleButton } from "./Buttons";
 import { DataWheel } from "./DataWheel";
 import { Display } from "./Display";
 import { Pedal, ExpressionPedal } from "./Pedal";
+import { PreviewPane, HoveredItem } from "./PreviewPane";
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
 import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
@@ -38,6 +39,8 @@ export function GR55Controller({
     ...DEFAULT_GR55_STATE,
     ...initialState,
   });
+
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   // CTL pedal state and function from GR-55
   const [ctlStatus, setCtlStatus] = useRemoteField(
@@ -408,6 +411,7 @@ export function GR55Controller({
                   patchName={state.patchName}
                   bank={state.bank}
                   mode={state.activeStyle}
+                  onHoverChange={setHoveredItem}
                 />
 
                 {/* Enhanced Sound Style Buttons with better alignment */}
@@ -699,10 +703,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 32,
     flex: 1,
+    position: "relative",
+    zIndex: 10,
   },
   leftColumn: {
     flex: 3,
     gap: 16,
+    position: "relative",
+    zIndex: 20,
   },
   styleSection: {
     paddingTop: 16,
@@ -950,6 +958,8 @@ const styles = StyleSheet.create({
     borderLeftColor: "rgba(0,0,0,0.5)",
     padding: 8,
     paddingLeft: 0,
+    position: "relative",
+    zIndex: 1,
   },
   usbSidePort: {
     position: "absolute",
