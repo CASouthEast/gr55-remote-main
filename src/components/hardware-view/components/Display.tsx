@@ -30,8 +30,9 @@ interface DisplayProps {
 export function Display({ patchName, bank, mode, style }: DisplayProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const flatListRef = React.useRef<FlatList>(null);
   // Current patch selection and description
-  const { selectedPatch } = useRolandRemotePatchSelection();
+  const { selectedPatch, setSelectedPatch } = useRolandRemotePatchSelection();
   const { patches } = useRolandGR55RemotePatchDescriptions();
   const currentPatch = patches?.find(
     (p) =>
@@ -47,7 +48,7 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
   const patchDescription = currentPatch?.data?.name ?? undefined;
   const filteredPatches = useMemo(() => {
     if (!patches) {
-      return [] as typeof patches;
+      return null;
     }
     const q = searchQuery.trim().toLowerCase();
     if (!q) {
@@ -61,6 +62,41 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
       return name.includes(q) || label.includes(q);
     });
   }, [patches, searchQuery]);
+
+  // Calculate the scroll position to center current patch
+  const scrollToIndex = useMemo(() => {
+    if (!filteredPatches || !selectedPatch || searchQuery.trim()) {
+      return undefined;
+    }
+    const currentIndex = filteredPatches.findIndex(
+      (p) =>
+        p.identity.bankMSB === selectedPatch.bankSelectMSB &&
+        p.identity.pc === selectedPatch.pc
+    );
+    if (currentIndex === -1) {
+      return undefined;
+    }
+    // For LEAD 01-1 to 01-3 (first 3 patches), start at index 0
+    if (currentIndex <= 2) {
+      return 0;
+    }
+    // Otherwise, show current patch as 3rd item (index - 2)
+    return currentIndex - 2;
+  }, [filteredPatches, selectedPatch, searchQuery]);
+
+  // Scroll to current patch when picker opens
+  useEffect(() => {
+    if (isPickerOpen && scrollToIndex !== undefined && flatListRef.current) {
+      // Use setTimeout to ensure the list has rendered
+      setTimeout(() => {
+        flatListRef.current?.scrollToIndex({
+          index: scrollToIndex,
+          animated: false,
+          viewPosition: 0,
+        });
+      }, 100);
+    }
+  }, [isPickerOpen, scrollToIndex]);
 
   useEffect(() => {
     if (Platform.OS !== "web" || !isPickerOpen) {
@@ -281,6 +317,7 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
                 autoFocus
               />
               <FlatList
+                ref={flatListRef}
                 data={filteredPatches}
                 keyExtractor={(item) =>
                   `${item.identity.bankMSB}-${item.identity.pc}`
@@ -288,6 +325,21 @@ export function Display({ patchName, bank, mode, style }: DisplayProps) {
                 showsVerticalScrollIndicator={false}
                 style={styles.popoverList}
                 contentContainerStyle={styles.popoverListContent}
+                getItemLayout={(data, index) => ({
+                  length: 56,
+                  offset: 56 * index,
+                  index,
+                })}
+                onScrollToIndexFailed={(info) => {
+                  // Fallback if scroll fails
+                  setTimeout(() => {
+                    flatListRef.current?.scrollToIndex({
+                      index: info.index,
+                      animated: false,
+                      viewPosition: 0,
+                    });
+                  }, 100);
+                }}
                 renderItem={({ item }) => (
                   <Pressable
                     onPress={() => {

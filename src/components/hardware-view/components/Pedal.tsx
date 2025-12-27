@@ -270,6 +270,9 @@ export function ExpressionPedal({
             // no-op; keep final value
           }}
         >
+          {/* Patch Level Label */}
+          <Text style={styles.patchLevelLabel}>PATCH LEVEL</Text>
+
           {/* Level Value Display */}
           <Text style={styles.levelValue}>{Math.round(patchLevel)}</Text>
 
@@ -610,6 +613,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 12,
+  },
+  patchLevelLabel: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#f97316", // GR orange
+    textAlign: "center",
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   levelValue: {
     fontSize: 18,
