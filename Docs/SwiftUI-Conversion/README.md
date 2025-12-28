@@ -43,6 +43,7 @@ This directory contains the SwiftUI conversion of the React Native GR55Controlle
   - Haptic feedback for tactile interaction
 
 - **NavigationCluster**: Complete navigation controls with:
+
   - DataWheel component with rotation and directional press gestures
   - OutputLevelKnob with visual indicator
   - Navigation buttons (PAGE left/right, EDIT, EXIT, ENTER, WRITE)
@@ -52,11 +53,38 @@ This directory contains the SwiftUI conversion of the React Native GR55Controlle
   - Visual feedback with scaling and rotation effects
   - Integration with state manager for pedal and style navigation
 
+- **ExpressionPedal**: Large expression pedal with level control featuring:
+  - Realistic 3D appearance with textured surface using ExpressionPedalShape
+  - ExpSwButton with LED indicator and function display
+  - Vertical drag gesture for patch level adjustment (0-100)
+  - LevelBar with gradient visualization and smooth updates
+  - PATCH LEVEL label and prominent value display
+  - Haptic feedback for iOS devices during level changes
+  - Visual feedback animations during interactions
+  - Complete integration with GR55StateManager for MIDI communication
+
+### ✅ Interface Components
+
+- **PortsBar**: Top connection labels display showing:
+
+  - Connection port labels (DC IN, POWER, USB COMPUTER, MIDI IN/OUT, PHONES, etc.)
+  - Dynamic guitar output source display with accent color
+  - Consistent typography and spacing following hardware aesthetic
+  - Semi-transparent background for subtle visual separation
+
+- **PreviewPane**: Contextual information overlay providing:
+  - Detailed parameter information for effects, tones, and assigns
+  - Card-style presentation with proper shadows and typography
+  - Hover detection integration with DisplayComponent
+  - Edit mode transition support with Cancel/Save controls
+  - Comprehensive parameter displays for all effect types (MOD, MFX, DELAY, CHORUS, REVERB, AMP, NS, EQ)
+  - Tone source information (GUITAR, PCM1, PCM2, MODEL) with configuration details
+  - Assign parameter routing and range settings
+  - Smooth show/hide animations with proper positioning
+
 ### 🚧 Pending Implementation
 
-- **ExpressionPedal**: Large pedal with level control
 - **SoundStylePanel**: Style selection buttons (LEAD, RHYTHM, OTHER, USER)
-- **PreviewPane**: Contextual parameter information overlay
 
 ## Swift 6.2 Compliance
 

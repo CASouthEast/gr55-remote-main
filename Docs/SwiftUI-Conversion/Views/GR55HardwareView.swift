@@ -2,6 +2,7 @@ import SwiftUI
 
 // Import the DisplayComponent and other components
 // Note: In a real Xcode project, this would be handled by the module system
+// Import the new PortsBar and PreviewPane components
 
 // MARK: - GR55HardwareView
 /// Main container view for the GR55 hardware interface
@@ -114,28 +115,6 @@ struct GR55HardwareView: View {
 // MARK: - Placeholder Views
 /// These are placeholder views that will be implemented in subsequent tasks
 
-struct PortsBar: View {
-    let guitarOutSource: String
-    
-    var body: some View {
-        HStack {
-            Text("GUITAR OUT: \(guitarOutSource)")
-                .font(DesignTokens.Fonts.statusText)
-                .foregroundColor(DesignTokens.Colors.textMuted)
-            
-            Spacer()
-            
-            Text("MIDI IN/OUT")
-                .font(DesignTokens.Fonts.statusText)
-                .foregroundColor(DesignTokens.Colors.textMuted)
-        }
-        .padding(.horizontal, DesignTokens.Spacing.medium)
-        .frame(height: 30)
-        .background(DesignTokens.Colors.surface)
-        .cornerRadius(DesignTokens.Radii.small)
-    }
-}
-
 struct HeaderView: View {
     var body: some View {
         HStack {
@@ -187,38 +166,7 @@ struct SoundStylePanel: View {
 
 // NavigationCluster is now implemented in separate file
 
-struct ExpressionPedal: View {
-    @ObservedObject var stateManager: GR55StateManager
-    
-    var body: some View {
-        VStack(spacing: DesignTokens.Spacing.medium) {
-            Text("EXP PEDAL")
-                .font(DesignTokens.Fonts.expressionLabel)
-                .foregroundColor(DesignTokens.Colors.accent)
-            
-            RoundedRectangle(cornerRadius: DesignTokens.Radii.large)
-                .fill(DesignTokens.Colors.expressionPedalBody)
-                .frame(
-                    width: DesignTokens.Dimensions.expressionPedalWidth,
-                    height: DesignTokens.Dimensions.expressionPedalHeight
-                )
-                .overlay(
-                    VStack {
-                        Text("PATCH LEVEL")
-                            .font(DesignTokens.Fonts.expressionLabel)
-                            .foregroundColor(DesignTokens.Colors.accent)
-                        
-                        Text("\(stateManager.state.patchLevel)")
-                            .font(DesignTokens.Fonts.expressionValue)
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
-                        
-                        Spacer()
-                    }
-                    .padding(DesignTokens.Spacing.medium)
-                )
-        }
-    }
-}
+// ExpressionPedal is now implemented in separate file
 
 struct PreviewPane: View {
     let hoveredItem: HoveredItem

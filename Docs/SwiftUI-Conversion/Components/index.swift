@@ -7,6 +7,9 @@
 @_exported import VisualComponents
 @_exported import FootPedal
 @_exported import NavigationCluster
+@_exported import ExpressionPedal
+@_exported import PortsBar
+@_exported import PreviewPane
 
 // Re-export commonly used shapes and components for convenience
 public typealias GR55PedalShape = PedalShape
@@ -28,3 +31,7 @@ public typealias GR55ExpressionPedalSurface = ExpressionPedalSurface
 public typealias GR55FootPedal = FootPedal
 public typealias GR55NavigationCluster = NavigationCluster
 public typealias GR55DataWheel = DataWheel
+public typealias GR55ExpressionPedal = ExpressionPedal
+public typealias GR55ExpSwButton = ExpSwButton
+public typealias GR55PortsBar = PortsBar
+public typealias GR55PreviewPane = PreviewPane
