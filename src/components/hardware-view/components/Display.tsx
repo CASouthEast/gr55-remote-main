@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -126,6 +126,40 @@ export function Display({
     PATCH,
     GR55.temporaryPatch.common.normalPuMute
   );
+
+  const [patchTempo, setPatchTempo] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.patchTempo
+  );
+  const [isEditingTempo, setIsEditingTempo] = useState(false);
+  const [tempoInput, setTempoInput] = useState("");
+  const lastTempoClickRef = useRef<number>(0);
+  const tempoSingleClickTimeout = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+
+  const clampTempo = (value: number) => {
+    return Math.max(20, Math.min(250, Math.round(value)));
+  };
+
+  const currentTempo = clampTempo(patchTempo ?? 120);
+
+  const commitTempo = (value: string | number) => {
+    const numeric = typeof value === "number" ? value : parseInt(value, 10);
+    if (Number.isFinite(numeric)) {
+      const next = clampTempo(numeric);
+      setPatchTempo(next);
+    }
+    setIsEditingTempo(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tempoSingleClickTimeout.current) {
+        clearTimeout(tempoSingleClickTimeout.current);
+      }
+    };
+  }, []);
 
   // Effect switches for bottom parameter rows
   const [mfxOn, setMfxOn] = useRemoteField(
@@ -290,7 +324,75 @@ export function Display({
               setModelMuted(!modelMuted)
             )}
           </View>
-          <Text style={styles.bpmText}>BPM: 120</Text>
+          <View style={styles.bpmContainer}>
+            <Text style={styles.bpmLabel}>BPM:</Text>
+            {isEditingTempo ? (
+              <TextInput
+                value={tempoInput}
+                onChangeText={setTempoInput}
+                onBlur={() => commitTempo(tempoInput)}
+                onSubmitEditing={() => commitTempo(tempoInput)}
+                keyboardType="numeric"
+                style={styles.bpmInput}
+                autoFocus
+              />
+            ) : (
+              <Pressable
+                onPress={() => {
+                  if (Platform.OS === "web") {
+                    if (tempoSingleClickTimeout.current) {
+                      clearTimeout(tempoSingleClickTimeout.current);
+                      tempoSingleClickTimeout.current = null;
+                    }
+
+                    const now = Date.now();
+                    const isDoubleClick = now - lastTempoClickRef.current < 300;
+
+                    if (isDoubleClick) {
+                      lastTempoClickRef.current = 0;
+                      setTempoInput(String(currentTempo));
+                      setIsEditingTempo(true);
+                      return;
+                    }
+
+                    lastTempoClickRef.current = now;
+                    tempoSingleClickTimeout.current = setTimeout(() => {
+                      commitTempo(currentTempo);
+                      tempoSingleClickTimeout.current = null;
+                      lastTempoClickRef.current = 0;
+                    }, 250);
+                    return;
+                  }
+
+                  commitTempo(currentTempo);
+                }}
+                onLongPress={() => {
+                  if (Platform.OS !== "web") {
+                    setTempoInput(String(currentTempo));
+                    setIsEditingTempo(true);
+                  }
+                }}
+              >
+                <Text style={styles.bpmText} selectable={false}>
+                  {currentTempo}
+                </Text>
+              </Pressable>
+            )}
+            <View style={styles.bpmArrows}>
+              <Pressable
+                onPress={() => commitTempo(currentTempo + 1)}
+                style={styles.bpmArrowButton}
+              >
+                <Text style={styles.bpmArrowText}>▲</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => commitTempo(currentTempo - 1)}
+                style={styles.bpmArrowButton}
+              >
+                <Text style={styles.bpmArrowText}>▼</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
 
         <View style={styles.mainInfo}>
@@ -559,6 +661,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#1e3a8a", // blue-900
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  bpmLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1e3a8a",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+  },
+  bpmContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  bpmInput: {
+    width: 40,
+    borderWidth: 1,
+    borderColor: "rgba(30, 58, 138, 0.4)",
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: Platform.OS === "web" ? 3 : 5,
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1e3a8a",
+    fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
+    backgroundColor: "#f8fafc",
+  },
+  bpmArrows: {
+    flexDirection: "column",
+    gap: 2,
+  },
+  bpmArrowButton: {
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    backgroundColor: "#e0e7ff",
+  },
+  bpmArrowText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1e3a8a",
     fontFamily: Platform.OS === "ios" ? "Courier" : "monospace",
   },
   mainInfo: {

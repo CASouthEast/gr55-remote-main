@@ -68,6 +68,11 @@ export function GR55Controller({
     GR55.temporaryPatch.common.patchLevel
   );
 
+  const [guitarOutSource] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.guitarOutSource
+  );
+
   // State update handler that notifies parent component
   const handleStateChange = useCallback(
     (newState: Partial<GR55State>) => {
@@ -386,7 +391,12 @@ export function GR55Controller({
             <Text style={styles.portLabel}>MIDI IN/OUT</Text>
             <Text style={styles.portLabel}>PHONES</Text>
             <Text style={styles.portLabel}>L/MONO OUTPUT R</Text>
-            <Text style={styles.portLabel}>GUITAR OUT</Text>
+            <View style={styles.portLabelGroup}>
+              <Text style={styles.portLabelAccent}>
+                {guitarOutSource ?? "—"}
+              </Text>
+              <Text style={styles.portLabel}>GUITAR OUT</Text>
+            </View>
             <Text style={styles.portLabel}>GK IN</Text>
           </View>
         </View>
@@ -667,6 +677,19 @@ const styles = StyleSheet.create({
     color: "#52525b", // zinc-600
     textTransform: "uppercase",
     letterSpacing: 1.2,
+  },
+  portLabelGroup: {
+    position: "relative",
+    alignItems: "center",
+  },
+  portLabelAccent: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#f97316", // orange-500
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+    position: "absolute",
+    top: -12,
   },
   leftSection: {
     flex: 1,
