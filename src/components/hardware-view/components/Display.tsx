@@ -9,7 +9,7 @@ import {
   FlatList,
 } from "react-native";
 
-import { PreviewPane, HoveredItem } from "./PreviewPane";
+import { HoveredItem } from "./PreviewPane";
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
 import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
@@ -38,7 +38,6 @@ export function Display({
 }: DisplayProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [hoveredItem, setHoveredItem] = useState<HoveredItem>(null);
   const flatListRef = React.useRef<FlatList>(null);
   // Current patch selection and description
   const { selectedPatch, setSelectedPatch } = useRolandRemotePatchSelection();
@@ -108,7 +107,6 @@ export function Display({
   }, [isPickerOpen, scrollToIndex]);
 
   const updateHoveredItem = (item: HoveredItem) => {
-    setHoveredItem(item);
     onHoverChange?.(item);
   };
   // Live tone switches so the top bar mirrors the active sources on the current patch

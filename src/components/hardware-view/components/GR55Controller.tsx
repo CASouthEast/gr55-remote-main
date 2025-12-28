@@ -40,7 +40,7 @@ export function GR55Controller({
     ...initialState,
   });
 
-  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoveredItem, setHoveredItem] = useState<HoveredItem>(null);
 
   // CTL pedal state and function from GR-55
   const [ctlStatus, setCtlStatus] = useRemoteField(
@@ -597,6 +597,9 @@ export function GR55Controller({
           />
         </View>
 
+        {/* Preview Pane - overlays Expression Pedal area */}
+        <PreviewPane hoveredItem={hoveredItem} />
+
         {/* USB Side Port */}
         <View style={styles.usbSidePort}>
           <Text style={styles.usbSideLabel}>USB MEMORY</Text>
@@ -628,6 +631,10 @@ const styles = StyleSheet.create({
     minWidth: Platform.OS === "web" ? 1000 : 350,
     maxWidth: Platform.OS === "web" ? 1200 : 400,
     flexDirection: "row",
+    overflow: Platform.select({
+      web: "visible",
+      default: "hidden",
+    }) as any,
     ...Platform.select({
       web: {
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",

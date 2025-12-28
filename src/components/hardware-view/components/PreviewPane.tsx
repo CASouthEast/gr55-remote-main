@@ -409,12 +409,11 @@ function ParameterSection({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     position: "absolute" as any,
-    top: 0,
-    bottom: -480,
-    right: 0,
-    left: "100%",
-    marginLeft: 32,
-    width: 320,
+    top: 100, // Align with Display top (accounting for header and padding)
+    left: "70%", // Position to the right of the left column
+    marginLeft: -32, // Pull back 32px to create the gap
+    width: 380,
+    maxHeight: 540,
     backgroundColor: "transparent",
     pointerEvents: "none" as any,
     zIndex: 500,
