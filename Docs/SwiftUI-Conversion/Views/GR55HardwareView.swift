@@ -1,11 +1,8 @@
 import SwiftUI
 
-// Import the DisplayComponent and other components
-// Note: In a real Xcode project, this would be handled by the module system
-// Import the new PortsBar and PreviewPane components
-
 // MARK: - GR55HardwareView
 /// Main container view for the GR55 hardware interface
+/// Integrates all component views with state manager and provides responsive scaling
 /// Follows Swift 6.2 concurrency patterns with @MainActor
 @MainActor
 struct GR55HardwareView: View {
@@ -16,23 +13,28 @@ struct GR55HardwareView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Main chassis background
+                // Main chassis background with proper styling and shadows
                 chassisBackground
                 
-                // Hardware layout
-                hardwareLayout
+                // Hardware layout with responsive scaling
+                hardwareLayout(geometry: geometry)
                     .padding(DesignTokens.Spacing.large)
+                    .scaleEffect(calculateScaleFactor(for: geometry.size))
+                    .animation(DesignTokens.Animations.layoutChange, value: geometry.size)
             }
             .overlay(
+                // Preview pane overlay system
                 PreviewPane(
                     hoveredItem: hoveredItem,
                     isEditMode: isEditMode
                 )
                 .allowsHitTesting(false)
+                .zIndex(DesignTokens.ZIndex.preview)
             )
         }
         .background(DesignTokens.Colors.background)
         .preferredColorScheme(.dark) // Hardware aesthetic works best in dark mode
+        .clipped() // Ensure content doesn't overflow on smaller screens
     }
     
     // MARK: - Chassis Background
@@ -45,21 +47,38 @@ struct GR55HardwareView: View {
                 x: DesignTokens.Shadows.chassis.x,
                 y: DesignTokens.Shadows.chassis.y
             )
+            .overlay(
+                // Subtle inner shadow for depth
+                RoundedRectangle(cornerRadius: DesignTokens.Radii.large)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                DesignTokens.Colors.border.opacity(0.5),
+                                DesignTokens.Colors.border.opacity(0.1)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
+            )
     }
     
     // MARK: - Hardware Layout
-    private var hardwareLayout: some View {
+    private func hardwareLayout(geometry: GeometryProxy) -> some View {
         VStack(spacing: DesignTokens.Spacing.large) {
             // Top ports bar
-            PortsBar(guitarOutSource: stateManager.state.guitarOutSource)
+            PortsBar(guitarOutSource: stateManager.currentState.guitarOutSource)
             
-            // Main hardware sections
+            // Main hardware sections with proper hierarchy
             HStack(spacing: DesignTokens.Spacing.extraLarge) {
                 // Left section - Main controls
                 leftSection
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Right section - Expression pedal
                 rightSection
+                    .frame(maxWidth: 200, alignment: .trailing)
             }
         }
     }
@@ -84,7 +103,7 @@ struct GR55HardwareView: View {
     // MARK: - Left Column
     private var leftColumn: some View {
         VStack(spacing: DesignTokens.Spacing.medium) {
-            // LCD Display
+            // LCD Display with hover and edit mode callbacks
             DisplayComponent(stateManager: stateManager)
                 .onHover { item in
                     hoveredItem = item
@@ -96,7 +115,7 @@ struct GR55HardwareView: View {
             // Sound style panel
             SoundStylePanel(stateManager: stateManager)
             
-            // Foot pedals
+            // Foot pedals cluster
             PedalCluster(stateManager: stateManager)
         }
     }
@@ -110,113 +129,71 @@ struct GR55HardwareView: View {
     private var rightSection: some View {
         ExpressionPedal(stateManager: stateManager)
     }
+    
+    // MARK: - Responsive Scaling
+    /// Calculates appropriate scale factor based on available screen size
+    private func calculateScaleFactor(for size: CGSize) -> CGFloat {
+        // Base dimensions for the hardware interface
+        let baseWidth: CGFloat = 1200
+        let baseHeight: CGFloat = 800
+        
+        // Calculate scale factors for width and height
+        let widthScale = size.width / baseWidth
+        let heightScale = size.height / baseHeight
+        
+        // Use the smaller scale factor to ensure everything fits
+        let scale = min(widthScale, heightScale)
+        
+        // Clamp scale between reasonable bounds
+        return max(0.5, min(1.2, scale))
+    }
 }
 
-// MARK: - Placeholder Views
-/// These are placeholder views that will be implemented in subsequent tasks
-
+// MARK: - HeaderView
+/// Header section with Roland branding and model designation
 struct HeaderView: View {
     var body: some View {
         HStack {
-            Text("ROLAND")
-                .font(DesignTokens.Fonts.previewTitle)
-                .foregroundColor(DesignTokens.Colors.accent)
+            // Roland branding
+            VStack(alignment: .leading, spacing: 2) {
+                Text("ROLAND")
+                    .font(DesignTokens.Fonts.previewTitle)
+                    .fontWeight(.black)
+                    .foregroundColor(DesignTokens.Colors.accent)
+                    .kerning(2)
+                
+                Text("GUITAR SYNTHESIZER")
+                    .font(DesignTokens.Fonts.statusText)
+                    .foregroundColor(DesignTokens.Colors.textMuted)
+                    .kerning(1)
+            }
             
             Spacer()
             
-            Text("GR-55")
-                .font(DesignTokens.Fonts.previewTitle)
-                .foregroundColor(DesignTokens.Colors.textPrimary)
+            // Model designation
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("GR-55")
+                    .font(DesignTokens.Fonts.previewTitle)
+                    .fontWeight(.black)
+                    .foregroundColor(DesignTokens.Colors.textPrimary)
+                    .kerning(2)
+                
+                Text("GUITAR SYNTHESIZER")
+                    .font(DesignTokens.Fonts.statusText)
+                    .foregroundColor(DesignTokens.Colors.textMuted)
+                    .kerning(1)
+            }
         }
         .padding(.horizontal, DesignTokens.Spacing.medium)
-    }
-}
-
-// DisplayComponent is now implemented in separate file
-
-struct SoundStylePanel: View {
-    @ObservedObject var stateManager: GR55StateManager
-    
-    var body: some View {
-        HStack(spacing: DesignTokens.Spacing.medium) {
-            ForEach(SoundStyle.allCases, id: \.self) { style in
-                Button(style.displayName) {
-                    stateManager.setActiveStyle(style)
-                }
-                .font(DesignTokens.Fonts.parameterLabel)
-                .foregroundColor(
-                    stateManager.state.activeStyle == style ?
-                    DesignTokens.Colors.accent : DesignTokens.Colors.textMuted
+        .padding(.vertical, DesignTokens.Spacing.small)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.Radii.small)
+                .fill(DesignTokens.Colors.surface.opacity(0.3))
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.Radii.small)
+                        .stroke(DesignTokens.Colors.border.opacity(0.5), lineWidth: 1)
                 )
-                .padding(.horizontal, DesignTokens.Spacing.small)
-                .padding(.vertical, DesignTokens.Spacing.extraSmall)
-                .background(
-                    stateManager.state.activeStyle == style ?
-                    DesignTokens.Colors.buttonPressed : DesignTokens.Colors.buttonDefault
-                )
-                .cornerRadius(DesignTokens.Radii.small)
-            }
-        }
-    }
-}
-
-// PedalCluster is now implemented in separate file
-
-// FootPedal is now implemented in separate file
-
-// NavigationCluster is now implemented in separate file
-
-// ExpressionPedal is now implemented in separate file
-
-struct PreviewPane: View {
-    let hoveredItem: HoveredItem
-    let isEditMode: Bool
-    
-    var body: some View {
-        Group {
-            if hoveredItem != .none || isEditMode {
-                VStack {
-                    Spacer()
-                    
-                    HStack {
-                        Spacer()
-                        
-                        RoundedRectangle(cornerRadius: DesignTokens.Radii.medium)
-                            .fill(DesignTokens.Colors.surface)
-                            .frame(
-                                maxWidth: DesignTokens.Dimensions.previewPaneMaxWidth,
-                                minHeight: DesignTokens.Dimensions.previewPaneMinHeight
-                            )
-                            .overlay(
-                                VStack {
-                                    Text(isEditMode ? "EDIT MODE" : "PREVIEW")
-                                        .font(DesignTokens.Fonts.previewTitle)
-                                        .foregroundColor(DesignTokens.Colors.accent)
-                                    
-                                    Text(hoveredItem.description)
-                                        .font(DesignTokens.Fonts.previewBody)
-                                        .foregroundColor(DesignTokens.Colors.textPrimary)
-                                    
-                                    Spacer()
-                                }
-                                .padding(DesignTokens.Spacing.medium)
-                            )
-                            .shadow(
-                                color: DesignTokens.Shadows.preview.color,
-                                radius: DesignTokens.Shadows.preview.radius,
-                                x: DesignTokens.Shadows.preview.x,
-                                y: DesignTokens.Shadows.preview.y
-                            )
-                        
-                        Spacer()
-                    }
-                    
-                    Spacer()
-                }
-                .transition(.opacity.combined(with: .scale))
-                .animation(DesignTokens.Animations.stateChange, value: hoveredItem)
-            }
-        }
+        )
     }
 }
 
@@ -224,4 +201,5 @@ struct PreviewPane: View {
 #Preview {
     GR55HardwareView()
         .frame(width: 1200, height: 800)
+        .background(DesignTokens.Colors.background)
 }
