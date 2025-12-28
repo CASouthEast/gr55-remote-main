@@ -312,31 +312,90 @@ extension Shape {
             .scaleEffect(isPressed ? 0.98 : 1.0)
             .animation(DesignTokens.Animations.buttonPress, value: isPressed)
     }
+    
+    /// Applies pedal styling with 3D appearance
+    func pedalStyle(
+        isPressed: Bool = false,
+        bodyColor: Color = DesignTokens.Colors.pedalBody,
+        borderColor: Color = DesignTokens.Colors.pedalBorder
+    ) -> some View {
+        self
+            .fill(isPressed ? DesignTokens.Colors.pedalPressed : bodyColor)
+            .overlay(
+                self.stroke(borderColor, lineWidth: 2)
+            )
+            .shadow(
+                color: DesignTokens.Shadows.component.color,
+                radius: isPressed ? 2 : DesignTokens.Shadows.component.radius,
+                x: DesignTokens.Shadows.component.x,
+                y: isPressed ? 1 : DesignTokens.Shadows.component.y
+            )
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(DesignTokens.Animations.buttonPress, value: isPressed)
+    }
+    
+    /// Applies expression pedal styling with texture
+    func expressionPedalStyle() -> some View {
+        self
+            .fill(DesignTokens.Colors.expressionPedalBody)
+            .overlay(
+                self.stroke(DesignTokens.Colors.expressionPedalBorder, lineWidth: 2)
+            )
+            .shadow(
+                color: DesignTokens.Shadows.component.color,
+                radius: DesignTokens.Shadows.component.radius,
+                x: DesignTokens.Shadows.component.x,
+                y: DesignTokens.Shadows.component.y
+            )
+    }
 }
 
 // MARK: - Preview Helpers
 #if DEBUG
 struct CustomShapesPreview: View {
+    @State private var isPedalPressed = false
+    @State private var isLEDActive = true
+    
     var body: some View {
         VStack(spacing: 20) {
             HStack(spacing: 20) {
+                // Pedal with new styling
                 PedalShape()
-                    .hardwareStyle()
+                    .pedalStyle(isPressed: isPedalPressed)
                     .frame(width: 80, height: 120)
+                    .onTapGesture {
+                        withAnimation {
+                            isPedalPressed.toggle()
+                        }
+                    }
                 
                 DataWheelShape()
                     .hardwareStyle()
                     .frame(width: 80, height: 80)
                 
                 LevelBarShape(level: 0.7)
-                    .fill(DesignTokens.Colors.accent)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                DesignTokens.Colors.accent,
+                                DesignTokens.Colors.accentHover
+                            ]),
+                            startPoint: .bottom,
+                            endPoint: .top
+                        )
+                    )
                     .frame(width: 20, height: 100)
             }
             
             HStack(spacing: 20) {
                 LEDShape()
-                    .ledStyle(isActive: true)
+                    .ledStyle(isActive: isLEDActive)
                     .frame(width: 16, height: 16)
+                    .onTapGesture {
+                        withAnimation {
+                            isLEDActive.toggle()
+                        }
+                    }
                 
                 KnobShape(angle: .pi / 4)
                     .hardwareStyle()
@@ -346,6 +405,16 @@ struct CustomShapesPreview: View {
                     .buttonStyle(isPressed: false)
                     .frame(width: 80, height: 30)
             }
+            
+            // Expression pedal shape
+            ExpressionPedalShape()
+                .expressionPedalStyle()
+                .frame(width: 120, height: 200)
+            
+            // Display bezel
+            DisplayBezelShape()
+                .fill(DesignTokens.Colors.lcdBorder)
+                .frame(width: 200, height: 100)
         }
         .padding()
         .background(DesignTokens.Colors.chassis)

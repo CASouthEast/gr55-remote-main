@@ -2,6 +2,43 @@ import Foundation
 import SwiftUI
 import Combine
 
+// MARK: - MIDI Integration Protocol
+/// Protocol defining the interface for MIDI communication
+/// Designed for integration with existing Swift MIDI layer
+@MainActor
+protocol MIDIIntegrationInterface: Sendable {
+    /// Sends a MIDI command asynchronously
+    func sendMIDICommand(_ command: MIDICommand) async throws
+    
+    /// Receives MIDI data as an async stream
+    func receiveMIDIData() -> AsyncStream<Data>
+    
+    /// Checks if MIDI connection is active
+    var isConnected: Bool { get async }
+}
+
+// MARK: - MIDI Command Types
+/// Represents different types of MIDI commands for the GR-55
+enum MIDICommand: Sendable {
+    case pedalSelection(Int)
+    case ctlToggle(Bool)
+    case expSwToggle(Bool)
+    case patchNameChange(String)
+    case patchLevelChange(Int)
+    case styleChange(SoundStyle)
+    case bankChange(Int)
+    case effectToggle(String, Bool)
+    case toneSourceToggle(String, Bool)
+    case assignToggle(Int, Bool)
+    
+    /// Raw MIDI data representation (to be implemented in MIDI integration task)
+    var midiData: Data {
+        // This will be implemented in the MIDI integration task
+        // For now, return empty data
+        return Data()
+    }
+}
+
 // MARK: - GR55StateManager
 /// Central state management for the GR55 hardware interface
 /// Implements ObservableObject pattern for SwiftUI integration
@@ -14,10 +51,12 @@ final class GR55StateManager: ObservableObject {
     
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
+    private let midiInterface: MIDIIntegrationInterface?
     
     // MARK: - Initialization
-    init(initialState: GR55State = GR55State()) {
+    init(initialState: GR55State = GR55State(), midiInterface: MIDIIntegrationInterface? = nil) {
         self.state = initialState
+        self.midiInterface = midiInterface
         setupMIDIIntegration()
     }
     
@@ -40,8 +79,10 @@ final class GR55StateManager: ObservableObject {
             state.patchName = bankSlots[pedal - 1].name
         }
         
-        // Send MIDI command for pedal selection
-        sendMIDIPedalSelection(pedal)
+        // Send MIDI command for pedal selection asynchronously
+        Task {
+            await sendMIDIPedalSelection(pedal)
+        }
     }
     
     /// Toggles CTL pedal status
@@ -51,8 +92,10 @@ final class GR55StateManager: ObservableObject {
         // Update CTL function display based on status
         state.ctlFunction = state.ctlStatus ? "ACTIVE" : "REC/PLAY/DUB"
         
-        // Send MIDI command for CTL toggle
-        sendMIDICtlToggle(state.ctlStatus)
+        // Send MIDI command for CTL toggle asynchronously
+        Task {
+            await sendMIDICtlToggle(state.ctlStatus)
+        }
     }
     
     /// Toggles expression switch status
@@ -62,8 +105,10 @@ final class GR55StateManager: ObservableObject {
         // Update EXP SW function display
         state.expSwFunction = state.expSwStatus ? "ACTIVE" : "EXP SW"
         
-        // Send MIDI command for EXP SW toggle
-        sendMIDIExpSwToggle(state.expSwStatus)
+        // Send MIDI command for EXP SW toggle asynchronously
+        Task {
+            await sendMIDIExpSwToggle(state.expSwStatus)
+        }
     }
     
     // MARK: - Patch Management
@@ -71,8 +116,10 @@ final class GR55StateManager: ObservableObject {
     func setPatchName(_ name: String) {
         state.patchName = name
         
-        // Send MIDI command for patch name change
-        sendMIDIPatchNameChange(name)
+        // Send MIDI command for patch name change asynchronously
+        Task {
+            await sendMIDIPatchNameChange(name)
+        }
     }
     
     /// Sets the patch level (0-100)
@@ -80,8 +127,10 @@ final class GR55StateManager: ObservableObject {
         let clampedLevel = max(0, min(100, level))
         state.patchLevel = clampedLevel
         
-        // Send MIDI command for patch level change
-        sendMIDIPatchLevelChange(clampedLevel)
+        // Send MIDI command for patch level change asynchronously
+        Task {
+            await sendMIDIPatchLevelChange(clampedLevel)
+        }
     }
     
     // MARK: - Style Management
@@ -92,8 +141,10 @@ final class GR55StateManager: ObservableObject {
         // Update bank slots for new style
         updateBankSlotsForStyle(style)
         
-        // Send MIDI command for style change
-        sendMIDIStyleChange(style)
+        // Send MIDI command for style change asynchronously
+        Task {
+            await sendMIDIStyleChange(style)
+        }
     }
     
     // MARK: - Bank Navigation
@@ -105,8 +156,10 @@ final class GR55StateManager: ObservableObject {
         state.bank = formatBankString(nextBankNumber, ordinal: state.activePedal)
         updateBankSlotsForCurrentBank()
         
-        // Send MIDI command for bank change
-        sendMIDIBankChange(nextBankNumber)
+        // Send MIDI command for bank change asynchronously
+        Task {
+            await sendMIDIBankChange(nextBankNumber)
+        }
     }
     
     /// Navigates to the previous bank
@@ -117,8 +170,10 @@ final class GR55StateManager: ObservableObject {
         state.bank = formatBankString(prevBankNumber, ordinal: state.activePedal)
         updateBankSlotsForCurrentBank()
         
-        // Send MIDI command for bank change
-        sendMIDIBankChange(prevBankNumber)
+        // Send MIDI command for bank change asynchronously
+        Task {
+            await sendMIDIBankChange(prevBankNumber)
+        }
     }
     
     /// Selects an ordinal within the current bank
@@ -185,8 +240,10 @@ final class GR55StateManager: ObservableObject {
             break
         }
         
-        // Send MIDI command for effect toggle
-        sendMIDIEffectToggle(effectName, isOn: getEffectState(effectName))
+        // Send MIDI command for effect toggle asynchronously
+        Task {
+            await sendMIDIEffectToggle(effectName, isOn: getEffectState(effectName))
+        }
     }
     
     /// Toggles a tone source mute state
@@ -204,8 +261,10 @@ final class GR55StateManager: ObservableObject {
             break
         }
         
-        // Send MIDI command for tone source toggle
-        sendMIDIToneSourceToggle(toneName, isMuted: getToneSourceMuteState(toneName))
+        // Send MIDI command for tone source toggle asynchronously
+        Task {
+            await sendMIDIToneSourceToggle(toneName, isMuted: getToneSourceMuteState(toneName))
+        }
     }
     
     /// Toggles an assign switch
@@ -215,71 +274,109 @@ final class GR55StateManager: ObservableObject {
         let index = assignNumber - 1
         state.assignStates[index].toggle()
         
-        // Send MIDI command for assign toggle
-        sendMIDIAssignToggle(assignNumber, isOn: state.assignStates[index])
+        // Send MIDI command for assign toggle asynchronously
+        Task {
+            await sendMIDIAssignToggle(assignNumber, isOn: state.assignStates[index])
+        }
     }
     
     // MARK: - MIDI Integration Interface
     /// Sets up MIDI integration with existing Swift layer
     private func setupMIDIIntegration() {
-        // This will interface with the existing Swift MIDI communication layer
-        // Implementation will be completed in the MIDI integration task
+        // Set up MIDI data reception if interface is available
+        guard let midiInterface = midiInterface else { return }
+        
+        // Start listening for incoming MIDI data
+        Task {
+            for await data in midiInterface.receiveMIDIData() {
+                await processMIDIData(data)
+            }
+        }
     }
     
     /// Processes incoming MIDI data and updates state
-    func processMIDIData(_ data: Data) {
+    /// Uses async/await for Swift 6.2 compliance
+    func processMIDIData(_ data: Data) async {
         // Parse MIDI data and update corresponding state properties
         // Implementation will be completed in the MIDI integration task
+        
+        // Ensure UI updates happen on main actor
+        await MainActor.run {
+            // Update state properties based on MIDI data
+            // This will be implemented in the MIDI integration task
+        }
+    }
+    
+    /// Sends a MIDI command using the integration interface
+    private func sendMIDICommand(_ command: MIDICommand) async {
+        guard let midiInterface = midiInterface else { return }
+        
+        do {
+            try await midiInterface.sendMIDICommand(command)
+        } catch {
+            // Handle MIDI communication errors
+            print("MIDI command failed: \(error)")
+        }
     }
     
     /// Sends MIDI command for pedal selection
-    private func sendMIDIPedalSelection(_ pedal: Int) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIPedalSelection(_ pedal: Int) async {
+        await sendMIDICommand(.pedalSelection(pedal))
     }
     
     /// Sends MIDI command for CTL toggle
-    private func sendMIDICtlToggle(_ isActive: Bool) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDICtlToggle(_ isActive: Bool) async {
+        await sendMIDICommand(.ctlToggle(isActive))
     }
     
     /// Sends MIDI command for EXP SW toggle
-    private func sendMIDIExpSwToggle(_ isActive: Bool) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIExpSwToggle(_ isActive: Bool) async {
+        await sendMIDICommand(.expSwToggle(isActive))
     }
     
     /// Sends MIDI command for patch name change
-    private func sendMIDIPatchNameChange(_ name: String) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIPatchNameChange(_ name: String) async {
+        await sendMIDICommand(.patchNameChange(name))
     }
     
     /// Sends MIDI command for patch level change
-    private func sendMIDIPatchLevelChange(_ level: Int) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIPatchLevelChange(_ level: Int) async {
+        await sendMIDICommand(.patchLevelChange(level))
     }
     
     /// Sends MIDI command for style change
-    private func sendMIDIStyleChange(_ style: SoundStyle) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIStyleChange(_ style: SoundStyle) async {
+        await sendMIDICommand(.styleChange(style))
     }
     
     /// Sends MIDI command for bank change
-    private func sendMIDIBankChange(_ bankNumber: Int) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIBankChange(_ bankNumber: Int) async {
+        await sendMIDICommand(.bankChange(bankNumber))
     }
     
     /// Sends MIDI command for effect toggle
-    private func sendMIDIEffectToggle(_ effectName: String, isOn: Bool) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIEffectToggle(_ effectName: String, isOn: Bool) async {
+        await sendMIDICommand(.effectToggle(effectName, isOn))
     }
     
     /// Sends MIDI command for tone source toggle
-    private func sendMIDIToneSourceToggle(_ toneName: String, isMuted: Bool) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIToneSourceToggle(_ toneName: String, isMuted: Bool) async {
+        await sendMIDICommand(.toneSourceToggle(toneName, isMuted))
     }
     
     /// Sends MIDI command for assign toggle
-    private func sendMIDIAssignToggle(_ assignNumber: Int, isOn: Bool) {
-        // Implementation will interface with existing MIDI layer
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIAssignToggle(_ assignNumber: Int, isOn: Bool) async {
+        await sendMIDICommand(.assignToggle(assignNumber, isOn))
     }
     
     // MARK: - Helper Methods
@@ -371,27 +468,56 @@ final class GR55StateManager: ObservableObject {
         default: return false
         }
     }
+    
+    /// Resets all state to default values
+    func resetToDefaults() {
+        state = GR55State()
+        
+        // Synchronize with MIDI hardware
+        Task {
+            await synchronizeWithMIDI()
+        }
+    }
+    
+    /// Updates multiple state properties atomically
+    func updateState(_ updates: (inout GR55State) -> Void) {
+        updates(&state)
+    }
+    
+    /// Gets a read-only copy of the current state
+    func getStateSnapshot() -> GR55State {
+        return state
+    }
 }
 
 // MARK: - MIDI Integration Extensions
 extension GR55StateManager {
     /// Updates state from MIDI patch change
-    func updateFromMIDIPatchChange(bankMSB: UInt8, pc: UInt8) {
+    func updateFromMIDIPatchChange(bankMSB: UInt8, pc: UInt8) async {
         // Convert MIDI values to internal state
         let bankNumber = Int(bankMSB) + 1
         let ordinal = Int(pc % 3) + 1
         
-        state.bank = formatBankString(bankNumber, ordinal: ordinal)
-        state.activePedal = ordinal
-        
-        // Update patch name from MIDI data
-        // This would typically involve a lookup table or MIDI query
+        // Ensure UI updates happen on main actor
+        await MainActor.run {
+            state.bank = formatBankString(bankNumber, ordinal: ordinal)
+            state.activePedal = ordinal
+            
+            // Update patch name from MIDI data
+            // This would typically involve a lookup table or MIDI query
+            updateBankSlotsForCurrentBank()
+        }
     }
     
     /// Updates state from MIDI parameter change
-    func updateFromMIDIParameter(address: [UInt8], value: UInt8) {
+    func updateFromMIDIParameter(address: [UInt8], value: UInt8) async {
         // Parse MIDI address and update corresponding state
         // Implementation depends on GR-55 MIDI specification
+        
+        await MainActor.run {
+            // Update specific state properties based on MIDI address
+            // This will be implemented in the MIDI integration task
+        }
     }
     
     /// Gets MIDI patch selection for current state
@@ -401,5 +527,42 @@ extension GR55StateManager {
         let pc = UInt8(max(0, min(127, state.activePedal - 1)))
         
         return PatchSelection(bankSelectMSB: bankMSB, pc: pc)
+    }
+    
+    /// Checks if MIDI interface is connected
+    var isMIDIConnected: Bool {
+        get async {
+            guard let midiInterface = midiInterface else { return false }
+            return await midiInterface.isConnected
+        }
+    }
+    
+    /// Synchronizes current state with MIDI hardware
+    func synchronizeWithMIDI() async {
+        // Send all current state values to MIDI hardware
+        await sendMIDIPedalSelection(state.activePedal)
+        await sendMIDIPatchLevelChange(state.patchLevel)
+        await sendMIDIStyleChange(state.activeStyle)
+        
+        // Sync all effect states
+        await sendMIDIEffectToggle("mfx", isOn: state.mfxOn)
+        await sendMIDIEffectToggle("delay", isOn: state.delayOn)
+        await sendMIDIEffectToggle("chorus", isOn: state.chorusOn)
+        await sendMIDIEffectToggle("reverb", isOn: state.reverbOn)
+        await sendMIDIEffectToggle("amp", isOn: state.ampOn)
+        await sendMIDIEffectToggle("ns", isOn: state.nsOn)
+        await sendMIDIEffectToggle("mod", isOn: state.modOn)
+        await sendMIDIEffectToggle("eq", isOn: state.eqOn)
+        
+        // Sync tone source states
+        await sendMIDIToneSourceToggle("pcm1", isMuted: state.pcm1Muted)
+        await sendMIDIToneSourceToggle("pcm2", isMuted: state.pcm2Muted)
+        await sendMIDIToneSourceToggle("model", isMuted: state.modelMuted)
+        await sendMIDIToneSourceToggle("guitar", isMuted: state.normalPuMuted)
+        
+        // Sync assign states
+        for (index, isOn) in state.assignStates.enumerated() {
+            await sendMIDIAssignToggle(index + 1, isOn: isOn)
+        }
     }
 }
