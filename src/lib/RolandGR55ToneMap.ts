@@ -950,6 +950,8 @@ for (const [encodedOffset, labels] of tonesAndOffsets) {
   }
 }
 
+export const getAllPcmToneLabels = () => allPcmToneLabels;
+
 export const pcmToneSelectField = enumField(
   allPcmToneLabels,
 

@@ -12,6 +12,7 @@ import {
 import { HoveredItem } from "./PreviewPane";
 import { RolandRemotePatchContext as PATCH } from "../../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../../hooks/useRemoteField";
+import { getAllPcmToneLabels } from "../../../lib/RolandGR55ToneMap";
 import { useRolandRemotePatchSelection } from "../../../lib/RolandRemotePatchSelection";
 import { RolandGR55AddressMapAbsolute as GR55 } from "../../../lib/roland-gr55/RolandGR55AddressMap";
 import { useRolandGR55RemotePatchDescriptions } from "../../../lib/roland-gr55/RolandGR55RemotePatchDescriptions";
@@ -126,6 +127,129 @@ export function Display({
     PATCH,
     GR55.temporaryPatch.common.normalPuMute
   );
+
+  // Tone selections for PCM1, PCM2, and Modeling Tone
+  const [pcm1ToneSelect] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.patchPCMTone1.toneSelect
+  );
+  const [pcm2ToneSelect] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.patchPCMTone2.toneSelect
+  );
+  const [modelingToneCategory] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.toneCategory_guitar
+  );
+  const [modelingToneEGtrGuitar] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.toneNumberEGtr_guitar
+  );
+  const [modelingToneAcGuitar] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.toneNumberAc_guitar
+  );
+  const [modelingToneEBassGuitar] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.toneNumberEBass_guitar
+  );
+  const [modelingToneSynthGuitar] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.modelingTone.toneNumberSynth_guitar
+  );
+
+  // Helper function to get tone category name and tone name from PCM tone name
+  const getPcmToneCategoryAndName = (
+    toneName: string | undefined
+  ): { category: string; name: string } | null => {
+    if (toneName === undefined || toneName === null) {
+      return null;
+    }
+
+    const allLabels = getAllPcmToneLabels();
+    const toneIndex = allLabels.indexOf(toneName);
+
+    if (toneIndex === -1) return null;
+
+    // Create a simple tone range map (0-based indices to category names)
+    const ranges = [
+      { name: "Ac.Piano", range: [0, 15] },
+      { name: "Pop Piano", range: [16, 18] },
+      { name: "E.Grand Piano", range: [19, 20] },
+      { name: "E.Piano1", range: [21, 45] },
+      { name: "E.Piano2", range: [46, 58] },
+      { name: "E.Organ", range: [59, 90] },
+      { name: "Pipe Organ", range: [91, 95] },
+      { name: "Reed Organ", range: [96, 96] },
+      { name: "Harpsichord", range: [97, 104] },
+      { name: "Vibraphone", range: [105, 119] },
+      { name: "Bell", range: [120, 140] },
+      { name: "Mallet", range: [141, 162] },
+      { name: "Ac.Guitar", range: [163, 180] },
+      { name: "E.Guitar", range: [181, 198] },
+      { name: "Dist.Guitar", range: [199, 209] },
+      { name: "Ac.Bass", range: [210, 227] },
+      { name: "E.Bass", range: [228, 245] },
+      { name: "Slap Bass", range: [246, 253] },
+      { name: "Fretless Bass", range: [254, 256] },
+      { name: "Strings", range: [257, 283] },
+      { name: "Pad/Strings", range: [284, 297] },
+      { name: "Choir", range: [298, 304] },
+      { name: "Wind", range: [305, 319] },
+      { name: "Reed", range: [320, 337] },
+      { name: "Pipe", range: [338, 350] },
+      { name: "Synth Bell", range: [351, 365] },
+      { name: "Lead", range: [366, 367] },
+      { name: "Solo Brass", range: [368, 378] },
+      { name: "Ensemble Brass", range: [379, 385] },
+      { name: "Synth Wood", range: [386, 392] },
+      { name: "Synth Mallet", range: [393, 398] },
+      { name: "Synth Lead", range: [399, 445] },
+      { name: "Synth Brass", range: [446, 568] },
+      { name: "Synth Pad/Strings", range: [569, 608] },
+      { name: "Synth Bellpad", range: [609, 692] },
+      { name: "Synth PolyKey", range: [693, 709] },
+      { name: "Synth FX", range: [710, 754] },
+      { name: "Synth Seq/Pop", range: [755, 785] },
+      { name: "Pulsating", range: [786, 796] },
+      { name: "Beat&Groove", range: [797, 828] },
+      { name: "Hit", range: [829, 839] },
+      { name: "Sound FX", range: [840, 846] },
+      { name: "Percussion", range: [847, 883] },
+      { name: "Drums", range: [884, 909] },
+    ];
+
+    let categoryName = "";
+    for (const { name, range } of ranges) {
+      if (toneIndex >= range[0] && toneIndex <= range[1]) {
+        categoryName = name;
+        break;
+      }
+    }
+
+    return categoryName ? { category: categoryName, name: toneName } : null;
+  };
+
+  // Get modeling tone name based on category
+  const getModelingToneName = (): string | null => {
+    if (modelingToneCategory === "E.GTR" && modelingToneEGtrGuitar) {
+      return modelingToneEGtrGuitar;
+    }
+    if (modelingToneCategory === "AC" && modelingToneAcGuitar) {
+      return modelingToneAcGuitar;
+    }
+    if (modelingToneCategory === "E.BASS" && modelingToneEBassGuitar) {
+      return modelingToneEBassGuitar;
+    }
+    if (modelingToneCategory === "SYNTH" && modelingToneSynthGuitar) {
+      return modelingToneSynthGuitar;
+    }
+    return null;
+  };
+
+  const pcm1Info = getPcmToneCategoryAndName(pcm1ToneSelect);
+  const pcm2Info = getPcmToneCategoryAndName(pcm2ToneSelect);
+  const modelingToneName = getModelingToneName();
 
   const [patchTempo, setPatchTempo] = useRemoteField(
     PATCH,
@@ -308,21 +432,49 @@ export function Display({
       <View style={styles.screenContent}>
         <View style={styles.statusBar}>
           <View style={styles.statusLeft}>
-            {renderStatusChip(
-              "GUITAR",
-              normalPuMuted,
-              () => setNormalPuMuted(!normalPuMuted),
-              true
-            )}
-            {renderStatusChip("PCM1", pcm1Muted, () =>
-              setPcm1Muted(!pcm1Muted)
-            )}
-            {renderStatusChip("PCM2", pcm2Muted, () =>
-              setPcm2Muted(!pcm2Muted)
-            )}
-            {renderStatusChip("MODEL", modelMuted, () =>
-              setModelMuted(!modelMuted)
-            )}
+            <View style={styles.statusChipColumn}>
+              {renderStatusChip(
+                "GUITAR",
+                normalPuMuted,
+                () => setNormalPuMuted(!normalPuMuted),
+                true
+              )}
+            </View>
+            <View style={styles.statusChipColumn}>
+              {renderStatusChip("PCM1", pcm1Muted, () =>
+                setPcm1Muted(!pcm1Muted)
+              )}
+              {pcm1Info && !pcm1Muted && (
+                <>
+                  <Text style={styles.toneLabel}>{pcm1Info.category}</Text>
+                  <Text style={styles.toneName}>{pcm1Info.name}</Text>
+                </>
+              )}
+            </View>
+            <View style={styles.statusChipColumn}>
+              {renderStatusChip("PCM2", pcm2Muted, () =>
+                setPcm2Muted(!pcm2Muted)
+              )}
+              {pcm2Info && !pcm2Muted && (
+                <>
+                  <Text style={styles.toneLabel}>{pcm2Info.category}</Text>
+                  <Text style={styles.toneName}>{pcm2Info.name}</Text>
+                </>
+              )}
+            </View>
+            <View style={styles.statusChipColumn}>
+              {renderStatusChip("MODEL", modelMuted, () =>
+                setModelMuted(!modelMuted)
+              )}
+              {modelingToneCategory && !modelMuted && (
+                <>
+                  <Text style={styles.toneLabel}>{modelingToneCategory}</Text>
+                  {modelingToneName && (
+                    <Text style={styles.toneName}>{modelingToneName}</Text>
+                  )}
+                </>
+              )}
+            </View>
           </View>
           <View style={styles.bpmContainer}>
             <Text style={styles.bpmLabel}>BPM:</Text>
@@ -622,8 +774,27 @@ const styles = StyleSheet.create({
   },
   statusLeft: {
     flexDirection: "row",
-    gap: 16,
+    gap: 4,
+    alignItems: "flex-start",
+  },
+  statusChipColumn: {
+    flexDirection: "column",
     alignItems: "center",
+    gap: 2,
+  },
+  toneLabel: {
+    fontSize: 9,
+    fontWeight: "700",
+    color: "#f97316",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  toneName: {
+    fontSize: 8,
+    fontWeight: "600",
+    color: "#f97316",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
   },
   statusText: {
     fontWeight: "700",
