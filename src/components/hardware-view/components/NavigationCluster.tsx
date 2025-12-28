@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     transform: [{ rotate: "45deg" }],
     ...(Platform.OS === "web"
-      ? { boxShadow: hardwareShadow?.web?.knob }
-      : (hardwareShadow?.default?.knob as object)),
+      ? { boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }
+      : (hardwareShadow?.knob as object)),
   },
   outputLevelIndicator: {
     width: 4,
@@ -176,8 +176,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     transform: [{ rotate: "45deg" }],
     ...(Platform.OS === "web"
-      ? { boxShadow: hardwareShadow?.web?.knobSmall }
-      : (hardwareShadow?.default?.knobSmall as object)),
+      ? {}
+      : typeof hardwareShadow?.knobSmall === "object"
+      ? hardwareShadow.knobSmall
+      : {}),
   },
   gkKnobIndicator: {
     width: 3,

@@ -172,12 +172,14 @@ const styles = StyleSheet.create({
       default: "hidden",
     }) as any,
     ...Platform.select({
-      web: {
-        boxShadow: hardwareShadow?.web?.chassis,
-      },
-      default: {
-        ...(hardwareShadow?.default?.chassis as object),
-      },
+      web:
+        typeof hardwareShadow?.chassis === "string"
+          ? { boxShadow: hardwareShadow.chassis }
+          : {},
+      default:
+        typeof hardwareShadow?.chassis === "object"
+          ? (hardwareShadow.chassis as object)
+          : {},
     }),
   },
   leftSection: {
