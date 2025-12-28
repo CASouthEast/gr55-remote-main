@@ -1,5 +1,8 @@
 import SwiftUI
 
+// Import the DisplayComponent and other components
+// Note: In a real Xcode project, this would be handled by the module system
+
 // MARK: - GR55HardwareView
 /// Main container view for the GR55 hardware interface
 /// Follows Swift 6.2 concurrency patterns with @MainActor
@@ -150,41 +153,7 @@ struct HeaderView: View {
     }
 }
 
-struct DisplayComponent: View {
-    @ObservedObject var stateManager: GR55StateManager
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: DesignTokens.Radii.medium)
-            .fill(DesignTokens.Colors.lcdBackground)
-            .frame(
-                width: DesignTokens.Dimensions.displayWidth,
-                height: DesignTokens.Dimensions.displayHeight
-            )
-            .overlay(
-                VStack {
-                    Text("LCD DISPLAY")
-                        .font(DesignTokens.Fonts.modeText)
-                        .foregroundColor(DesignTokens.Colors.lcdText)
-                    
-                    Text(stateManager.state.patchName)
-                        .font(DesignTokens.Fonts.patchName)
-                        .foregroundColor(DesignTokens.Colors.lcdText)
-                    
-                    Text(stateManager.state.bank)
-                        .font(DesignTokens.Fonts.bankDisplay)
-                        .foregroundColor(DesignTokens.Colors.lcdText)
-                }
-            )
-    }
-    
-    func onHover(_ callback: @escaping (HoveredItem) -> Void) -> some View {
-        self // Placeholder - will be implemented in DisplayComponent task
-    }
-    
-    func onEditModeChange(_ callback: @escaping (Bool) -> Void) -> some View {
-        self // Placeholder - will be implemented in DisplayComponent task
-    }
-}
+// DisplayComponent is now implemented in separate file
 
 struct SoundStylePanel: View {
     @ObservedObject var stateManager: GR55StateManager
@@ -212,88 +181,11 @@ struct SoundStylePanel: View {
     }
 }
 
-struct PedalCluster: View {
-    @ObservedObject var stateManager: GR55StateManager
-    
-    var body: some View {
-        HStack(spacing: DesignTokens.Spacing.large) {
-            ForEach(1...3, id: \.self) { pedalNumber in
-                FootPedal(
-                    number: pedalNumber,
-                    isActive: stateManager.state.activePedal == pedalNumber,
-                    topLabel: "PATCH \(pedalNumber)",
-                    onTap: { stateManager.setActivePedal(pedalNumber) }
-                )
-            }
-            
-            FootPedal(
-                number: "CTL",
-                isActive: stateManager.state.ctlStatus,
-                topLabel: stateManager.state.ctlFunction,
-                onTap: { stateManager.toggleCtlPedal() }
-            )
-        }
-    }
-}
+// PedalCluster is now implemented in separate file
 
-struct FootPedal: View {
-    let number: Any
-    let isActive: Bool
-    let topLabel: String
-    let onTap: () -> Void
-    
-    var body: some View {
-        VStack(spacing: DesignTokens.Spacing.small) {
-            Text(topLabel)
-                .font(DesignTokens.Fonts.pedalTopLabel)
-                .foregroundColor(DesignTokens.Colors.accent)
-            
-            Button(action: onTap) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: DesignTokens.Radii.medium)
-                        .fill(DesignTokens.Colors.pedalBody)
-                        .frame(
-                            width: DesignTokens.Dimensions.pedalWidth,
-                            height: DesignTokens.Dimensions.pedalHeight
-                        )
-                    
-                    VStack {
-                        DesignTokens.ledStyle(isActive: isActive)
-                        
-                        Spacer()
-                        
-                        Text("\(number)")
-                            .font(DesignTokens.Fonts.pedalNumber)
-                            .foregroundColor(DesignTokens.Colors.textPrimary)
-                    }
-                    .padding(DesignTokens.Spacing.medium)
-                }
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
-}
+// FootPedal is now implemented in separate file
 
-struct NavigationCluster: View {
-    @ObservedObject var stateManager: GR55StateManager
-    
-    var body: some View {
-        VStack(spacing: DesignTokens.Spacing.large) {
-            Text("NAVIGATION")
-                .font(DesignTokens.Fonts.navigationLabel)
-                .foregroundColor(DesignTokens.Colors.textMuted)
-            
-            Circle()
-                .fill(DesignTokens.Colors.surface)
-                .frame(width: DesignTokens.Dimensions.dataWheelSize, height: DesignTokens.Dimensions.dataWheelSize)
-                .overlay(
-                    Text("DATA")
-                        .font(DesignTokens.Fonts.navigationLabel)
-                        .foregroundColor(DesignTokens.Colors.textPrimary)
-                )
-        }
-    }
-}
+// NavigationCluster is now implemented in separate file
 
 struct ExpressionPedal: View {
     @ObservedObject var stateManager: GR55StateManager

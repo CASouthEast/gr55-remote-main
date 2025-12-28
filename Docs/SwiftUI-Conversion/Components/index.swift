@@ -5,6 +5,8 @@
 // Import all component files
 @_exported import CustomShapes
 @_exported import VisualComponents
+@_exported import FootPedal
+@_exported import NavigationCluster
 
 // Re-export commonly used shapes and components for convenience
 public typealias GR55PedalShape = PedalShape
@@ -23,3 +25,6 @@ public typealias GR55KnobComponent = KnobComponent
 public typealias GR55HardwareButton = HardwareButton
 public typealias GR55DisplayBezel = DisplayBezel
 public typealias GR55ExpressionPedalSurface = ExpressionPedalSurface
+public typealias GR55FootPedal = FootPedal
+public typealias GR55NavigationCluster = NavigationCluster
+public typealias GR55DataWheel = DataWheel

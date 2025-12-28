@@ -26,7 +26,9 @@ YourProject/
 │   ├── Views/
 │   │   └── GR55HardwareView.swift
 │   ├── Components/
-│   │   └── CustomShapes.swift
+│   │   ├── CustomShapes.swift
+│   │   ├── FootPedal.swift
+│   │   └── DisplayComponent.swift
 │   └── Utils/
 │       ├── DesignTokens.swift
 │       └── SwiftUIExtensions.swift
@@ -349,7 +351,192 @@ class GR55UITests: XCTestCase {
         pedal2Button.tap()
         // Verify state change
     }
+
+    func testFootPedalGestures() {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Test single tap
+        let pedal1 = app.buttons["Pedal 1"]
+        pedal1.tap()
+
+        // Test double tap for bank navigation
+        pedal1.doubleTap()
+
+        // Test CTL pedal
+        let ctlPedal = app.buttons["Control Pedal"]
+        ctlPedal.tap()
+    }
 }
+```
+
+### 8.1. NavigationCluster Component Integration
+
+The NavigationCluster component provides data wheel interaction, page navigation, and GK controls:
+
+#### Basic NavigationCluster Usage
+
+```swift
+import SwiftUI
+
+struct HardwareControlsView: View {
+    @ObservedObject var stateManager: GR55StateManager
+
+    var body: some View {
+        HStack(spacing: DesignTokens.Spacing.extraLarge) {
+            // Left side controls
+            VStack {
+                DisplayComponent(stateManager: stateManager)
+                PedalCluster(stateManager: stateManager)
+            }
+
+            // Right side navigation
+            NavigationCluster(stateManager: stateManager)
+        }
+    }
+}
+```
+
+#### NavigationCluster Features
+
+```swift
+// Data wheel interactions
+NavigationCluster(stateManager: stateManager)
+    .onDataWheelRotate { direction in
+        // Automatic pedal selection changes
+        // Handled by stateManager.handleDataWheelRotate
+    }
+    .onDataWheelPress { direction in
+        // Style and bank navigation
+        // Handled by stateManager.handleDataWheelPress
+    }
+```
+
+#### Custom Navigation Button Actions
+
+```swift
+// Extend NavigationCluster for custom button handling
+extension NavigationCluster {
+    func withCustomActions(
+        onPageLeft: @escaping () -> Void,
+        onPageRight: @escaping () -> Void,
+        onEdit: @escaping () -> Void,
+        onExit: @escaping () -> Void,
+        onEnter: @escaping () -> Void,
+        onWrite: @escaping () -> Void
+    ) -> some View {
+        // Custom button action implementation
+        // Currently buttons are placeholders for future implementation
+    }
+}
+```
+
+#### GK Controls Integration
+
+```swift
+// GK controls reflect MIDI parameter values
+struct GKStatusView: View {
+    @ObservedObject var stateManager: GR55StateManager
+
+    var body: some View {
+        HStack {
+            Text("S1: \(stateManager.currentState.gkS1Value)")
+            Text("S2: \(stateManager.currentState.gkS2Value)")
+            Text("VOL: \(stateManager.currentState.gkVolValue)")
+        }
+        .font(DesignTokens.Fonts.gkValue)
+    }
+}
+```
+
+### 8.2. FootPedal Component Integration
+
+The FootPedal component provides individual pedal controls with gesture recognition:
+
+#### Basic FootPedal Usage
+
+```swift
+import SwiftUI
+
+struct PedalCluster: View {
+    @ObservedObject var stateManager: GR55StateManager
+
+    var body: some View {
+        HStack(spacing: DesignTokens.Spacing.large) {
+            // Numbered pedals 1-3
+            ForEach(1...3, id: \.self) { pedalNumber in
+                FootPedal(
+                    number: pedalNumber,
+                    isActive: stateManager.currentState.activePedal == pedalNumber,
+                    topLabel: stateManager.currentState.bankSlots?[pedalNumber - 1]?.name,
+                    onSingleTap: {
+                        stateManager.selectOrdinalInCurrentBank(pedalNumber)
+                    },
+                    onDoubleTap: {
+                        if pedalNumber == 1 {
+                            stateManager.gotoNextBank()
+                        } else if pedalNumber == 2 {
+                            stateManager.gotoPrevBank()
+                        }
+                    }
+                )
+            }
+
+            // CTL pedal
+            FootPedal(
+                isCtlActive: stateManager.currentState.ctlStatus,
+                ctlFunction: stateManager.currentState.ctlFunction,
+                onCtlToggle: {
+                    stateManager.toggleCtlPedal()
+                }
+            )
+        }
+    }
+}
+```
+
+#### Custom FootPedal Configuration
+
+```swift
+// Custom pedal with specific styling
+FootPedal(
+    number: .numbered(1),
+    isActive: true,
+    topLabel: "CUSTOM PATCH",
+    subLabel: "SPECIAL MODE",
+    onSingleTap: {
+        // Custom single tap action
+    },
+    onDoubleTap: {
+        // Custom double tap action
+    }
+)
+
+// CTL pedal with custom function
+FootPedal(
+    number: .ctl,
+    isActive: ctlActive,
+    topLabel: customCtlFunction,
+    subLabel: "CUSTOM CTL",
+    onSingleTap: {
+        // Custom CTL toggle
+    }
+)
+```
+
+#### FootPedal Accessibility
+
+```swift
+// FootPedal automatically provides accessibility support
+// Custom accessibility can be added:
+FootPedal(
+    number: 1,
+    isActive: isActive,
+    topLabel: "LEAD GUITAR",
+    onSingleTap: { /* action */ }
+)
+.accessibilityHint("Double tap to navigate banks")
+.accessibilityValue(isActive ? "Active" : "Inactive")
 ```
 
 ### 9. Deployment Considerations
