@@ -73,6 +73,19 @@ export function GR55Controller({
     GR55.temporaryPatch.common.guitarOutSource
   );
 
+  const [gkS1Function] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.gkS1.function
+  );
+  const [gkS2Function] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.gkS2.function
+  );
+  const [gkVolFunction] = useRemoteField(
+    PATCH,
+    GR55.temporaryPatch.common.gkVol.function
+  );
+
   // State update handler that notifies parent component
   const handleStateChange = useCallback(
     (newState: Partial<GR55State>) => {
@@ -591,6 +604,26 @@ export function GR55Controller({
                   <Button label="ENTER" variant="rect" />
                   <Button label="WRITE" variant="rect" />
                 </View>
+
+                <View style={styles.gkRow}>
+                  <View style={styles.gkControl}>
+                    <Text style={styles.gkValue}>{gkS1Function ?? "—"}</Text>
+                    <Button label="" variant="rect" style={styles.gkButton} />
+                    <Text style={styles.gkLabel}>GK S1</Text>
+                  </View>
+                  <View style={styles.gkControl}>
+                    <Text style={styles.gkValue}>{gkS2Function ?? "—"}</Text>
+                    <Button label="" variant="rect" style={styles.gkButton} />
+                    <Text style={styles.gkLabel}>GK S2</Text>
+                  </View>
+                  <View style={styles.gkControl}>
+                    <Text style={styles.gkValue}>{gkVolFunction ?? "—"}</Text>
+                    <View style={styles.gkKnob}>
+                      <View style={styles.gkKnobIndicator} />
+                    </View>
+                    <Text style={styles.gkLabel}>GK VOL</Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
@@ -854,6 +887,64 @@ const styles = StyleSheet.create({
     color: "#a1a1aa", // zinc-400
     textTransform: "uppercase",
     letterSpacing: 1.2,
+  },
+  gkRow: {
+    flexDirection: "row",
+    gap: 16,
+    width: "100%",
+    paddingHorizontal: 8,
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginTop: -15,
+  },
+  gkControl: {
+    alignItems: "center",
+    gap: 6,
+  },
+  gkValue: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#f97316", // orange-500
+    textTransform: "uppercase",
+  },
+  gkLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#a1a1aa", // zinc-400
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
+  gkButton: {
+    width: 48,
+    height: 32,
+  },
+  gkKnob: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#27272a", // zinc-800
+    borderWidth: 2,
+    borderColor: "#52525b", // zinc-600
+    justifyContent: "center",
+    alignItems: "center",
+    transform: [{ rotate: "45deg" }],
+    ...Platform.select({
+      web: {
+        boxShadow: "0 3px 5px -1px rgba(0, 0, 0, 0.12)",
+        cursor: "pointer",
+      },
+      default: {
+        elevation: 3,
+      },
+    }),
+  },
+  gkKnobIndicator: {
+    width: 3,
+    height: 12,
+    backgroundColor: "#ffffff",
+    borderRadius: 2,
+    position: "absolute",
+    top: 4,
   },
   audioPlayer: {
     marginTop: "auto",
