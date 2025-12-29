@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 import { ConnectScreen } from "../../screens/ConnectScreen";
 import GR55HWViewPage from "../../screens/GR55HWViewPage";
 import { LibraryPatchListScreen } from "../../screens/LibraryPatchListScreen";
+import { SystemScreen } from "../../screens/SystemScreen";
 import { useUserOptions } from "../UserOptions";
 import { RootTabParamList } from "../navigation";
 import { SetupStackNavigator } from "./NavigatorComponents";
@@ -95,6 +96,20 @@ export function RootTabNavigator() {
           ...(Platform.OS === "web" && {
             tabBarAccessibilityLabel: "Patch library",
             tabBarAccessibilityHint: "Browse and manage saved patches",
+          }),
+        }}
+      />
+      <RootTab.Screen
+        name="System"
+        component={SystemScreen}
+        options={{
+          title: "System",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings-outline" size={24} color={color} />
+          ),
+          ...(Platform.OS === "web" && {
+            tabBarAccessibilityLabel: "System settings",
+            tabBarAccessibilityHint: "Configure global system parameters",
           }),
         }}
       />

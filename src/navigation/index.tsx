@@ -4,6 +4,7 @@ export type RootTabParamList = {
   Connect: object;
   PatchDrawer: object;
   LibraryPatchList: object;
+  System: object;
   SetupStack: object;
   Hardware: object;
 };

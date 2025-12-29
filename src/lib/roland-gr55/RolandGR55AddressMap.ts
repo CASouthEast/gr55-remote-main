@@ -4179,14 +4179,535 @@ export const PatchStruct = {
   ),
 };
 
+const systemExpPdlFunctions = enumField([
+  "OFF",
+  "PATCH SETTING",
+  "PATCH VOLUME",
+  "TONE VOLUME",
+  "PITCH BEND",
+  "MODULATION",
+  "CROSS FADER",
+  "DELAY LEVEL",
+  "REVERB LEVEL",
+  "CHORUS LEVEL",
+  "MOD CONTROL",
+] as const);
+
+const systemExpSwFunctions = enumField([
+  "OFF",
+  "PATCH SETTING",
+  "TAP TEMPO",
+  "TONE SW",
+  "AMP SW",
+  "MOD SW",
+  "MFX SW",
+  "DELAY SW",
+  "REVERB SW",
+  "CHORUS SW",
+  "SOUND STYLE INC",
+  "SOUND STYLE DEC",
+  "BANK NUMBER INC",
+  "BANK NUMBER DEC",
+  "PATCH NUMBER INC",
+  "PATCH NUMBER DEC",
+  "AUDIO PLAYER PLAY/STOP",
+  "AUDIO PLAYER SONG INC",
+  "AUDIO PLAYER SONG DEC",
+  "AUDIO PLAYER SW",
+  "V-LINK SW",
+] as const);
+
+const systemCtlFunctions = enumField([
+  "OFF",
+  "PATCH SETTING",
+  "HOLD",
+  "TAP TEMPO",
+  "TONE SW",
+  "AMP SW",
+  "MOD SW",
+  "MFX SW",
+  "DELAY SW",
+  "REVERB SW",
+  "CHORUS SW",
+  "SOUND STYLE INC",
+  "SOUND STYLE DEC",
+  "BANK NUMBER INC",
+  "BANK NUMBER DEC",
+  "PATCH NUMBER INC",
+  "PATCH NUMBER DEC",
+  "AUDIO PLAYER PLAY/STOP",
+  "AUDIO PLAYER SONG INC",
+  "AUDIO PLAYER SONG DEC",
+  "AUDIO PLAYER SW",
+  "V-LINK SW",
+] as const);
+
+const systemGkTypeGuitar = enumField([
+  "GK-3",
+  "GK-3A",
+  "GK-2A",
+  "GK-2B",
+  "GK-2C",
+  "GK-2D",
+  "GK-2E",
+  "GK-2F",
+] as const);
+
+const systemGkTypeBass = enumField([
+  "GK-3B",
+  "GK-3A",
+  "GK-2A",
+  "GK-2B",
+  "GK-2C",
+  "GK-2D",
+  "GK-2E",
+  "GK-2F",
+] as const);
+
+const systemScaleGuitar = enumField([
+  "Les P",
+  "Strat",
+  "Tele",
+  "Jazz",
+  "335",
+  "Dread",
+  "Jumbo",
+  "Classic",
+  "12Str",
+] as const);
+
+const systemScaleBass = enumField(["Long", "Medium", "Short"] as const);
+
+const systemPuPhase = enumField(["Normal", "Reverse"] as const);
+const systemPuDirection = enumField(["Normal", "Reverse"] as const);
+const systemS1S2Pos = enumField(["Normal", "Reverse"] as const);
+const systemGkPuPos = enumField(["6 string", "4 string"] as const);
+
+const SystemCommonStruct = {
+  gkSetSelect: new FieldDefinition(
+    pack7(0x00),
+    "GK SET Select",
+    new UByteField(0, 9, {
+      format: (val) => `SET ${val + 1}`,
+    })
+  ),
+  outputSelect: new FieldDefinition(
+    pack7(0x01),
+    "OUTPUT Select",
+    enumField([
+      "LINE/PHONES",
+      "JC-120",
+      "SMALL",
+      "COMBO",
+      "STACK",
+      "JC-120 RETURN",
+      "COMBO RETURN",
+      "STACK RETURN",
+      "B-AMP WITH TWEETER",
+      "B-AMP NO TWEETER",
+    ] as const)
+  ),
+  assignHold: new FieldDefinition(pack7(0x02), "Assign Hold", booleanField),
+  patchControlChannel: new FieldDefinition(
+    pack7(0x03),
+    "Patch Control Channel",
+    new UByteField(0, 15, {
+      format: (val) => `${val + 1}`,
+    })
+  ),
+  rxSwitch: new FieldDefinition(
+    pack7(0x04),
+    "Bank/Program Change RX Switch",
+    booleanField
+  ),
+  txSwitch: new FieldDefinition(
+    pack7(0x05),
+    "Bank/Program Change TX Switch",
+    booleanField
+  ),
+  vLinkMidiChannel: new FieldDefinition(
+    pack7(0x06),
+    "V-LINK MIDI Channel",
+    new UByteField(0, 15, {
+      format: (val) => `${val + 1}`,
+    })
+  ),
+  guitarToMidiSwitch: new FieldDefinition(
+    pack7(0x07),
+    "Guitar to MIDI Switch",
+    booleanField
+  ),
+  guitarToMidiMode: new FieldDefinition(
+    pack7(0x08),
+    "Guitar to MIDI Mode",
+    enumField(["MONO", "POLY"] as const)
+  ),
+  guitarToMidiChromatic: new FieldDefinition(
+    pack7(0x09),
+    "Guitar to MIDI Chromatic",
+    booleanField
+  ),
+  guitarToMidiStringChannel: new FieldDefinition(
+    pack7(0x0a),
+    "Guitar to MIDI String Channel",
+    enumField([
+      "1-6",
+      "2-7",
+      "3-8",
+      "4-9",
+      "5-10",
+      "6-11",
+      "7-12",
+      "8-13",
+      "9-14",
+      "10-15",
+      "11-16",
+    ] as const)
+  ),
+  guitarToMidiDataThin: new FieldDefinition(
+    pack7(0x0b),
+    "Guitar to MIDI Data Thin",
+    booleanField
+  ),
+  guitarToMidiCtlPdlCc: new FieldDefinition(
+    pack7(0x0c),
+    "Guitar to MIDI CTL PDL CC#",
+    new UByteField(0, 63) // TODO: Format OFF/1-31/64-95
+  ),
+  guitarToMidiExpPdlCc: new FieldDefinition(
+    pack7(0x0d),
+    "Guitar to MIDI EXP PDL CC#",
+    new UByteField(0, 63)
+  ),
+  guitarToMidiExpPdlBendRange: new FieldDefinition(
+    pack7(0x0e),
+    "Guitar to MIDI EXP pedal BendRange",
+    new UByteField(0, 48, { encodedOffset: 24 })
+  ),
+  guitarToMidiGkVolCc: new FieldDefinition(
+    pack7(0x0f),
+    "Guitar to MIDI GK VOL CC#",
+    new UByteField(0, 63)
+  ),
+  guitarToMidiGkS1Cc: new FieldDefinition(
+    pack7(0x10),
+    "Guitar to MIDI GK S1 CC#",
+    new UByteField(0, 63)
+  ),
+  guitarToMidiGkS2Cc: new FieldDefinition(
+    pack7(0x11),
+    "Guitar to MIDI GK S2 CC#",
+    new UByteField(0, 63)
+  ),
+  rxMapSelect: new FieldDefinition(
+    pack7(0x12),
+    "RX MAP Select",
+    enumField(["FIX", "PRG"] as const)
+  ),
+  usbDirectMonitor: new FieldDefinition(
+    pack7(0x15),
+    "USB Direct Monitor",
+    booleanField
+  ),
+  guitarOutSourceSelect: new FieldDefinition(
+    pack7(0x16),
+    "GUITAR OUT Source Select",
+    enumField(["PATCH", "OFF", "NORMAL PU", "MODELING", "BOTH"] as const)
+  ),
+  tunerPitch: new FieldDefinition(
+    pack7(0x17),
+    "Tuner Pitch",
+    new UByteField(0, 10, {
+      format: (val) => `${val + 435} Hz`,
+    })
+  ),
+  tunerMuteSwitch: new FieldDefinition(
+    pack7(0x18),
+    "Tuner Mute Switch",
+    booleanField
+  ),
+  guitarBassSelect: new FieldDefinition(
+    pack7(0x1a),
+    "GUITAR/BASS Select",
+    enumField(["GUITAR", "BASS"] as const)
+  ),
+  audioPlayerLevel: new FieldDefinition(
+    pack7(0x1c),
+    "Audio Player Level",
+    new UByteField(0, 200)
+  ),
+  usbAudioInLevel: new FieldDefinition(
+    pack7(0x1e),
+    "USB Audio In Level",
+    new UByteField(0, 200)
+  ),
+  usbAudioOutLevel: new FieldDefinition(
+    pack7(0x20),
+    "USB Audio Out Level",
+    new UByteField(0, 200)
+  ),
+};
+
+const SystemCtlStruct = {
+  ctlFunction: new FieldDefinition(
+    pack7(0x00),
+    "CTL Function",
+    systemCtlFunctions
+  ),
+  ctlHoldType: new FieldDefinition(
+    pack7(0x01),
+    "CTL Hold Type",
+    new UByteField(0, 3)
+  ),
+  ctlHoldSwitchMode: new FieldDefinition(
+    pack7(0x02),
+    "CTL Hold Switch Mode",
+    enumField(["LATCH", "MOMENT"] as const)
+  ),
+  ctlHoldPcmTone1: new FieldDefinition(
+    pack7(0x03),
+    "CTL Hold PCM Tone1",
+    booleanField
+  ),
+  ctlHoldPcmTone2: new FieldDefinition(
+    pack7(0x04),
+    "CTL Hold PCM Tone2",
+    booleanField
+  ),
+  ctlOffPcmTone1Switch: new FieldDefinition(
+    pack7(0x05),
+    "CTL=OFF PCM Tone1 Switch",
+    booleanField
+  ),
+  ctlOffPcmTone2Switch: new FieldDefinition(
+    pack7(0x06),
+    "CTL=OFF PCM Tone2 Switch",
+    booleanField
+  ),
+  ctlOffModelingToneSwitch: new FieldDefinition(
+    pack7(0x07),
+    "CTL=OFF Modeling Tone Switch",
+    booleanField
+  ),
+  ctlOffNormalPuSwitch: new FieldDefinition(
+    pack7(0x08),
+    "CTL=OFF Normal PU Switch",
+    booleanField
+  ),
+  ctlOnPcmTone1Switch: new FieldDefinition(
+    pack7(0x09),
+    "CTL=ON PCM Tone1 Switch",
+    booleanField
+  ),
+  ctlOnPcmTone2Switch: new FieldDefinition(
+    pack7(0x0a),
+    "CTL=ON PCM Tone2 Switch",
+    booleanField
+  ),
+  ctlOnModelingToneSwitch: new FieldDefinition(
+    pack7(0x0b),
+    "CTL=ON Modeling Tone Switch",
+    booleanField
+  ),
+  ctlOnNormalPuSwitch: new FieldDefinition(
+    pack7(0x0c),
+    "CTL=ON Normal PU Switch",
+    booleanField
+  ),
+
+  expFunction: new FieldDefinition(
+    pack7(0x0d),
+    "EXP Function",
+    systemExpPdlFunctions
+  ),
+  // TODO: Add remaining EXP properties
+
+  // Shortcuts for GK S1/S2 Function which are simple enough to add
+  gkS1Function: new FieldDefinition(
+    pack7(0x5f),
+    "GK S1 Function",
+    systemExpSwFunctions
+  ),
+  gkS2Function: new FieldDefinition(
+    pack7(0x6c),
+    "GK S2 Function",
+    systemExpSwFunctions
+  ),
+};
+
+const SystemGkGuitarStruct = {
+  name: new FieldDefinition(pack7(0x00), "Name", new AsciiStringField(8)),
+  puType: new FieldDefinition(pack7(0x08), "PU Type", systemGkTypeGuitar),
+  scale: new FieldDefinition(pack7(0x09), "Scale", systemScaleGuitar),
+  puPhase: new FieldDefinition(pack7(0x0a), "PU Phase", systemPuPhase),
+  puDirection: new FieldDefinition(
+    pack7(0x0b),
+    "PU Direction",
+    systemPuDirection
+  ),
+  s1s2Pos: new FieldDefinition(pack7(0x0c), "S1/S2 Position", systemS1S2Pos),
+  // String Distance
+  string1Dist: new FieldDefinition(
+    pack7(0x0d),
+    "String 1 Distance",
+    new UByteField(0, 100)
+  ),
+  string2Dist: new FieldDefinition(
+    pack7(0x0e),
+    "String 2 Distance",
+    new UByteField(0, 100)
+  ),
+  string3Dist: new FieldDefinition(
+    pack7(0x0f),
+    "String 3 Distance",
+    new UByteField(0, 100)
+  ),
+  string4Dist: new FieldDefinition(
+    pack7(0x10),
+    "String 4 Distance",
+    new UByteField(0, 100)
+  ),
+  string5Dist: new FieldDefinition(
+    pack7(0x11),
+    "String 5 Distance",
+    new UByteField(0, 100)
+  ),
+  string6Dist: new FieldDefinition(
+    pack7(0x12),
+    "String 6 Distance",
+    new UByteField(0, 100)
+  ),
+  // String Sens
+  string1Sens: new FieldDefinition(
+    pack7(0x13),
+    "String 1 Sens",
+    new UByteField(0, 100)
+  ),
+  string2Sens: new FieldDefinition(
+    pack7(0x14),
+    "String 2 Sens",
+    new UByteField(0, 100)
+  ),
+  string3Sens: new FieldDefinition(
+    pack7(0x15),
+    "String 3 Sens",
+    new UByteField(0, 100)
+  ),
+  string4Sens: new FieldDefinition(
+    pack7(0x16),
+    "String 4 Sens",
+    new UByteField(0, 100)
+  ),
+  string5Sens: new FieldDefinition(
+    pack7(0x17),
+    "String 5 Sens",
+    new UByteField(0, 100)
+  ),
+  string6Sens: new FieldDefinition(
+    pack7(0x18),
+    "String 6 Sens",
+    new UByteField(0, 100)
+  ),
+
+  normalPuGain: new FieldDefinition(
+    pack7(0x1f),
+    "Normal PU Gain",
+    new UByteField(-20, 20, { encodedOffset: 20, format: (val) => `${val} dB` })
+  ),
+};
+
+// Simplified Bass Struct just for scaffolding
+const SystemGkBassStruct = {
+  name: new FieldDefinition(pack7(0x00), "Name", new AsciiStringField(8)),
+  puType: new FieldDefinition(pack7(0x08), "PU Type", systemGkTypeBass),
+  scale: new FieldDefinition(pack7(0x09), "Scale", systemScaleBass),
+  gkPuPos: new FieldDefinition(pack7(0x0a), "GK PU Pos", systemGkPuPos),
+  puPhase: new FieldDefinition(pack7(0x0b), "PU Phase", systemPuPhase),
+  puDirection: new FieldDefinition(
+    pack7(0x0c),
+    "PU Direction",
+    systemPuDirection
+  ),
+  s1s2Pos: new FieldDefinition(pack7(0x0d), "S1/S2 Position", systemS1S2Pos),
+  // String Distance
+  string1Dist: new FieldDefinition(
+    pack7(0x0e),
+    "String 1 Distance",
+    new UByteField(0, 100)
+  ),
+  string2Dist: new FieldDefinition(
+    pack7(0x0f),
+    "String 2 Distance",
+    new UByteField(0, 100)
+  ),
+  string3Dist: new FieldDefinition(
+    pack7(0x10),
+    "String 3 Distance",
+    new UByteField(0, 100)
+  ),
+  string4Dist: new FieldDefinition(
+    pack7(0x11),
+    "String 4 Distance",
+    new UByteField(0, 100)
+  ),
+  string5Dist: new FieldDefinition(
+    pack7(0x12),
+    "String 5 Distance",
+    new UByteField(0, 100)
+  ),
+  string6Dist: new FieldDefinition(
+    pack7(0x13),
+    "String 6 Distance",
+    new UByteField(0, 100)
+  ),
+  // String Sens
+  string1Sens: new FieldDefinition(
+    pack7(0x14),
+    "String 1 Sens",
+    new UByteField(0, 100)
+  ),
+  string2Sens: new FieldDefinition(
+    pack7(0x15),
+    "String 2 Sens",
+    new UByteField(0, 100)
+  ),
+  string3Sens: new FieldDefinition(
+    pack7(0x16),
+    "String 3 Sens",
+    new UByteField(0, 100)
+  ),
+  string4Sens: new FieldDefinition(
+    pack7(0x17),
+    "String 4 Sens",
+    new UByteField(0, 100)
+  ),
+  string5Sens: new FieldDefinition(
+    pack7(0x18),
+    "String 5 Sens",
+    new UByteField(0, 100)
+  ),
+  string6Sens: new FieldDefinition(
+    pack7(0x19),
+    "String 6 Sens",
+    new UByteField(0, 100)
+  ),
+
+  normalPuGain: new FieldDefinition(
+    pack7(0x1f),
+    "Normal PU Gain",
+    new UByteField(-20, 20, { encodedOffset: 20, format: (val) => `${val} dB` })
+  ),
+};
+
 const SystemStruct = {
-  common: new StructDefinition(0x000000, "Common", {
-    guitarBassSelect: new FieldDefinition(
-      pack7(0x001a),
-      "GUITAR/BASS Select",
-      enumField(["GUITAR", "BASS"] as const)
-    ),
-  }),
+  common: new StructDefinition(pack7(0x000000), "Common", SystemCommonStruct),
+  ctl: new StructDefinition(pack7(0x000200), "CTL/Assign", SystemCtlStruct),
+  // Defaulting to only mapping Set 1 for now to avoid code bloat, can add 2-10 later
+  gkSet1: new StructDefinition(
+    pack7(0x000400),
+    "GK Set 1",
+    SystemGkGuitarStruct
+  ),
 };
 
 const SetupStruct = {
