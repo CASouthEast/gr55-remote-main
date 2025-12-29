@@ -288,23 +288,214 @@ final class GR55StateManager: ObservableObject {
         
         // Start listening for incoming MIDI data
         Task {
-            for await data in midiInterface.receiveMIDIData() {
-                await processMIDIData(data)
+            for await update in midiInterface.receiveMIDIData() {
+                await processMIDIUpdate(update)
+            }
+        }
+        
+        // Start monitoring connection state
+        Task {
+            for await connectionState in midiInterface.connectionState {
+                await handleConnectionStateChange(connectionState)
             }
         }
     }
     
-    /// Processes incoming MIDI data and updates state
-    /// Uses async/await for Swift 6.2 compliance
-    func processMIDIData(_ data: Data) async {
-        // Parse MIDI data and update corresponding state properties
-        // Implementation will be completed in the MIDI integration task
+    /// Configures MIDI integration with existing Swift MIDI layer contexts
+    func configureMIDIIntegration(
+        dataTransfer: Any?, // RolandDataTransferContext
+        ioSetup: Any?,      // RolandIoSetupContext
+        patchContext: Any?  // RolandRemotePatchContext
+    ) async {
+        guard let midiInterface = midiInterface else { return }
         
-        // Ensure UI updates happen on main actor
-        await MainActor.run {
-            // Update state properties based on MIDI data
-            // This will be implemented in the MIDI integration task
+        await midiInterface.configureWithExistingMIDILayer(
+            dataTransfer: dataTransfer,
+            ioSetup: ioSetup,
+            patchContext: patchContext
+        )
+    }
+    
+    /// Processes incoming MIDI data updates and updates state
+    /// Uses async/await for Swift 6.2 compliance
+    func processMIDIUpdate(_ update: MIDIDataUpdate) async {
+        // Process different types of MIDI updates
+        switch update.updateType {
+        case .patchChange:
+            await handlePatchChangeUpdate(update)
+        case .parameterChange(let parameterName):
+            await handleParameterChangeUpdate(update, parameterName: parameterName)
+        case .effectChange(let effectName):
+            await handleEffectChangeUpdate(update, effectName: effectName)
+        case .toneSourceChange(let toneName):
+            await handleToneSourceChangeUpdate(update, toneName: toneName)
+        case .assignChange(let assignNumber):
+            await handleAssignChangeUpdate(update, assignNumber: assignNumber)
+        case .levelChange:
+            await handleLevelChangeUpdate(update)
+        case .styleChange:
+            await handleStyleChangeUpdate(update)
+        case .systemChange:
+            await handleSystemChangeUpdate(update)
+        case .connectionChange:
+            await handleConnectionChangeUpdate(update)
         }
+    }
+    
+    /// Handles connection state changes from MIDI interface
+    func handleConnectionStateChange(_ connectionState: MIDIConnectionState) async {
+        // Update UI based on connection state
+        await MainActor.run {
+            // Update connection-related UI state
+            // This could involve showing/hiding connection indicators
+            // or enabling/disabling controls based on connection status
+        }
+        
+        // Handle specific connection states
+        switch connectionState {
+        case .connected:
+            // Synchronize state when connection is established
+            await synchronizeWithMIDI()
+        case .disconnected:
+            // Handle disconnection gracefully
+            await handleMIDIDisconnection()
+        case .error(let error):
+            // Handle connection errors
+            await handleMIDIConnectionError(error)
+        case .connecting, .reconnecting:
+            // Show appropriate UI feedback
+            break
+        }
+    }
+    
+    // MARK: - MIDI Update Handlers
+    private func handlePatchChangeUpdate(_ update: MIDIDataUpdate) async {
+        // Extract patch information from MIDI data
+        let bankMSB = update.address.count > 1 ? update.address[1] : 0
+        let pc = update.value
+        
+        await updateFromMIDIPatchChange(bankMSB: bankMSB, pc: pc)
+    }
+    
+    private func handleParameterChangeUpdate(_ update: MIDIDataUpdate, parameterName: String) async {
+        await MainActor.run {
+            // Update specific parameter based on name and value
+            switch parameterName.lowercased() {
+            case "patch level":
+                state.patchLevel = Int(update.value)
+            case "ctl status":
+                state.ctlStatus = update.value > 0
+            case "exp sw status":
+                state.expSwStatus = update.value > 0
+            default:
+                break
+            }
+        }
+    }
+    
+    private func handleEffectChangeUpdate(_ update: MIDIDataUpdate, effectName: String) async {
+        await MainActor.run {
+            let isOn = update.value > 0
+            switch effectName.lowercased() {
+            case "mfx":
+                state.mfxOn = isOn
+            case "delay":
+                state.delayOn = isOn
+            case "chorus":
+                state.chorusOn = isOn
+            case "reverb":
+                state.reverbOn = isOn
+            case "amp":
+                state.ampOn = isOn
+            case "ns":
+                state.nsOn = isOn
+            case "mod":
+                state.modOn = isOn
+            case "eq":
+                state.eqOn = isOn
+            default:
+                break
+            }
+        }
+    }
+    
+    private func handleToneSourceChangeUpdate(_ update: MIDIDataUpdate, toneName: String) async {
+        await MainActor.run {
+            let isMuted = update.value == 0 // Inverted logic for mute
+            switch toneName.lowercased() {
+            case "pcm1":
+                state.pcm1Muted = isMuted
+            case "pcm2":
+                state.pcm2Muted = isMuted
+            case "model":
+                state.modelMuted = isMuted
+            case "guitar", "normal":
+                state.normalPuMuted = isMuted
+            default:
+                break
+            }
+        }
+    }
+    
+    private func handleAssignChangeUpdate(_ update: MIDIDataUpdate, assignNumber: Int) async {
+        await MainActor.run {
+            guard assignNumber >= 1 && assignNumber <= 8 else { return }
+            let index = assignNumber - 1
+            state.assignStates[index] = update.value > 0
+        }
+    }
+    
+    private func handleLevelChangeUpdate(_ update: MIDIDataUpdate) async {
+        await MainActor.run {
+            state.patchLevel = Int(update.value)
+        }
+    }
+    
+    private func handleStyleChangeUpdate(_ update: MIDIDataUpdate) async {
+        await MainActor.run {
+            switch update.value {
+            case 0:
+                state.activeStyle = .lead
+            case 1:
+                state.activeStyle = .rhythm
+            case 2:
+                state.activeStyle = .other
+            case 3:
+                state.activeStyle = .user
+            default:
+                break
+            }
+        }
+    }
+    
+    private func handleSystemChangeUpdate(_ update: MIDIDataUpdate) async {
+        // Handle system-level changes
+        // This could involve updating system parameters or configuration
+    }
+    
+    private func handleConnectionChangeUpdate(_ update: MIDIDataUpdate) async {
+        // Handle connection-related changes
+        // This could involve updating connection quality or status
+    }
+    
+    // MARK: - MIDI Error Handling
+    private func handleMIDIDisconnection() async {
+        // Handle MIDI disconnection gracefully
+        await MainActor.run {
+            // Update UI to show disconnected state
+            // Disable controls that require MIDI connection
+        }
+    }
+    
+    private func handleMIDIConnectionError(_ error: MIDIError) async {
+        // Handle MIDI connection errors
+        await MainActor.run {
+            // Show error message to user
+            // Provide recovery options
+        }
+        
+        // Log error for debugging
+        print("MIDI Connection Error: \(error.localizedDescription)")
     }
     
     /// Sends a MIDI command using the integration interface
