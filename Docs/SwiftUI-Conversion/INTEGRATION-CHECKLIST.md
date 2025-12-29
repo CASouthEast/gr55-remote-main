@@ -4,8 +4,8 @@
 
 ### Development Environment
 
-- [ ] **Xcode 15.0+** installed and updated
-- [ ] **iOS 15.0+** deployment target set
+- [ ] **Xcode 26.2+** installed and updated
+- [ ] **iOS 26.2+** deployment target set
 - [ ] **Swift 6.2** language version configured
 - [ ] **Existing MIDI layer** available and documented
 
