@@ -1,59 +1,94 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Design Tokens
 /// Centralized design system for the GR55 hardware interface
-/// Provides consistent styling across all SwiftUI components
+/// Provides consistent styling across all SwiftUI components with accessibility and appearance mode support
 /// Follows Swift 6.2 patterns with static properties for performance
 enum DesignTokens {
     
     // MARK: - Colors
-    /// Color palette matching the original hardware aesthetic
+    /// Color palette matching the original hardware aesthetic with dynamic appearance mode support
     enum Colors {
-        // Base colors - zinc palette
-        static let background = Color(red: 0.894, green: 0.894, blue: 0.906) // zinc-200
-        static let chassis = Color(red: 0.118, green: 0.125, blue: 0.141) // zinc-800
-        static let surface = Color(red: 0.145, green: 0.157, blue: 0.180) // zinc-700
-        static let border = Color(red: 0.322, green: 0.322, blue: 0.357) // zinc-600
+        // Base colors - zinc palette with dynamic appearance support
+        static let background = Color("BackgroundColor", bundle: nil) ?? Color(light: Color(red: 0.894, green: 0.894, blue: 0.906), dark: Color(red: 0.071, green: 0.071, blue: 0.078))
+        static let chassis = Color("ChassisColor", bundle: nil) ?? Color(light: Color(red: 0.118, green: 0.125, blue: 0.141), dark: Color(red: 0.094, green: 0.094, blue: 0.106))
+        static let surface = Color("SurfaceColor", bundle: nil) ?? Color(light: Color(red: 0.145, green: 0.157, blue: 0.180), dark: Color(red: 0.118, green: 0.125, blue: 0.141))
+        static let border = Color("BorderColor", bundle: nil) ?? Color(light: Color(red: 0.322, green: 0.322, blue: 0.357), dark: Color(red: 0.244, green: 0.244, blue: 0.267))
         
-        // Text colors
-        static let textPrimary = Color(red: 0.957, green: 0.957, blue: 0.961) // zinc-100
-        static let textSecondary = Color(red: 0.780, green: 0.780, blue: 0.804) // zinc-300
-        static let textMuted = Color(red: 0.631, green: 0.631, blue: 0.667) // zinc-400
+        // Text colors with dynamic appearance support
+        static let textPrimary = Color("TextPrimaryColor", bundle: nil) ?? Color(light: Color(red: 0.118, green: 0.125, blue: 0.141), dark: Color(red: 0.957, green: 0.957, blue: 0.961))
+        static let textSecondary = Color("TextSecondaryColor", bundle: nil) ?? Color(light: Color(red: 0.322, green: 0.322, blue: 0.357), dark: Color(red: 0.780, green: 0.780, blue: 0.804))
+        static let textMuted = Color("TextMutedColor", bundle: nil) ?? Color(light: Color(red: 0.631, green: 0.631, blue: 0.667), dark: Color(red: 0.631, green: 0.631, blue: 0.667))
         
-        // Accent colors
-        static let accent = Color(red: 0.976, green: 0.451, blue: 0.086) // orange-500
-        static let accentHover = Color(red: 0.992, green: 0.549, blue: 0.235) // orange-400
+        // Accent colors with high contrast support
+        static let accent = Color("AccentColor", bundle: nil) ?? Color(red: 0.976, green: 0.451, blue: 0.086) // orange-500
+        static let accentHover = Color("AccentHoverColor", bundle: nil) ?? Color(red: 0.992, green: 0.549, blue: 0.235) // orange-400
         
-        // LED indicators
-        static let ledActive = Color(red: 0.937, green: 0.267, blue: 0.267) // red-500
-        static let ledInactive = Color(red: 0.094, green: 0.094, blue: 0.106) // zinc-900
-        static let ledGlow = Color(red: 0.937, green: 0.267, blue: 0.267) // red-500 for glow effect
+        // LED indicators with accessibility-compliant contrast
+        static let ledActive = Color("LEDActiveColor", bundle: nil) ?? Color(red: 0.937, green: 0.267, blue: 0.267) // red-500
+        static let ledInactive = Color("LEDInactiveColor", bundle: nil) ?? Color(light: Color(red: 0.631, green: 0.631, blue: 0.667), dark: Color(red: 0.094, green: 0.094, blue: 0.106))
+        static let ledGlow = Color("LEDGlowColor", bundle: nil) ?? Color(red: 0.937, green: 0.267, blue: 0.267) // red-500 for glow effect
         
-        // LCD Display colors
-        static let lcdBackground = Color(red: 0.859, green: 0.914, blue: 0.996) // blue-100
-        static let lcdBorder = Color(red: 0.153, green: 0.153, blue: 0.169) // zinc-800
-        static let lcdText = Color(red: 0.118, green: 0.227, blue: 0.541) // blue-900
-        static let lcdTextMuted = Color(red: 0.118, green: 0.227, blue: 0.541).opacity(0.6)
+        // LCD Display colors with high contrast
+        static let lcdBackground = Color("LCDBackgroundColor", bundle: nil) ?? Color(light: Color(red: 0.859, green: 0.914, blue: 0.996), dark: Color(red: 0.071, green: 0.094, blue: 0.141))
+        static let lcdBorder = Color("LCDBorderColor", bundle: nil) ?? Color(light: Color(red: 0.153, green: 0.153, blue: 0.169), dark: Color(red: 0.322, green: 0.322, blue: 0.357))
+        static let lcdText = Color("LCDTextColor", bundle: nil) ?? Color(light: Color(red: 0.118, green: 0.227, blue: 0.541), dark: Color(red: 0.678, green: 0.847, blue: 0.902))
+        static let lcdTextMuted = Color("LCDTextMutedColor", bundle: nil) ?? Color(light: Color(red: 0.118, green: 0.227, blue: 0.541).opacity(0.6), dark: Color(red: 0.678, green: 0.847, blue: 0.902).opacity(0.6))
         
-        // Pedal colors
-        static let pedalBody = Color(red: 0.212, green: 0.220, blue: 0.235) // zinc-700
-        static let pedalBorder = Color(red: 0.322, green: 0.322, blue: 0.357) // zinc-600
-        static let pedalPressed = Color(red: 0.161, green: 0.169, blue: 0.184) // zinc-800
+        // Pedal colors with appearance mode support
+        static let pedalBody = Color("PedalBodyColor", bundle: nil) ?? Color(light: Color(red: 0.212, green: 0.220, blue: 0.235), dark: Color(red: 0.145, green: 0.157, blue: 0.180))
+        static let pedalBorder = Color("PedalBorderColor", bundle: nil) ?? Color(light: Color(red: 0.322, green: 0.322, blue: 0.357), dark: Color(red: 0.244, green: 0.244, blue: 0.267))
+        static let pedalPressed = Color("PedalPressedColor", bundle: nil) ?? Color(light: Color(red: 0.161, green: 0.169, blue: 0.184), dark: Color(red: 0.094, green: 0.094, blue: 0.106))
         
         // Expression pedal colors
-        static let expressionPedalBody = Color(red: 0.145, green: 0.157, blue: 0.180) // zinc-700
-        static let expressionPedalBorder = Color(red: 0.094, green: 0.094, blue: 0.106) // zinc-900
-        static let expressionPedalSurface = Color(red: 0.212, green: 0.220, blue: 0.235) // zinc-700
+        static let expressionPedalBody = Color("ExpressionPedalBodyColor", bundle: nil) ?? Color(light: Color(red: 0.145, green: 0.157, blue: 0.180), dark: Color(red: 0.118, green: 0.125, blue: 0.141))
+        static let expressionPedalBorder = Color("ExpressionPedalBorderColor", bundle: nil) ?? Color(light: Color(red: 0.094, green: 0.094, blue: 0.106), dark: Color(red: 0.071, green: 0.071, blue: 0.078))
+        static let expressionPedalSurface = Color("ExpressionPedalSurfaceColor", bundle: nil) ?? Color(light: Color(red: 0.212, green: 0.220, blue: 0.235), dark: Color(red: 0.145, green: 0.157, blue: 0.180))
         
-        // Button colors
-        static let buttonDefault = Color(red: 0.322, green: 0.322, blue: 0.357) // zinc-600
-        static let buttonHover = Color(red: 0.404, green: 0.404, blue: 0.427) // zinc-500
-        static let buttonPressed = Color(red: 0.244, green: 0.244, blue: 0.267) // zinc-700
+        // Button colors with accessibility compliance
+        static let buttonDefault = Color("ButtonDefaultColor", bundle: nil) ?? Color(light: Color(red: 0.322, green: 0.322, blue: 0.357), dark: Color(red: 0.244, green: 0.244, blue: 0.267))
+        static let buttonHover = Color("ButtonHoverColor", bundle: nil) ?? Color(light: Color(red: 0.404, green: 0.404, blue: 0.427), dark: Color(red: 0.322, green: 0.322, blue: 0.357))
+        static let buttonPressed = Color("ButtonPressedColor", bundle: nil) ?? Color(light: Color(red: 0.244, green: 0.244, blue: 0.267), dark: Color(red: 0.161, green: 0.169, blue: 0.184))
         
-        // Status colors
-        static let success = Color(red: 0.133, green: 0.694, blue: 0.298) // green-600
-        static let warning = Color(red: 0.918, green: 0.549, blue: 0.020) // amber-600
-        static let error = Color(red: 0.863, green: 0.078, blue: 0.235) // rose-600
+        // Status colors with WCAG AA compliance
+        static let success = Color("SuccessColor", bundle: nil) ?? Color(red: 0.133, green: 0.694, blue: 0.298) // green-600
+        static let warning = Color("WarningColor", bundle: nil) ?? Color(red: 0.918, green: 0.549, blue: 0.020) // amber-600
+        static let error = Color("ErrorColor", bundle: nil) ?? Color(red: 0.863, green: 0.078, blue: 0.235) // rose-600
+        
+        // Focus and selection colors for accessibility
+        static let focusRing = Color("FocusRingColor", bundle: nil) ?? Color(red: 0.000, green: 0.478, blue: 1.000) // iOS system blue
+        static let selectionBackground = Color("SelectionBackgroundColor", bundle: nil) ?? Color(red: 0.000, green: 0.478, blue: 1.000).opacity(0.2)
+    }
+    
+    // MARK: - Accessibility
+    /// Accessibility-specific design tokens
+    enum Accessibility {
+        // Minimum touch target sizes (44pt minimum per Apple HIG)
+        static let minimumTouchTarget: CGFloat = 44
+        static let recommendedTouchTarget: CGFloat = 48
+        
+        // Focus ring properties
+        static let focusRingWidth: CGFloat = 3
+        static let focusRingOffset: CGFloat = 2
+        
+        // Animation durations for accessibility
+        static let reducedMotionDuration: Double = 0.1
+        static let standardMotionDuration: Double = 0.3
+        
+        // High contrast mode adjustments
+        static let highContrastBorderWidth: CGFloat = 2
+        static let highContrastShadowRadius: CGFloat = 0 // Disable shadows in high contrast
+        
+        // Voice Over navigation order
+        enum NavigationOrder: Int, CaseIterable {
+            case display = 1
+            case soundStylePanel = 2
+            case pedalCluster = 3
+            case navigationCluster = 4
+            case expressionPedal = 5
+            case previewPane = 6
+        }
     }
     
     // MARK: - Spacing
@@ -200,18 +235,50 @@ enum DesignTokens {
     }
     
     // MARK: - Animation Durations
-    /// Standard animation timing for consistent feel
+    /// Standard animation timing for consistent feel with accessibility support
     enum Animations {
         static let fast: Double = 0.1
         static let normal: Double = 0.2
         static let slow: Double = 0.3
         static let ledPulse: Double = 1.0
         
-        // Spring animations
-        static let buttonPress = Animation.easeInOut(duration: fast)
-        static let stateChange = Animation.easeInOut(duration: normal)
-        static let layoutChange = Animation.easeInOut(duration: slow)
-        static let ledGlow = Animation.easeInOut(duration: ledPulse).repeatForever(autoreverses: true)
+        // Accessibility-aware animations
+        static var accessibleFast: Double {
+            UIAccessibility.isReduceMotionEnabled ? 0.05 : fast
+        }
+        
+        static var accessibleNormal: Double {
+            UIAccessibility.isReduceMotionEnabled ? 0.1 : normal
+        }
+        
+        static var accessibleSlow: Double {
+            UIAccessibility.isReduceMotionEnabled ? 0.15 : slow
+        }
+        
+        // Spring animations with accessibility support
+        static var buttonPress: Animation {
+            UIAccessibility.isReduceMotionEnabled ? 
+                .easeInOut(duration: accessibleFast) : 
+                .easeInOut(duration: fast)
+        }
+        
+        static var stateChange: Animation {
+            UIAccessibility.isReduceMotionEnabled ? 
+                .easeInOut(duration: accessibleNormal) : 
+                .easeInOut(duration: normal)
+        }
+        
+        static var layoutChange: Animation {
+            UIAccessibility.isReduceMotionEnabled ? 
+                .easeInOut(duration: accessibleSlow) : 
+                .easeInOut(duration: slow)
+        }
+        
+        static var ledGlow: Animation {
+            UIAccessibility.isReduceMotionEnabled ? 
+                .easeInOut(duration: 0.5) : 
+                .easeInOut(duration: ledPulse).repeatForever(autoreverses: true)
+        }
     }
     
     // MARK: - Z-Index Values
@@ -228,40 +295,87 @@ enum DesignTokens {
     }
 }
 
+// MARK: - Color Extensions for Appearance Mode Support
+extension Color {
+    /// Creates a color that adapts to light and dark appearance modes
+    init(light: Color, dark: Color) {
+        self = Color(UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor(dark)
+            default:
+                return UIColor(light)
+            }
+        })
+    }
+    
+    /// Creates a high contrast version of the color for accessibility
+    func highContrastVersion() -> Color {
+        if UIAccessibility.isDarkerSystemColorsEnabled {
+            return self.opacity(0.9) // Increase opacity for better contrast
+        }
+        return self
+    }
+}
+
 // MARK: - Design Token Extensions
 extension DesignTokens {
-    /// Convenience methods for applying common styling patterns
+    /// Convenience methods for applying common styling patterns with accessibility support
     
-    /// Standard component background with border
+    /// Standard component background with border and accessibility support
     static func componentBackground() -> some View {
         RoundedRectangle(cornerRadius: Radii.medium)
             .fill(Colors.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: Radii.medium)
-                    .stroke(Colors.border, lineWidth: 1)
+                    .stroke(
+                        Colors.border, 
+                        lineWidth: UIAccessibility.isDarkerSystemColorsEnabled ? 
+                            Accessibility.highContrastBorderWidth : 1
+                    )
             )
     }
     
-    /// Standard button styling
-    static func buttonStyle(isPressed: Bool = false) -> some View {
+    /// Standard button styling with accessibility enhancements
+    static func buttonStyle(isPressed: Bool = false, isFocused: Bool = false) -> some View {
         RoundedRectangle(cornerRadius: Radii.small)
             .fill(isPressed ? Colors.buttonPressed : Colors.buttonDefault)
             .overlay(
                 RoundedRectangle(cornerRadius: Radii.small)
-                    .stroke(Colors.border, lineWidth: 1)
+                    .stroke(
+                        isFocused ? Colors.focusRing : Colors.border, 
+                        lineWidth: isFocused ? Accessibility.focusRingWidth : 1
+                    )
             )
     }
     
-    /// LED indicator styling
+    /// LED indicator styling with accessibility compliance
     static func ledStyle(isActive: Bool) -> some View {
         Circle()
             .fill(isActive ? Colors.ledActive : Colors.ledInactive)
             .frame(width: Dimensions.pedalLEDSize, height: Dimensions.pedalLEDSize)
+            .overlay(
+                Circle()
+                    .stroke(
+                        Colors.border, 
+                        lineWidth: UIAccessibility.isDarkerSystemColorsEnabled ? 2 : 1
+                    )
+            )
             .shadow(
-                color: isActive ? Shadows.ledGlow.color : .clear,
-                radius: isActive ? Shadows.ledGlow.radius : 0,
+                color: isActive && !UIAccessibility.isReduceTransparencyEnabled ? 
+                    Shadows.ledGlow.color : .clear,
+                radius: isActive && !UIAccessibility.isReduceTransparencyEnabled ? 
+                    Shadows.ledGlow.radius : 0,
                 x: Shadows.ledGlow.x,
                 y: Shadows.ledGlow.y
             )
+    }
+    
+    /// Focus ring for keyboard navigation
+    static func focusRing(isVisible: Bool) -> some View {
+        RoundedRectangle(cornerRadius: Radii.medium + Accessibility.focusRingOffset)
+            .stroke(Colors.focusRing, lineWidth: Accessibility.focusRingWidth)
+            .opacity(isVisible ? 1.0 : 0.0)
+            .animation(.easeInOut(duration: 0.2), value: isVisible)
     }
 }

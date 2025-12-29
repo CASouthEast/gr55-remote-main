@@ -212,3 +212,175 @@ struct PatchSelection: Sendable {
         self.pc = pc
     }
 }
+
+// MARK: - Patch Selection Data Models
+
+/// Patch information model for the patch selector
+/// Sendable for Swift 6.2 concurrency compliance
+struct PatchInfo: Identifiable, Sendable, Hashable {
+    let id: UUID
+    let name: String
+    let description: String
+    let style: SoundStyle
+    let category: PatchCategory
+    let bank: String
+    let tags: [String]
+    
+    init(id: UUID = UUID(), name: String, description: String, style: SoundStyle, category: PatchCategory, bank: String, tags: [String] = []) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.style = style
+        self.category = category
+        self.bank = bank
+        self.tags = tags
+    }
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    // Equatable conformance
+    static func == (lhs: PatchInfo, rhs: PatchInfo) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+/// Patch categories for filtering and organization
+/// Sendable and CaseIterable for SwiftUI compatibility
+enum PatchCategory: String, CaseIterable, Sendable, Hashable {
+    case all = "ALL"
+    case guitar = "GUITAR"
+    case bass = "BASS"
+    case synth = "SYNTH"
+    case organ = "ORGAN"
+    case effects = "EFFECTS"
+    case user = "USER"
+    
+    /// Display name for UI presentation
+    var displayName: String {
+        return rawValue
+    }
+    
+    /// SF Symbol icon for category
+    var icon: String {
+        switch self {
+        case .all: return "music.note.list"
+        case .guitar: return "guitars"
+        case .bass: return "guitars.fill"
+        case .synth: return "waveform"
+        case .organ: return "pianokeys"
+        case .effects: return "waveform.path.ecg"
+        case .user: return "person.crop.circle"
+        }
+    }
+    
+    /// Color associated with category
+    var associatedColor: Color {
+        switch self {
+        case .all: return .gray
+        case .guitar: return .orange
+        case .bass: return .purple
+        case .synth: return .blue
+        case .organ: return .brown
+        case .effects: return .green
+        case .user: return .pink
+        }
+    }
+}
+
+// MARK: - MIDI Data Update Types
+/// Types of MIDI updates that can be received
+/// Sendable for cross-actor communication
+enum MIDIUpdateType: Sendable {
+    case patchChange
+    case parameterChange(String)
+    case effectChange(String)
+    case toneSourceChange(String)
+    case assignChange(Int)
+    case levelChange
+    case styleChange
+    case systemChange
+    case connectionChange
+}
+
+/// MIDI data update structure
+/// Sendable for Swift 6.2 concurrency compliance
+struct MIDIDataUpdate: Sendable {
+    let updateType: MIDIUpdateType
+    let address: [UInt8]
+    let value: UInt8
+    let timestamp: Date
+    
+    init(updateType: MIDIUpdateType, address: [UInt8], value: UInt8, timestamp: Date = Date()) {
+        self.updateType = updateType
+        self.address = address
+        self.value = value
+        self.timestamp = timestamp
+    }
+}
+
+/// MIDI connection states
+/// Sendable for cross-actor communication
+enum MIDIConnectionState: Sendable {
+    case disconnected
+    case connecting
+    case connected
+    case reconnecting
+    case error(MIDIError)
+}
+
+/// MIDI error types
+/// Sendable and LocalizedError for proper error handling
+struct MIDIError: Error, Sendable, LocalizedError {
+    let code: Int
+    let message: String
+    
+    var errorDescription: String? {
+        return message
+    }
+    
+    init(code: Int, message: String) {
+        self.code = code
+        self.message = message
+    }
+}
+
+// MARK: - Extensions for SwiftUI Integration
+extension SoundStyle {
+    /// Returns all styles except for filtering purposes
+    static var filterStyles: [SoundStyle] {
+        return allCases
+    }
+}
+
+extension BankSlot {
+    /// Creates a sample bank slot for testing
+    static func sample(ordinal: Int = 1, name: String = "Sample Patch", style: SoundStyle = .lead) -> BankSlot {
+        return BankSlot(ordinal: ordinal, name: name, style: style)
+    }
+}
+
+// MARK: - MIDI Integration Protocol Extensions
+extension MIDIIntegrationInterface {
+    /// Connection state as async stream
+    var connectionState: AsyncStream<MIDIConnectionState> {
+        return AsyncStream { continuation in
+            // Implementation would depend on actual MIDI layer
+            // For now, provide a placeholder
+            continuation.yield(.disconnected)
+            continuation.finish()
+        }
+    }
+    
+    /// Configure with existing MIDI layer contexts
+    func configureWithExistingMIDILayer(
+        dataTransfer: Any?,
+        ioSetup: Any?,
+        patchContext: Any?
+    ) async {
+        // Implementation would integrate with existing Swift MIDI layer
+        // This is a placeholder for the interface design
+    }
+}

@@ -1,9 +1,10 @@
 import SwiftUI
+import UIKit
 
 // MARK: - FootPedal Component
 /// Individual foot pedal with trapezoidal shape, LED indicator, and gesture recognition
 /// Implements single-tap and double-tap interactions with visual feedback
-/// Follows Swift 6.2 patterns with proper gesture handling and animations
+/// Follows Swift 6.2 patterns with comprehensive accessibility support
 struct FootPedal: View {
     // MARK: - Properties
     let number: FootPedalNumber
@@ -15,8 +16,10 @@ struct FootPedal: View {
     
     // MARK: - State
     @State private var isPressed = false
+    @State private var isFocused = false
     @State private var tapCount = 0
     @State private var lastTapTime = Date()
+    @EnvironmentObject private var focusManager: AccessibilityFocusManager
     
     // MARK: - Constants
     private let doubleTapTimeWindow: TimeInterval = 0.5
@@ -34,6 +37,24 @@ struct FootPedal: View {
             subLabelView
         }
         .frame(width: DesignTokens.Dimensions.pedalWidth)
+        .minimumTouchTarget() // Ensure accessibility compliance
+        .focusRing(isVisible: isFocused)
+        .accessibilitySupport(
+            order: .pedalCluster,
+            label: buildAccessibilityLabel(),
+            hint: buildAccessibilityHint(),
+            value: buildAccessibilityValue(),
+            traits: AccessibilityTraitsHelper.buttonTraits(isSelected: isActive, isToggle: true),
+            isEnabled: true
+        )
+        .accessibilityActions(
+            primary: handleSingleTap,
+            secondary: onDoubleTap,
+            adjustable: nil
+        )
+        .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.voiceOverStatusDidChangeNotification)) { _ in
+            updateAccessibilityFocus()
+        }
     }
     
     // MARK: - Top Label View
@@ -43,35 +64,43 @@ struct FootPedal: View {
             Text(topLabel)
                 .font(DesignTokens.Fonts.pedalTopLabel)
                 .foregroundColor(DesignTokens.Colors.accent)
+                .highContrastColor(
+                    normal: DesignTokens.Colors.accent,
+                    highContrast: DesignTokens.Colors.accent.opacity(0.9)
+                )
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .frame(maxWidth: DesignTokens.Dimensions.pedalWidth + 20)
                 .multilineTextAlignment(.center)
+                .accessibilityHidden(true) // Included in main pedal accessibility
         } else {
             // Maintain consistent spacing even without label
             Text(" ")
                 .font(DesignTokens.Fonts.pedalTopLabel)
                 .opacity(0)
+                .accessibilityHidden(true)
         }
     }
     
     // MARK: - Pedal Body View
     private var pedalBodyView: some View {
         ZStack {
-            // Pedal shape with 3D styling
+            // Pedal shape with 3D styling and accessibility enhancements
             PedalShape()
-                .pedalStyle(isPressed: isPressed)
+                .pedalStyle(isPressed: isPressed, isFocused: isFocused)
                 .frame(
                     width: DesignTokens.Dimensions.pedalWidth,
                     height: DesignTokens.Dimensions.pedalHeight
                 )
             
-            // LED indicator positioned at top
+            // LED indicator positioned at top with accessibility support
             ledIndicatorView
                 .offset(y: -50) // Position near top of pedal
+                .accessibilityHidden(true) // Included in main pedal accessibility
             
             // Pedal number/label in center
             pedalNumberView
+                .accessibilityHidden(true) // Included in main pedal accessibility
         }
         .contentShape(Rectangle()) // Ensure entire area is tappable
         .onTapGesture {
@@ -84,9 +113,24 @@ struct FootPedal: View {
                 withAnimation(DesignTokens.Animations.buttonPress) {
                     isPressed = pressing
                 }
+                
+                // Provide haptic feedback for press state
+                if pressing {
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                    impactFeedback.impactOccurred()
+                }
             },
             perform: {}
         )
+        .onHover { hovering in
+            isFocused = hovering
+        }
+        .focusable(true) { focused in
+            isFocused = focused
+            if focused {
+                updateAccessibilityFocus()
+            }
+        }
     }
     
     // MARK: - LED Indicator View
@@ -96,18 +140,22 @@ struct FootPedal: View {
             .frame(width: DesignTokens.Dimensions.pedalLEDSize, height: DesignTokens.Dimensions.pedalLEDSize)
             .overlay(
                 Circle()
-                    .stroke(Color.black, lineWidth: 1)
+                    .stroke(
+                        DesignTokens.Colors.border, 
+                        lineWidth: UIAccessibility.isDarkerSystemColorsEnabled ? 2 : 1
+                    )
             )
             .shadow(
-                color: isActive ? DesignTokens.Colors.ledGlow : .clear,
-                radius: isActive ? 8 : 0,
+                color: isActive && !UIAccessibility.isReduceTransparencyEnabled ? 
+                    DesignTokens.Colors.ledGlow : .clear,
+                radius: isActive && !UIAccessibility.isReduceTransparencyEnabled ? 8 : 0,
                 x: 0,
                 y: 0
             )
             .scaleEffect(isActive ? 1.1 : 1.0)
-            .animation(
-                isActive ? DesignTokens.Animations.ledGlow : .easeInOut(duration: 0.2),
-                value: isActive
+            .reducedMotionAnimation(
+                normal: isActive ? DesignTokens.Animations.ledGlow : .easeInOut(duration: 0.2),
+                reduced: .easeInOut(duration: 0.1)
             )
     }
     
@@ -116,9 +164,18 @@ struct FootPedal: View {
         Text(number.displayText)
             .font(DesignTokens.Fonts.pedalNumber)
             .foregroundColor(.white)
-            .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+            .highContrastColor(normal: .white, highContrast: .white)
+            .shadow(
+                color: UIAccessibility.isReduceTransparencyEnabled ? .clear : .black.opacity(0.5), 
+                radius: UIAccessibility.isReduceTransparencyEnabled ? 0 : 2, 
+                x: 0, 
+                y: 1
+            )
             .scaleEffect(isPressed ? 0.95 : 1.0)
-            .animation(DesignTokens.Animations.buttonPress, value: isPressed)
+            .reducedMotionAnimation(
+                normal: DesignTokens.Animations.buttonPress,
+                reduced: .easeInOut(duration: 0.05)
+            )
     }
     
     // MARK: - Sub Label View
@@ -129,18 +186,65 @@ struct FootPedal: View {
                 Text(subLabel)
                     .font(DesignTokens.Fonts.pedalSubLabel)
                     .foregroundColor(DesignTokens.Colors.textMuted)
+                    .highContrastColor(
+                        normal: DesignTokens.Colors.textMuted,
+                        highContrast: DesignTokens.Colors.textPrimary
+                    )
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .padding(.horizontal, DesignTokens.Spacing.small)
                     .padding(.vertical, DesignTokens.Spacing.extraSmall)
                     .background(
                         RoundedRectangle(cornerRadius: DesignTokens.Radii.small)
-                            .fill(Color.black.opacity(0.5))
+                            .fill(Color.black.opacity(UIAccessibility.isReduceTransparencyEnabled ? 0.8 : 0.5))
                             .overlay(
                                 RoundedRectangle(cornerRadius: DesignTokens.Radii.small)
-                                    .stroke(DesignTokens.Colors.border, lineWidth: 1)
+                                    .stroke(
+                                        DesignTokens.Colors.border, 
+                                        lineWidth: UIAccessibility.isDarkerSystemColorsEnabled ? 2 : 1
+                                    )
                             )
                     )
+                    .accessibilityHidden(true) // Included in main pedal accessibility
+            }
+        }
+    }
+    
+    // MARK: - Accessibility Support Methods
+    private func buildAccessibilityLabel() -> String {
+        var components = [number.accessibilityLabel]
+        
+        if let topLabel = topLabel, !topLabel.isEmpty {
+            components.append(topLabel)
+        }
+        
+        if isActive {
+            components.append("active")
+        }
+        
+        return components.joined(separator: ", ")
+    }
+    
+    private func buildAccessibilityHint() -> String {
+        switch number {
+        case .ctl:
+            return AccessibilityHints.ctlPedalHint
+        case .numbered:
+            return AccessibilityHints.pedalSingleTap
+        }
+    }
+    
+    private func buildAccessibilityValue() -> String {
+        return AccessibilityValues.pedalState(isActive: isActive, patchName: topLabel)
+    }
+    
+    private func updateAccessibilityFocus() {
+        if UIAccessibility.isVoiceOverRunning {
+            switch number {
+            case .numbered(let num):
+                focusManager.moveFocus(to: .pedal(num))
+            case .ctl:
+                focusManager.moveFocus(to: .pedal(0)) // Use 0 for CTL pedal
             }
         }
     }
@@ -171,6 +275,14 @@ struct FootPedal: View {
         // Provide haptic feedback
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
+        
+        // Announce action for VoiceOver users
+        if UIAccessibility.isVoiceOverRunning {
+            let announcement = isActive ? 
+                "\(number.accessibilityLabel) activated" : 
+                "\(number.accessibilityLabel) selected"
+            UIAccessibility.post(notification: .announcement, argument: announcement)
+        }
     }
     
     private func handleSingleTap() {
@@ -188,6 +300,12 @@ struct FootPedal: View {
             // Stronger haptic feedback for double tap
             let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
             impactFeedback.impactOccurred()
+            
+            // Announce navigation action for VoiceOver users
+            if UIAccessibility.isVoiceOverRunning {
+                let announcement = "Bank navigation activated"
+                UIAccessibility.post(notification: .announcement, argument: announcement)
+            }
         }
     }
 }
@@ -258,45 +376,32 @@ extension FootPedal {
 
 // MARK: - Accessibility Support
 extension FootPedal {
-    /// Adds accessibility support for VoiceOver users
-    private func accessibilityModifiers() -> some ViewModifier {
-        return AccessibilityModifier(
-            label: number.accessibilityLabel,
-            hint: "Tap to select, double tap for navigation",
-            isActive: isActive,
-            topLabel: topLabel
-        )
+    /// Creates a FootPedal with accessibility focus management
+    func withAccessibilityFocus(_ focusManager: AccessibilityFocusManager) -> some View {
+        self.environmentObject(focusManager)
     }
 }
 
-// MARK: - Accessibility Modifier
-private struct AccessibilityModifier: ViewModifier {
-    let label: String
-    let hint: String
-    let isActive: Bool
-    let topLabel: String?
-    
-    func body(content: Content) -> some View {
-        content
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(buildAccessibilityLabel())
-            .accessibilityHint(hint)
-            .accessibilityAddTraits(isActive ? .isSelected : [])
-            .accessibilityAddTraits(.isButton)
-    }
-    
-    private func buildAccessibilityLabel() -> String {
-        var components = [label]
-        
-        if let topLabel = topLabel, !topLabel.isEmpty {
-            components.append(topLabel)
-        }
-        
-        if isActive {
-            components.append("active")
-        }
-        
-        return components.joined(separator: ", ")
+// MARK: - PedalShape Extension for Accessibility
+extension PedalShape {
+    /// Applies pedal styling with accessibility enhancements
+    func pedalStyle(isPressed: Bool, isFocused: Bool = false) -> some View {
+        self
+            .fill(isPressed ? DesignTokens.Colors.pedalPressed : DesignTokens.Colors.pedalBody)
+            .overlay(
+                self
+                    .stroke(
+                        isFocused ? DesignTokens.Colors.focusRing : DesignTokens.Colors.pedalBorder,
+                        lineWidth: isFocused ? DesignTokens.Accessibility.focusRingWidth : 
+                            (UIAccessibility.isDarkerSystemColorsEnabled ? 2 : 1)
+                    )
+            )
+            .shadow(
+                color: UIAccessibility.isReduceTransparencyEnabled ? .clear : .black.opacity(0.3),
+                radius: UIAccessibility.isReduceTransparencyEnabled ? 0 : 8,
+                x: 0,
+                y: 4
+            )
     }
 }
 

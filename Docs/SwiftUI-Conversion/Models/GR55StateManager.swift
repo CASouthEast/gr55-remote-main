@@ -757,3 +757,229 @@ extension GR55StateManager {
         }
     }
 }
+
+// MARK: - Patch Selection Extensions
+extension GR55StateManager {
+    /// Loads available patches for the patch selector
+    /// Uses async/await for Swift 6.2 compliance
+    func loadAvailablePatches() async -> [PatchInfo] {
+        // In real implementation, this would query MIDI device or load from storage
+        // For now, return sample data
+        return await withCheckedContinuation { continuation in
+            Task {
+                // Simulate async loading
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                
+                let patches = generateSamplePatchLibrary()
+                continuation.resume(returning: patches)
+            }
+        }
+    }
+    
+    /// Searches patches based on criteria
+    /// Uses async/await for Swift 6.2 compliance
+    func searchPatches(query: String, category: PatchCategory?, style: SoundStyle?) async -> [PatchInfo] {
+        let allPatches = await loadAvailablePatches()
+        
+        return await withCheckedContinuation { continuation in
+            Task {
+                var filtered = allPatches
+                
+                // Apply category filter
+                if let category = category, category != .all {
+                    filtered = filtered.filter { $0.category == category }
+                }
+                
+                // Apply style filter
+                if let style = style {
+                    filtered = filtered.filter { $0.style == style }
+                }
+                
+                // Apply search query
+                if !query.isEmpty {
+                    filtered = filtered.filter { patch in
+                        patch.name.localizedCaseInsensitiveContains(query) ||
+                        patch.description.localizedCaseInsensitiveContains(query) ||
+                        patch.tags.contains { $0.localizedCaseInsensitiveContains(query) }
+                    }
+                }
+                
+                continuation.resume(returning: filtered.sorted { $0.name < $1.name })
+            }
+        }
+    }
+    
+    /// Selects a patch and updates all related state
+    /// Uses async/await for Swift 6.2 compliance
+    func selectPatch(_ patch: PatchInfo) async {
+        await MainActor.run {
+            // Update patch name and style
+            state.patchName = patch.name
+            state.activeStyle = patch.style
+            
+            // Update bank if different
+            if patch.bank != state.bank {
+                state.bank = patch.bank
+                
+                // Extract ordinal from bank string
+                let components = patch.bank.split(separator: "-")
+                if let ordinalStr = components.last,
+                   let ordinal = Int(ordinalStr) {
+                    state.activePedal = ordinal
+                }
+            }
+            
+            // Update bank slots for new selection
+            updateBankSlotsForCurrentBank()
+        }
+        
+        // Send MIDI commands for patch selection
+        await sendMIDIPatchSelection(patch)
+    }
+    
+    /// Sends MIDI commands for patch selection
+    /// Uses async/await for Swift 6.2 compliance
+    private func sendMIDIPatchSelection(_ patch: PatchInfo) async {
+        // Extract bank and program change values
+        let components = patch.bank.split(separator: "-")
+        guard let bankStr = components.first,
+              let ordinalStr = components.last,
+              let bankNumber = Int(bankStr),
+              let ordinal = Int(ordinalStr) else { return }
+        
+        // Send bank select and program change
+        let bankMSB = UInt8(max(0, min(127, bankNumber - 1)))
+        let pc = UInt8(max(0, min(127, ordinal - 1)))
+        
+        await sendMIDICommand(.bankChange(bankNumber))
+        await sendMIDICommand(.pedalSelection(ordinal))
+        await sendMIDICommand(.styleChange(patch.style))
+    }
+    
+    /// Generates sample patch library for demonstration
+    private func generateSamplePatchLibrary() -> [PatchInfo] {
+        var patches: [PatchInfo] = []
+        
+        // Generate patches for each style and category
+        for style in SoundStyle.allCases {
+            for category in PatchCategory.allCases where category != .all {
+                let categoryPatches = generatePatchesForStyleAndCategory(style: style, category: category)
+                patches.append(contentsOf: categoryPatches)
+            }
+        }
+        
+        return patches
+    }
+    
+    /// Generates patches for a specific style and category
+    private func generatePatchesForStyleAndCategory(style: SoundStyle, category: PatchCategory) -> [PatchInfo] {
+        let baseNames = getPatchNamesForCategory(category)
+        let bankStart = getBankStartForStyle(style)
+        
+        return baseNames.enumerated().map { index, baseName in
+            let bankNumber = bankStart + (index / 3)
+            let ordinal = (index % 3) + 1
+            let bank = String(format: "%02d-%d", bankNumber, ordinal)
+            
+            return PatchInfo(
+                name: "\(style.rawValue) \(baseName)",
+                description: "A \(style.rawValue.lowercased()) \(category.displayName.lowercased()) patch with \(baseName.lowercased()) characteristics",
+                style: style,
+                category: category,
+                bank: bank,
+                tags: generateTagsForPatch(style: style, category: category, baseName: baseName)
+            )
+        }
+    }
+    
+    /// Gets patch names for a category
+    private func getPatchNamesForCategory(_ category: PatchCategory) -> [String] {
+        switch category {
+        case .all:
+            return []
+        case .guitar:
+            return ["CLEAN", "CRUNCH", "OVERDRIVE", "DISTORTION", "FUZZ", "VINTAGE", "ACOUSTIC", "JAZZ", "BLUES", "ROCK"]
+        case .bass:
+            return ["FINGER", "PICK", "SLAP", "FRETLESS", "SYNTH", "VINTAGE", "UPRIGHT", "FUNK", "ROCK", "JAZZ"]
+        case .synth:
+            return ["PAD", "LEAD", "BRASS", "STRINGS", "CHOIR", "BELL", "ANALOG", "DIGITAL", "WARM", "BRIGHT"]
+        case .organ:
+            return ["HAMMOND", "CHURCH", "ROCK", "JAZZ", "PIPE", "COMBO", "GOSPEL", "BLUES", "CLASSICAL", "MODERN"]
+        case .effects:
+            return ["CHORUS", "DELAY", "REVERB", "FLANGER", "PHASER", "TREMOLO", "DISTORTION", "FILTER", "MODULATION", "AMBIENT"]
+        case .user:
+            return ["CUSTOM 1", "CUSTOM 2", "CUSTOM 3", "CUSTOM 4", "CUSTOM 5", "CUSTOM 6", "CUSTOM 7", "CUSTOM 8", "CUSTOM 9", "CUSTOM 10"]
+        }
+    }
+    
+    /// Gets bank start number for a style
+    private func getBankStartForStyle(_ style: SoundStyle) -> Int {
+        switch style {
+        case .lead: return 1
+        case .rhythm: return 21
+        case .other: return 41
+        case .user: return 61
+        }
+    }
+    
+    /// Generates tags for a patch
+    private func generateTagsForPatch(style: SoundStyle, category: PatchCategory, baseName: String) -> [String] {
+        var tags = [style.rawValue.lowercased(), category.displayName.lowercased()]
+        
+        // Add base name components as tags
+        let nameComponents = baseName.lowercased().split(separator: " ").map(String.init)
+        tags.append(contentsOf: nameComponents)
+        
+        // Add contextual tags based on category
+        switch category {
+        case .guitar:
+            tags.append(contentsOf: ["electric", "guitar", "amp"])
+        case .bass:
+            tags.append(contentsOf: ["bass", "low", "rhythm"])
+        case .synth:
+            tags.append(contentsOf: ["synthesizer", "electronic", "modern"])
+        case .organ:
+            tags.append(contentsOf: ["organ", "keys", "vintage"])
+        case .effects:
+            tags.append(contentsOf: ["fx", "processing", "ambient"])
+        case .user:
+            tags.append(contentsOf: ["custom", "user", "personal"])
+        case .all:
+            break
+        }
+        
+        return Array(Set(tags)) // Remove duplicates
+    }
+}
+
+// MARK: - Patch Category Extension
+extension PatchCategory {
+    /// Returns all categories except .all for filtering
+    static var filterCategories: [PatchCategory] {
+        return allCases.filter { $0 != .all }
+    }
+}
+
+// MARK: - PatchInfo Extension
+extension PatchInfo {
+    /// Creates a sample patch for testing
+    static func sample(name: String = "Sample Patch", style: SoundStyle = .lead, category: PatchCategory = .guitar) -> PatchInfo {
+        return PatchInfo(
+            name: name,
+            description: "A sample \(style.rawValue.lowercased()) patch for testing",
+            style: style,
+            category: category,
+            bank: "01-1",
+            tags: [style.rawValue.lowercased(), category.displayName.lowercased(), "sample"]
+        )
+    }
+    
+    /// Checks if patch matches search criteria
+    func matches(query: String) -> Bool {
+        guard !query.isEmpty else { return true }
+        
+        return name.localizedCaseInsensitiveContains(query) ||
+               description.localizedCaseInsensitiveContains(query) ||
+               tags.contains { $0.localizedCaseInsensitiveContains(query) }
+    }
+}
