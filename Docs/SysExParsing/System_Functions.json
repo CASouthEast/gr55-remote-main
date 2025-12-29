@@ -1,0 +1,95 @@
+{
+  "expPdlFunctions": [
+    { "value": "00", "name": "OFF" },
+    { "value": "01", "name": "PATCH SETTING" },
+    { "value": "02", "name": "PATCH VOLUME" },
+    { "value": "03", "name": "TONE VOLUME" },
+    { "value": "04", "name": "PITCH BEND" },
+    { "value": "05", "name": "MODULATION" },
+    { "value": "06", "name": "CROSS FADER" },
+    { "value": "07", "name": "DELAY LEVEL" },
+    { "value": "08", "name": "REVERB LEVEL" },
+    { "value": "09", "name": "CHORUS LEVEL" },
+    { "value": "0A", "name": "MOD CONTROL" }
+  ],
+  "expSwFunctions": [
+    { "value": "00", "name": "OFF" },
+    { "value": "01", "name": "PATCH SETTING" },
+    { "value": "02", "name": "TAP TEMPO" },
+    { "value": "03", "name": "TONE SW" },
+    { "value": "04", "name": "AMP SW" },
+    { "value": "05", "name": "MOD SW" },
+    { "value": "06", "name": "MFX SW" },
+    { "value": "07", "name": "DELAY SW" },
+    { "value": "08", "name": "REVERB SW" },
+    { "value": "09", "name": "CHORUS SW" },
+    { "value": "0A", "name": "SOUND STYLE INC" },
+    { "value": "0B", "name": "SOUND STYLE DEC" },
+    { "value": "0C", "name": "BANK NUMBER INC" },
+    { "value": "0D", "name": "BANK NUMBER DEC" },
+    { "value": "0E", "name": "PATCH NUMBER INC" },
+    { "value": "0F", "name": "PATCH NUMBER DEC" },
+    { "value": "10", "name": "AUDIO PLAYER PLAY/STOP" },
+    { "value": "11", "name": "AUDIO PLAYER SONG INC" },
+    { "value": "12", "name": "AUDIO PLAYER SONG DEC" },
+    { "value": "13", "name": "AUDIO PLAYER SW" },
+    { "value": "14", "name": "V-LINK SW" }
+  ],
+  "xfadePolarity": [
+    { "value": "00", "name": "OFF" },
+    { "value": "01", "name": "TOE" },
+    { "value": "02", "name": "HEEL" }
+  ],
+  "hexPuTypesGuitar": [
+    { "value": "00", "name": "GK-3" },
+    { "value": "01", "name": "GK-3A" },
+    { "value": "02", "name": "GK-2A" },
+    { "value": "03", "name": "GK-2B" },
+    { "value": "04", "name": "GK-2C" },
+    { "value": "05", "name": "GK-2D" },
+    { "value": "06", "name": "GK-2E" },
+    { "value": "07", "name": "GK-2F" }
+  ],
+  "hexPuTypesBass": [
+    { "value": "00", "name": "GK-3B" },
+    { "value": "01", "name": "GK-3A" },
+    { "value": "02", "name": "GK-2A" },
+    { "value": "03", "name": "GK-2B" },
+    { "value": "04", "name": "GK-2C" },
+    { "value": "05", "name": "GK-2D" },
+    { "value": "06", "name": "GK-2E" },
+    { "value": "07", "name": "GK-2F" }
+  ],
+  "scalesGuitar": [
+    { "value": "00", "name": "Les P" },
+    { "value": "01", "name": "Strat" },
+    { "value": "02", "name": "Tele" },
+    { "value": "03", "name": "Jazz" },
+    { "value": "04", "name": "335" },
+    { "value": "05", "name": "Dread" },
+    { "value": "06", "name": "Jumbo" },
+    { "value": "07", "name": "Classic" },
+    { "value": "08", "name": "12Str" }
+  ],
+  "scalesBass": [
+    { "value": "00", "name": "Long" },
+    { "value": "01", "name": "Medium" },
+    { "value": "02", "name": "Short" }
+  ],
+  "puPhase": [
+    { "value": "00", "name": "Normal" },
+    { "value": "01", "name": "Reverse" }
+  ],
+  "puDirection": [
+    { "value": "00", "name": "Normal" },
+    { "value": "01", "name": "Reverse" }
+  ],
+  "s1S2Position": [
+    { "value": "00", "name": "Normal" },
+    { "value": "01", "name": "Reverse" }
+  ],
+  "gkPuPosition": [
+    { "value": "00", "name": "6 string" },
+    { "value": "01", "name": "4 string" }
+  ]
+}

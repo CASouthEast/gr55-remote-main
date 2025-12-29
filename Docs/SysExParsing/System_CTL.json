@@ -1,0 +1,166 @@
+{
+  "name": "System CTL",
+  "identifier": "02",
+  "addressBase": "02-00-02",
+  "parameters": [
+    {
+      "name": "CTL Function",
+      "address": "00",
+      "type": "options",
+      "range": { "min": 0, "max": 21 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "PATCH SETTING" },
+        { "value": "02", "name": "HOLD" },
+        { "value": "03", "name": "TAP TEMPO" },
+        { "value": "04", "name": "TONE SW" },
+        { "value": "05", "name": "AMP SW" },
+        { "value": "06", "name": "MOD SW" },
+        { "value": "07", "name": "MFX SW" },
+        { "value": "08", "name": "DELAY SW" },
+        { "value": "09", "name": "REVERB SW" },
+        { "value": "0A", "name": "CHORUS SW" },
+        { "value": "0B", "name": "SOUND STYLE INC" },
+        { "value": "0C", "name": "SOUND STYLE DEC" },
+        { "value": "0D", "name": "BANK NUMBER INC" },
+        { "value": "0E", "name": "BANK NUMBER DEC" },
+        { "value": "0F", "name": "PATCH NUMBER INC" },
+        { "value": "10", "name": "PATCH NUMBER DEC" },
+        { "value": "11", "name": "AUDIO PLAYER PLAY/STOP" },
+        { "value": "12", "name": "AUDIO PLAYER SONG INC" },
+        { "value": "13", "name": "AUDIO PLAYER SONG DEC" },
+        { "value": "14", "name": "AUDIO PLAYER SW" },
+        { "value": "15", "name": "V-LINK SW" }
+      ],
+      "displayFormat": "OFF, PATCH SETTING, HOLD, TAP TEMPO, TONE SW, AMP SW, MOD SW, MFX SW, DELAY SW, REVERB SW, CHORUS SW, SOUND STYLE INC, SOUND STYLE DEC, BANK NUMBER INC, BANK NUMBER DEC, PATCH NUMBER INC, PATCH NUMBER DEC, AUDIO PLAYER PLAY/STOP, AUDIO PLAYER SONG INC, AUDIO PLAYER SONG DEC, AUDIO PLAYER SW, V-LINK SW"
+    },
+    {
+      "name": "CTL Hold Type",
+      "address": "01",
+      "type": "value",
+      "range": { "min": 0, "max": 3 },
+      "displayFormat": "1-4"
+    },
+    {
+      "name": "CTL Hold Switch Mode",
+      "address": "02",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "LATCH" },
+        { "value": "01", "name": "MOMENT" }
+      ],
+      "displayFormat": "LATCH, MOMENT"
+    },
+    {
+      "name": "CTL Hold PCM Tone1",
+      "address": "03",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL Hold PCM Tone2",
+      "address": "04",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=OFF PCM Tone1 Switch",
+      "address": "05",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=OFF PCM Tone2 Switch",
+      "address": "06",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=OFF Modeling Tone Switch",
+      "address": "07",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=OFF Normal PU Switch",
+      "address": "08",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=ON PCM Tone1 Switch",
+      "address": "09",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=ON PCM Tone2 Switch",
+      "address": "0A",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=ON Modeling Tone Switch",
+      "address": "0B",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    },
+    {
+      "name": "CTL=ON Normal PU Switch",
+      "address": "0C",
+      "type": "options",
+      "range": { "min": 0, "max": 1 },
+      "options": [
+        { "value": "00", "name": "OFF" },
+        { "value": "01", "name": "ON" }
+      ],
+      "displayFormat": "OFF, ON"
+    }
+  ]
+}
