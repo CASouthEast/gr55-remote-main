@@ -10,6 +10,7 @@ export type UserOptions = Readonly<{
     library: boolean;
     system: boolean;
   };
+  hardwareTheme: "metallicBlack" | "turquoise";
 }>;
 
 const DEFAULT_OPTIONS: UserOptions = {
@@ -20,6 +21,7 @@ const DEFAULT_OPTIONS: UserOptions = {
     library: true,
     system: true,
   },
+  hardwareTheme: "metallicBlack",
 };
 
 const UserOptionsContext = createContext<
@@ -48,6 +50,12 @@ export function UserOptionsContainer({
     "@motiz88/gr55-remote/UserOptions/visibleTabs",
     DEFAULT_OPTIONS.visibleTabs
   );
+  const [hardwareTheme, setHardwareTheme] = useStateWithStoredDefault<
+    UserOptions["hardwareTheme"]
+  >(
+    "@motiz88/gr55-remote/UserOptions/hardwareTheme",
+    DEFAULT_OPTIONS.hardwareTheme
+  );
 
   const userOptionsAndSetter = useMemo(
     () =>
@@ -56,6 +64,7 @@ export function UserOptionsContainer({
           enableExperimentalFeatures,
           webTabBarPosition,
           visibleTabs,
+          hardwareTheme,
         },
         (newOptions: Partial<UserOptions>) => {
           if (newOptions.enableExperimentalFeatures != null) {
@@ -69,15 +78,20 @@ export function UserOptionsContainer({
           if (newOptions.visibleTabs != null) {
             setVisibleTabs({ ...visibleTabs, ...newOptions.visibleTabs });
           }
+          if (newOptions.hardwareTheme != null) {
+            setHardwareTheme(newOptions.hardwareTheme);
+          }
         },
       ] as const,
     [
       enableExperimentalFeatures,
       webTabBarPosition,
       visibleTabs,
+      hardwareTheme,
       setEnableExperimentalFeatures,
       setWebTabBarPosition,
       setVisibleTabs,
+      setHardwareTheme,
     ]
   );
   return (

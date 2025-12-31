@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    elevation: 4,
     ...Platform.select({
       web: {
         boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
@@ -37,8 +36,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
       },
-      android: {},
-      default: {},
+      android: {
+        elevation: 4,
+      },
+      default: {
+        elevation: 4,
+      },
     }),
     maxWidth: 600,
     width: "100%",

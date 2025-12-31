@@ -304,6 +304,7 @@ const PatchItem = memo(function PatchItem({
             },
             isSingleColumn && styles.singleColumnItem,
           ]}
+          collapsable={Platform.OS === "web" ? undefined : false}
         >
           <AnimatedThemedText style={[styles.itemText, pressFeedbackStyle]}>
             {patch.identity.styleLabel} {patch.identity.patchNumberLabel}

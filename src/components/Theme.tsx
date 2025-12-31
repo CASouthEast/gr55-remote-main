@@ -230,7 +230,7 @@ export const DarkTheme: AppTheme = {
   },
 };
 
-export const rneTheme = createRNETheme({
+const rneThemeOptions = {
   lightColors: {
     primary: "rgb(0, 122, 255)",
     background: "rgb(242, 242, 242)",
@@ -246,10 +246,6 @@ export const rneTheme = createRNETheme({
     grey3: "rgb(96, 96, 96)",
     grey4: "rgb(216, 216, 216)",
     grey5: "rgb(242, 242, 242)",
-    ...Platform.select({
-      ios: lightColors.platform.ios,
-      android: lightColors.platform.android,
-    }),
   },
   darkColors: {
     background: "rgb(28, 28, 30)",
@@ -265,19 +261,15 @@ export const rneTheme = createRNETheme({
     grey3: "rgb(229, 229, 231)",
     grey4: "rgb(242, 242, 242)",
     grey5: "rgb(255, 255, 255)",
-    ...Platform.select({
-      ios: darkColors.platform.ios,
-      android: darkColors.platform.android,
-    }),
     primary: "rgb(0, 122, 255)",
   },
-});
+};
 
 const paperThemeDark = {
   ...MD2DarkTheme,
   colors: {
     ...MD2DarkTheme.colors,
-    primary: rneTheme.darkColors?.primary,
+    primary: rneThemeOptions.darkColors?.primary,
   },
 };
 
@@ -285,7 +277,7 @@ const paperThemeLight = {
   ...MD2LightTheme,
   colors: {
     ...MD2LightTheme.colors,
-    primary: rneTheme.lightColors?.primary,
+    primary: rneThemeOptions.lightColors?.primary,
   },
 };
 
@@ -326,7 +318,7 @@ export function ThemeProvider({ children }: { children?: React.ReactNode }) {
   const rneThemeWithMode = useMemo(
     () =>
       createRNETheme({
-        ...rneTheme,
+        ...rneThemeOptions,
         mode: scheme === "dark" ? "dark" : "light",
       }),
     [scheme]

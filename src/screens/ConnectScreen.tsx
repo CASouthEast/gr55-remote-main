@@ -1,6 +1,13 @@
 import { useTheme, useNavigation } from "@react-navigation/native";
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
 import { ThemedPicker as Picker } from "../components/ThemedPicker";
@@ -372,11 +379,23 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   imageButtonActive: {
-    shadowColor: "#10b981",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 4px 8px rgba(16, 185, 129, 0.3)",
+      },
+      ios: {
+        shadowColor: "#10b981",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 8,
+      },
+      default: {
+        elevation: 8,
+      },
+    }),
   },
   hardwareImage: {
     width: 320,

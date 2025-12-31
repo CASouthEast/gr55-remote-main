@@ -943,10 +943,20 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     gap: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    ...Platform.select({
+      web: {
+        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.12)",
+      },
+      ios: {
+        shadowColor: "#000",
+        shadowOpacity: 0.12,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   searchInput: {
     borderWidth: 1,

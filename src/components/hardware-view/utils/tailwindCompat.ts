@@ -73,7 +73,7 @@ export function getLucideIcon(
 export const webOnlyStyles = {
   backdropFilter: webOnly("blur(10px)"),
   WebkitBackdropFilter: webOnly("blur(10px)"),
-  background: (gradient: string) => webOnly(gradient),
+  backgroundImage: (gradient: string) => webOnly(gradient),
   boxShadow: (shadow: string) => webOnly(shadow),
   filter: (filter: string) => webOnly(filter),
 };

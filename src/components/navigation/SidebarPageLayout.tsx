@@ -113,15 +113,17 @@ export function SidebarPageLayout({
                   ({
                     onFocus: (e: any) => {
                       // Add focus styling
-                      if (e.target) {
-                        e.target.style.outline = `2px solid ${theme.colors.navigation.tabBar.activeText}`;
-                        e.target.style.outlineOffset = "-2px";
+                      if (e.target && e.target.style) {
+                        e.target.style.outlineWidth = "2px";
+                        e.target.style.outlineStyle = "solid";
+                        e.target.style.outlineColor =
+                          theme.colors.navigation.tabBar.activeText;
                       }
                     },
                     onBlur: (e: any) => {
                       // Remove focus styling
-                      if (e.target) {
-                        e.target.style.outline = "none";
+                      if (e.target && e.target.style) {
+                        e.target.style.outlineWidth = "0";
                       }
                     },
                     onKeyDown: (e: any) => {
@@ -266,7 +268,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 20,
       paddingVertical: 16,
       transition: "background-color 0.2s ease, color 0.2s ease",
-      outline: "none",
+      outlineWidth: 0,
     }),
   },
   webTab:
@@ -281,8 +283,9 @@ const styles = StyleSheet.create({
             backgroundColor: "rgba(0, 122, 255, 0.2)",
           },
           ":focus": {
-            outline: "2px solid #007AFF",
-            outlineOffset: "-2px",
+            outlineWidth: 2,
+            outlineStyle: "solid",
+            outlineColor: "#007AFF",
           },
         } as any)
       : {},

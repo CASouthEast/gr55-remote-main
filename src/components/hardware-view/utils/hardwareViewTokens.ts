@@ -14,6 +14,17 @@ export const hardwareColors = {
   inset: "#27272a", // zinc-800
   black: "#000000",
   white: "#ffffff",
+  // New aesthetic colors
+  neonGreen: "#39FF14",
+  neonGreenGlow: "rgba(57, 255, 20, 0.5)",
+  turquoise: {
+    chassis: "#003d5c",
+    surface: "#00527a",
+  },
+  metallicBlack: {
+    chassis: "#1e2024",
+    surface: "#25282e",
+  },
 } as const;
 
 export const hardwareSpacing = {

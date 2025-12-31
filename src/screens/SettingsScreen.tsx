@@ -58,6 +58,12 @@ export function SettingsScreen({
     [userOptions, setUserOptions]
   );
 
+  const setHardwareTheme = useCallback(
+    (hardwareTheme: "metallicBlack" | "turquoise") =>
+      setUserOptions({ hardwareTheme }),
+    [setUserOptions]
+  );
+
   useEffect(() => {
     if (canShowBluetoothSettings) {
       const navigateToBluetoothSettings = () => {
@@ -92,6 +98,7 @@ export function SettingsScreen({
         toggleTabVisibility={toggleTabVisibility}
         setWebTabBarPosition={setWebTabBarPosition}
         setEnableExperimentalFeatures={setEnableExperimentalFeatures}
+        setHardwareTheme={setHardwareTheme}
         safeAreaStyle={safeAreaStyle}
       />
     </ThemeVariantProvider>
@@ -113,6 +120,7 @@ function SettingsScreenContent({
   toggleTabVisibility,
   setWebTabBarPosition,
   setEnableExperimentalFeatures,
+  setHardwareTheme,
   safeAreaStyle,
 }: any) {
   const colors = useThemedColors();
@@ -146,10 +154,19 @@ function SettingsScreenContent({
           </Section>
         </ThemedCard>
 
-        {Platform.OS === "web" && (
-          <ThemedCard>
-            <Section heading="Appearance (Web)">
-              <FieldRow description="Menu Position">
+        <ThemedCard>
+          <Section heading="Appearance">
+            <FieldRow description="Hardware Style">
+              <Picker
+                selectedValue={userOptions.hardwareTheme}
+                onValueChange={setHardwareTheme}
+              >
+                <Picker.Item label="Metallic Black" value="metallicBlack" />
+                <Picker.Item label="GR-55 Turquoise" value="turquoise" />
+              </Picker>
+            </FieldRow>
+            {Platform.OS === "web" && (
+              <FieldRow description="Menu Position (Web)">
                 <Picker
                   selectedValue={userOptions.webTabBarPosition}
                   onValueChange={(val) =>
@@ -160,9 +177,9 @@ function SettingsScreenContent({
                   <Picker.Item label="Bottom" value="bottom" />
                 </Picker>
               </FieldRow>
-            </Section>
-          </ThemedCard>
-        )}
+            )}
+          </Section>
+        </ThemedCard>
 
         <ThemedCard>
           <Section heading="MIDI Connections">

@@ -99,8 +99,13 @@ export const FieldRow = function FieldRow({
         <>{children}</>
       ) : (
         <View
-          renderToHardwareTextureAndroid
-          collapsable={false}
+          {...Platform.select({
+            android: {
+              renderToHardwareTextureAndroid: true,
+              collapsable: false,
+            },
+            default: {},
+          })}
           ref={viewRef}
           style={[
             FieldStyles.fieldRow,

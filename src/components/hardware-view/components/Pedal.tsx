@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     height: "55%",
     ...Platform.select({
       web: {
-        outline: "none",
+        outlineWidth: 0,
       },
     }),
   },
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     ...Platform.select({
       web: {
-        background: "linear-gradient(to bottom, #52525b, #27272a)", // zinc-700 to zinc-800
+        backgroundImage: "linear-gradient(to bottom, #52525b, #27272a)", // zinc-700 to zinc-800
         boxShadow: "inset 0 2px 5px rgba(255, 255, 255, 0.2)",
       },
       default: {
@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#52525b", // zinc-600
     ...Platform.select({
       web: {
-        background: "linear-gradient(to bottom, #52525b, #27272a)", // zinc-700 to zinc-800
+        backgroundImage: "linear-gradient(to bottom, #52525b, #27272a)", // zinc-700 to zinc-800
         boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
       },
       default: {
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     height: 96,
     ...Platform.select({
       web: {
-        background:
+        backgroundImage:
           "linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent)",
       },
       default: {
@@ -677,7 +677,8 @@ const styles = StyleSheet.create({
         backgroundImage:
           "linear-gradient(to top, #00ff00, #ffff00, #ff8800, #ff0000)",
         backgroundSize: "100% 600px",
-        backgroundPosition: "0 100%",
+        backgroundPositionX: 0,
+        backgroundPositionY: "100%",
         backgroundRepeat: "no-repeat",
       },
       default: {

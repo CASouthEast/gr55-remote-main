@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
       web: {
         boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
         cursor: "pointer",
-        outline: "none",
+        outlineWidth: 0,
       },
       default: {
         elevation: 4,

@@ -1,4 +1,4 @@
-import { View, Animated, StyleSheet } from "react-native";
+import { View, Animated, StyleSheet, Platform } from "react-native";
 import { useAnimation } from "react-native-animation-hooks";
 
 import { RemoteFieldSwitch } from "./RemoteFieldSwitch";
@@ -41,10 +41,10 @@ export function RemoteFieldSwitchedSection({
                 with a "natural" zIndex breaks some overlaid components' touch
                 behaviour (specifically Slider) on web. */}
         <Animated.View
-          pointerEvents="none"
+          collapsable={Platform.OS === "web" ? undefined : false}
           style={[
             styles.disabledSectionOverlay,
-            { backgroundColor },
+            { backgroundColor, pointerEvents: "none" },
             { opacity: overlayOpacity },
           ]}
         />
