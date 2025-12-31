@@ -1,6 +1,3 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import {
   View,
@@ -8,136 +5,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  ViewStyle,
+  StyleProp,
 } from "react-native";
 
 import { useAccessibility } from "../../hooks/useAccessibility";
-import { PatchAssignsScreen } from "../../screens/PatchAssignsScreen";
-import { PatchEffectsScreen } from "../../screens/PatchEffects/PatchEffectsScreen";
-import { PatchMainScreen } from "../../screens/PatchMainScreen";
-import { PatchMasterOtherScreen } from "../../screens/PatchMasterOtherScreen";
-import { PatchMasterPedalGkCtlScreen } from "../../screens/PatchMasterPedalGkCtlScreen";
-import { PatchSaveAsScreen } from "../../screens/PatchSaveAsScreen";
-import { PatchToneScreen } from "../../screens/PatchTone/PatchToneScreen";
 import { useTheme } from "../Theme";
-import { PatchTabParamList, PatchStackParamList } from "../navigation";
-import { patchAssignsTabs } from "./PatchAssignsCustomNavigation";
-import { patchEffectsTabs } from "./PatchEffectsCustomNavigation";
-import { patchMasterPedalGkCtlTabs } from "./PatchMasterPedalGkCtlCustomNavigation";
-import { patchToneTabs } from "./PatchToneCustomNavigation";
 
-// Wrapper components to provide navigation props with proper route structure
-function PatchMainWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<PatchStackParamList, "PatchMain"> = {
-    navigation: navigation as any,
-    route: {
-      key: "PatchMain-" + Date.now(),
-      name: "PatchMain",
-      params: parentRoute.params || {},
-      path: parentRoute.path,
-    },
-  };
-
-  return <PatchMainScreen {...mockProps} />;
-}
-
-function PatchToneWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<PatchStackParamList, "PatchTone"> = {
-    navigation: navigation as any,
-    route: {
-      key: "PatchTone-" + Date.now(),
-      name: "PatchTone",
-      params: parentRoute.params || {},
-      path: parentRoute.path,
-    },
-  };
-
-  return <PatchToneScreen {...mockProps} />;
-}
-
-function PatchEffectsWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<PatchStackParamList, "PatchEffects"> =
-    {
-      navigation: navigation as any,
-      route: {
-        key: "PatchEffects-" + Date.now(),
-        name: "PatchEffects",
-        params: parentRoute.params || {},
-        path: parentRoute.path,
-      },
-    };
-
-  return <PatchEffectsScreen {...mockProps} />;
-}
-
-function PatchMasterPedalGkCtlWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<
-    PatchStackParamList,
-    "PatchMasterPedalGkCtl"
-  > = {
-    navigation: navigation as any,
-    route: {
-      key: "PatchMasterPedalGkCtl-" + Date.now(),
-      name: "PatchMasterPedalGkCtl",
-      params: parentRoute.params || {},
-      path: parentRoute.path,
-    },
-  };
-
-  return <PatchMasterPedalGkCtlScreen {...mockProps} />;
-}
-
-function PatchAssignsWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<PatchStackParamList, "PatchAssigns"> =
-    {
-      navigation: navigation as any,
-      route: {
-        key: "PatchAssigns-" + Date.now(),
-        name: "PatchAssigns",
-        params: parentRoute.params || {},
-        path: parentRoute.path,
-      },
-    };
-
-  return <PatchAssignsScreen {...mockProps} />;
-}
-
-function PatchMasterOtherWrapper() {
-  const navigation = useNavigation();
-  const parentRoute = useRoute();
-
-  const mockProps: NativeStackScreenProps<
-    PatchStackParamList,
-    "PatchMasterOther"
-  > = {
-    navigation: navigation as any,
-    route: {
-      key: "PatchMasterOther-" + Date.now(),
-      name: "PatchMasterOther",
-      params: parentRoute.params || {},
-      path: parentRoute.path,
-    },
-  };
-
-  return <PatchMasterOtherScreen {...mockProps} />;
-}
-
-const tabs: {
-  key: keyof PatchTabParamList;
+export interface SidebarTab {
+  key: string;
   title: string;
   component: React.ComponentType<any>;
   subTabs?: {
@@ -145,40 +21,24 @@ const tabs: {
     title: string;
     component: React.ComponentType<any>;
   }[];
-}[] = [
-  { key: "Main", title: "Main", component: PatchMainWrapper },
-  {
-    key: "Tone",
-    title: "Tone",
-    component: PatchToneWrapper,
-    subTabs: patchToneTabs,
-  },
-  {
-    key: "Effects",
-    title: "Effects",
-    component: PatchEffectsWrapper,
-    subTabs: patchEffectsTabs,
-  },
-  {
-    key: "PedalGK",
-    title: "Pedal/GK",
-    component: PatchMasterPedalGkCtlWrapper,
-    subTabs: patchMasterPedalGkCtlTabs,
-  },
-  {
-    key: "Assigns",
-    title: "Assigns",
-    component: PatchAssignsWrapper,
-    subTabs: patchAssignsTabs,
-  },
-  { key: "Other", title: "Other", component: PatchMasterOtherWrapper },
-];
+}
 
-const PatchStack = createNativeStackNavigator<PatchStackParamList>();
+interface SidebarPageLayoutProps {
+  tabs: SidebarTab[];
+  title?: string;
+  defaultTab?: string;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+}
 
-// Main patch navigation with tabs
-function PatchTabNavigation(): JSX.Element {
-  const [activeTab, setActiveTab] = useState<keyof PatchTabParamList>("Main");
+export function SidebarPageLayout({
+  tabs,
+  title,
+  defaultTab,
+  contentContainerStyle,
+}: SidebarPageLayoutProps) {
+  const [activeTab, setActiveTab] = useState<string>(
+    defaultTab || tabs[0]?.key || ""
+  );
   const [activeSubTab, setActiveSubTab] = useState<string | null>(null);
   const theme = useTheme();
   const {
@@ -186,12 +46,11 @@ function PatchTabNavigation(): JSX.Element {
     createTabListProps,
     createTabPanelProps,
     handleKeyboardNavigation,
-    // announceToScreenReader, // Removed unused
   } = useAccessibility();
 
   // Determine the component to render
   const currentTab = tabs.find((tab) => tab.key === activeTab);
-  let ActiveComponent = currentTab?.component || PatchMainWrapper;
+  let ActiveComponent = currentTab?.component || (() => null);
 
   // On Web, if we have an active sub-tab, render that instead
   if (Platform.OS === "web" && currentTab?.subTabs && activeSubTab) {
@@ -201,8 +60,7 @@ function PatchTabNavigation(): JSX.Element {
     }
   }
 
-  const handleTabChange = (tabKey: keyof PatchTabParamList) => {
-    // const previousTab = activeTab; // Unused
+  const handleTabChange = (tabKey: string) => {
     setActiveTab(tabKey);
 
     // If the new tab has sub-tabs, select the first one by default on Web
@@ -212,11 +70,6 @@ function PatchTabNavigation(): JSX.Element {
     } else {
       setActiveSubTab(null);
     }
-
-    // Announce tab change to screen readers
-    // if (newTab && previousTab !== tabKey) {
-    //   announceToScreenReader(`Switched to ${newTab.title} tab`);
-    // }
   };
 
   const handleSubTabChange = (subTabKey: string) => {
@@ -232,9 +85,9 @@ function PatchTabNavigation(): JSX.Element {
           { backgroundColor: theme.colors.navigation.tabBar.background },
           Platform.OS === "web" && { zIndex: 1 },
         ]}
-        {...(createTabListProps("Patch navigation tabs") as any)}
+        {...(createTabListProps(title || "Navigation tabs") as any)}
       >
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const tabProps = createTabProps(tab.title, activeTab === tab.key);
           const isWeb = Platform.OS === "web";
           const hasSubTabs = isWeb && tab.subTabs && tab.subTabs.length > 0;
@@ -345,7 +198,7 @@ function PatchTabNavigation(): JSX.Element {
         })}
       </View>
 
-      {/* Active Tab Indicator */}
+      {/* Active Tab Indicator (Mobile) */}
       <View
         style={[
           styles.indicator,
@@ -358,7 +211,7 @@ function PatchTabNavigation(): JSX.Element {
 
       {/* Screen Content */}
       <View
-        style={styles.content}
+        style={[styles.content, contentContainerStyle]}
         {...(createTabPanelProps(
           tabs.find((tab) => tab.key === activeTab)?.title || "Main",
           true
@@ -370,36 +223,12 @@ function PatchTabNavigation(): JSX.Element {
   );
 }
 
-export function PatchSectionWithTopNavigation(): JSX.Element {
-  return (
-    <PatchStack.Navigator
-      initialRouteName="PatchMain"
-      id="PatchStack"
-      screenOptions={{ headerShown: false }}
-    >
-      <PatchStack.Screen
-        name="PatchMain"
-        component={PatchTabNavigation}
-        options={{ headerShown: false }}
-      />
-      <PatchStack.Group screenOptions={{ presentation: "modal" }}>
-        <PatchStack.Screen
-          name="PatchSaveAs"
-          component={PatchSaveAsScreen}
-          options={{ title: "Write user patch", headerShown: true }}
-        />
-      </PatchStack.Group>
-    </PatchStack.Navigator>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
     ...(Platform.OS === "web" && {
       flexDirection: "row", // Sidebar layout on web
-      paddingTop: 60, // Avoid overlap with top bar
     }),
   },
   tabBar: {
@@ -453,7 +282,6 @@ const styles = StyleSheet.create({
         } as any)
       : {},
   activeTab: {
-    // Active tab styling will be handled by theme colors
     ...(Platform.OS === "web" && {
       borderRightWidth: 3,
       borderRightColor: "#007AFF", // Indicator on the right for sidebar

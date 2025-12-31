@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { Section } from "../../components/fields/Section";
 import { PatchEffectsTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
@@ -30,14 +31,24 @@ export function PatchEffectsChorusScreen({
       contentContainerStyle={safeAreaStyle}
     >
       <RemoteFieldSwitchedSection page={PATCH} field={sendsAndEq.chorusSwitch}>
-        <RemoteFieldPicker page={PATCH} field={sendsAndEq.chorusType} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.chorusRate} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.chorusDepth} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.chorusEffectLevel} />
+        <Section heading="Chorus Model">
+          <RemoteFieldPicker page={PATCH} field={sendsAndEq.chorusType} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.chorusRate} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.chorusDepth} />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={sendsAndEq.chorusEffectLevel}
+          />
+        </Section>
 
-        <RemoteFieldSlider page={PATCH} field={mfx.mfxChorusSendLevel} />
-        <RemoteFieldSlider page={PATCH} field={ampModNs.modChorusSendLevel} />
-        <RemoteFieldSlider page={PATCH} field={common.bypassChorusSendLevel} />
+        <Section heading="Send Levels">
+          <RemoteFieldSlider page={PATCH} field={mfx.mfxChorusSendLevel} />
+          <RemoteFieldSlider page={PATCH} field={ampModNs.modChorusSendLevel} />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={common.bypassChorusSendLevel}
+          />
+        </Section>
       </RemoteFieldSwitchedSection>
     </PopoverAwareScrollView>
   );

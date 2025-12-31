@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     flex: 0,
     marginVertical: -4,
+    width: "100%",
   },
   sliderTrack: {
     height: 32,

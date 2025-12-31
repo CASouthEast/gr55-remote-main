@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { Section } from "../../components/fields/Section";
 import { PatchEffectsTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSegmentedSwitch } from "../../components/remote-fields/RemoteFieldSegmentedSwitch";
@@ -39,85 +40,93 @@ export function PatchEffectsAmpScreen({
         page={PATCH}
         field={GR55.temporaryPatch.ampModNs.ampSwitch}
       >
-        <RemoteFieldPicker
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampType}
-          value={ampType}
-          onValueChange={setAmpType}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampGain}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampLevel}
-        />
-        <RemoteFieldPicker
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampGainSwitch}
-        />
-        <RemoteFieldSwitch
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampSoloSwitch}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampSoloLevel}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampBass}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampMiddle}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampTreble}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampPresence}
-        />
-        {ampType === "BOSS CLEAN" ||
-        ampType === "JC-120" ||
-        ampType === "JAZZ COMBO" ||
-        ampType === "CLEAN TWIN" ||
-        ampType === "PRO CRUNCH" ||
-        ampType === "TWEED" ||
-        ampType === "BOSS CRUNCH" ||
-        ampType === "BLUES" ||
-        ampType === "STACK CRUNCH" ||
-        ampType === "BG LEAD" ||
-        ampType === "BG DRIVE" ||
-        ampType === "BG RHYTHM" ? (
+        <Section heading="Amp Model">
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampType}
+            value={ampType}
+            onValueChange={setAmpType}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampGain}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampLevel}
+          />
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampGainSwitch}
+          />
+        </Section>
+
+        <Section heading="Tone">
           <RemoteFieldSwitch
             page={PATCH}
-            field={GR55.temporaryPatch.ampModNs.ampBright}
+            field={GR55.temporaryPatch.ampModNs.ampSoloSwitch}
           />
-        ) : null}
-        <RemoteFieldPicker
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampSpType}
-        />
-        <RemoteFieldPicker
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampMicType}
-        />
-        <RemoteFieldSegmentedSwitch
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampMicDistance}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampMicPosition}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.ampMicLevel}
-        />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampSoloLevel}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampBass}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampMiddle}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampTreble}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampPresence}
+          />
+          {ampType === "BOSS CLEAN" ||
+          ampType === "JC-120" ||
+          ampType === "JAZZ COMBO" ||
+          ampType === "CLEAN TWIN" ||
+          ampType === "PRO CRUNCH" ||
+          ampType === "TWEED" ||
+          ampType === "BOSS CRUNCH" ||
+          ampType === "BLUES" ||
+          ampType === "STACK CRUNCH" ||
+          ampType === "BG LEAD" ||
+          ampType === "BG DRIVE" ||
+          ampType === "BG RHYTHM" ? (
+            <RemoteFieldSwitch
+              page={PATCH}
+              field={GR55.temporaryPatch.ampModNs.ampBright}
+            />
+          ) : null}
+        </Section>
+
+        <Section heading="Speaker & Mic">
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampSpType}
+          />
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampMicType}
+          />
+          <RemoteFieldSegmentedSwitch
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampMicDistance}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampMicPosition}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.ampMicLevel}
+          />
+        </Section>
       </RemoteFieldSwitchedSection>
     </PopoverAwareScrollView>
   );

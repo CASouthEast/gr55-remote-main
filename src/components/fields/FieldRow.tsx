@@ -1,4 +1,5 @@
 import { Entypo } from "@expo/vector-icons";
+import { useTheme } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -89,6 +90,7 @@ export const FieldRow = function FieldRow({
     duration: isPressed ? 0 : 300,
     useNativeDriver: true,
   });
+  const { colors } = useTheme();
   return (
     <FieldRowContext.Provider value={fieldRowContext}>
       {inline ? (
@@ -100,6 +102,7 @@ export const FieldRow = function FieldRow({
           ref={viewRef}
           style={[
             FieldStyles.fieldRow,
+            { borderBottomColor: colors.border },
             isAssigned && FieldStyles.fieldRowAssigned,
           ]}
         >

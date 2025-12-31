@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
 import { RefreshControl } from "../components/RefreshControl";
+import { Section } from "../components/fields/Section";
 import { PatchStackParamList } from "../components/navigation";
 import { RemoteFieldPicker } from "../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../components/remote-fields/RemoteFieldSlider";
@@ -43,83 +44,91 @@ export function PatchMasterOtherScreen({
       style={[styles.container]}
       contentContainerStyle={safeAreaStyle}
     >
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.common.patchTempo}
-      />
-      {/* TODO: Fetch and render GK set names */}
-      <RemoteFieldPicker
-        page={PATCH}
-        field={GR55.temporaryPatch.common.gkSet}
-      />
-      {/* TODO: Indicate that this is ignored if SYSTEM GUITAR OUT is anything other than PATCH */}
-      <RemoteFieldPicker
-        page={PATCH}
-        field={GR55.temporaryPatch.common.guitarOutSource}
-      />
+      <Section heading="Patch Settings">
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.common.patchTempo}
+        />
+        {/* TODO: Fetch and render GK set names */}
+        <RemoteFieldPicker
+          page={PATCH}
+          field={GR55.temporaryPatch.common.gkSet}
+        />
+        {/* TODO: Indicate that this is ignored if SYSTEM GUITAR OUT is anything other than PATCH */}
+        <RemoteFieldPicker
+          page={PATCH}
+          field={GR55.temporaryPatch.common.guitarOutSource}
+        />
+      </Section>
+
       <RemoteFieldSwitchedSection
         page={PATCH}
         field={GR55.temporaryPatch.common.altTuneSwitch}
       >
+        <Section heading="Alt Tuning">
+          <RemoteFieldPicker
+            page={PATCH}
+            field={GR55.temporaryPatch.common.altTuneType}
+            value={altTuneType}
+            onValueChange={setAltTuneType}
+          />
+          {altTuneType === "USER" && (
+            <>
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString1}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString2}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString3}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString4}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString5}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={GR55.temporaryPatch.common.userTuneShiftString6}
+              />
+            </>
+          )}
+        </Section>
+      </RemoteFieldSwitchedSection>
+
+      <Section heading="V-Link">
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.common.vlinkPalette}
+        />
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.common.vlinkPatchClip}
+        />
+        <RemoteFieldSlider
+          page={PATCH}
+          field={GR55.temporaryPatch.common.vlinkClipChange}
+        />
         <RemoteFieldPicker
           page={PATCH}
-          field={GR55.temporaryPatch.common.altTuneType}
-          value={altTuneType}
-          onValueChange={setAltTuneType}
+          field={GR55.temporaryPatch.common.vlinkExpPedal}
         />
-        {altTuneType === "USER" && (
-          <>
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString1}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString2}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString3}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString4}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString5}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.common.userTuneShiftString6}
-            />
-          </>
-        )}
-      </RemoteFieldSwitchedSection>
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkPalette}
-      />
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkPatchClip}
-      />
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkClipChange}
-      />
-      <RemoteFieldPicker
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkExpPedal}
-      />
-      <RemoteFieldPicker
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkExpPedalOn}
-      />
-      <RemoteFieldPicker
-        page={PATCH}
-        field={GR55.temporaryPatch.common.vlinkGkVol}
-      />
+        <RemoteFieldPicker
+          page={PATCH}
+          field={GR55.temporaryPatch.common.vlinkExpPedalOn}
+        />
+        <RemoteFieldPicker
+          page={PATCH}
+          field={GR55.temporaryPatch.common.vlinkGkVol}
+        />
+      </Section>
     </PopoverAwareScrollView>
   );
 }

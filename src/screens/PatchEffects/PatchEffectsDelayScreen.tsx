@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { Section } from "../../components/fields/Section";
 import { PatchEffectsTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
@@ -30,13 +31,17 @@ export function PatchEffectsDelayScreen({
       contentContainerStyle={safeAreaStyle}
     >
       <RemoteFieldSwitchedSection page={PATCH} field={sendsAndEq.delaySwitch}>
-        <RemoteFieldPicker page={PATCH} field={sendsAndEq.delayType} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayTime} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayFeedback} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayEffectLevel} />
-        <RemoteFieldSlider page={PATCH} field={mfx.mfxDelaySendLevel} />
-        <RemoteFieldSlider page={PATCH} field={ampModNs.modDelaySendLevel} />
-        <RemoteFieldSlider page={PATCH} field={common.bypassDelaySendLevel} />
+        <Section heading="Delay Delay">
+          <RemoteFieldPicker page={PATCH} field={sendsAndEq.delayType} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayTime} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayFeedback} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.delayEffectLevel} />
+        </Section>
+        <Section heading="Send Levels">
+          <RemoteFieldSlider page={PATCH} field={mfx.mfxDelaySendLevel} />
+          <RemoteFieldSlider page={PATCH} field={ampModNs.modDelaySendLevel} />
+          <RemoteFieldSlider page={PATCH} field={common.bypassDelaySendLevel} />
+        </Section>
       </RemoteFieldSwitchedSection>
     </PopoverAwareScrollView>
   );

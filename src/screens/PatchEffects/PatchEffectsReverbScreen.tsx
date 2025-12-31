@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { Section } from "../../components/fields/Section";
 import { PatchEffectsTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
@@ -30,14 +31,24 @@ export function PatchEffectsReverbScreen({
       contentContainerStyle={safeAreaStyle}
     >
       <RemoteFieldSwitchedSection page={PATCH} field={sendsAndEq.reverbSwitch}>
-        <RemoteFieldPicker page={PATCH} field={sendsAndEq.reverbType} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.reverbTime} />
-        <RemoteFieldPicker page={PATCH} field={sendsAndEq.reverbHighCut} />
-        <RemoteFieldSlider page={PATCH} field={sendsAndEq.reverbEffectLevel} />
+        <Section heading="Reverb Model">
+          <RemoteFieldPicker page={PATCH} field={sendsAndEq.reverbType} />
+          <RemoteFieldSlider page={PATCH} field={sendsAndEq.reverbTime} />
+          <RemoteFieldPicker page={PATCH} field={sendsAndEq.reverbHighCut} />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={sendsAndEq.reverbEffectLevel}
+          />
+        </Section>
 
-        <RemoteFieldSlider page={PATCH} field={mfx.mfxReverbSendLevel} />
-        <RemoteFieldSlider page={PATCH} field={ampModNs.modReverbSendLevel} />
-        <RemoteFieldSlider page={PATCH} field={common.bypassReverbSendLevel} />
+        <Section heading="Send Levels">
+          <RemoteFieldSlider page={PATCH} field={mfx.mfxReverbSendLevel} />
+          <RemoteFieldSlider page={PATCH} field={ampModNs.modReverbSendLevel} />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={common.bypassReverbSendLevel}
+          />
+        </Section>
       </RemoteFieldSwitchedSection>
     </PopoverAwareScrollView>
   );
