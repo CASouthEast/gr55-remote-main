@@ -387,7 +387,7 @@ function GkVolWrapper() {
   );
 }
 
-const tabs: {
+export const patchMasterPedalGkCtlTabs: {
   key: keyof PatchMasterPedalGkCtlTabParamList;
   title: string;
   component: React.ComponentType<any>;
@@ -406,13 +406,14 @@ export function PatchMasterPedalGkCtlCustomNavigation(): JSX.Element {
     useState<keyof PatchMasterPedalGkCtlTabParamList>("Ctl");
 
   const ActiveComponent =
-    tabs.find((tab) => tab.key === activeTab)?.component || CtlWrapper;
+    patchMasterPedalGkCtlTabs.find((tab) => tab.key === activeTab)?.component ||
+    CtlWrapper;
 
   return (
     <View style={styles.container}>
       {/* Custom Tab Bar */}
       <View style={styles.tabBar}>
-        {tabs.map((tab) => (
+        {patchMasterPedalGkCtlTabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}

@@ -77,7 +77,7 @@ function PatchToneModelingWrapper() {
   return <PatchToneModelingScreen {...mockProps} />;
 }
 
-const tabs: {
+export const patchToneTabs: {
   key: keyof PatchToneTabParamList;
   title: string;
   component: React.ComponentType<any>;
@@ -93,14 +93,14 @@ export function PatchToneCustomNavigation(): JSX.Element {
     useState<keyof PatchToneTabParamList>("Normal");
 
   const ActiveComponent =
-    tabs.find((tab) => tab.key === activeTab)?.component ||
+    patchToneTabs.find((tab) => tab.key === activeTab)?.component ||
     PatchToneNormalWrapper;
 
   return (
     <View style={styles.container}>
       {/* Custom Tab Bar */}
       <View style={styles.tabBar}>
-        {tabs.map((tab) => (
+        {patchToneTabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}

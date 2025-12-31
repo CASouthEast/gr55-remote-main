@@ -15,31 +15,34 @@ const RootTab = createBottomTabNavigator<RootTabParamList>();
 
 export function RootTabNavigator() {
   const EXPERIMENTAL_ROUTES: (keyof RootTabParamList)[] = [];
-  const [{ enableExperimentalFeatures }] = useUserOptions();
+  const [userOptions] = useUserOptions();
+  const isWebAndTop =
+    Platform.OS === "web" && userOptions.webTabBarPosition === "top";
 
   return (
     <RootTab.Navigator
       id="RootTab"
       screenOptions={({ route }) => ({
         tabBarHideOnKeyboard: true,
+        tabBarStyle: isWebAndTop
+          ? {
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 60,
+              borderBottomWidth: 1,
+              borderTopWidth: 0,
+            }
+          : undefined,
+        sceneContainerStyle: isWebAndTop ? { marginTop: 60 } : undefined,
         tabBarButton:
-          !enableExperimentalFeatures &&
+          !userOptions.enableExperimentalFeatures &&
           EXPERIMENTAL_ROUTES.includes(route.name)
             ? () => {
                 return null;
               }
             : undefined,
-        // Enhanced accessibility for web
-        ...(Platform.OS === "web" && {
-          tabBarAccessibilityRole: "tablist",
-          tabBarItemStyle: {
-            // Ensure proper focus indicators
-            ":focus": {
-              outline: "2px solid #007AFF",
-              outlineOffset: "-2px",
-            },
-          },
-        }),
       })}
     >
       <RootTab.Screen
@@ -70,60 +73,66 @@ export function RootTabNavigator() {
           }),
         }}
       />
-      <RootTab.Screen
-        name="PatchDrawer"
-        component={PatchSectionWithTopNavigation}
-        options={{
-          headerShown: false,
-          title: "Patch",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="sound-mix" size={24} color={color} />
-          ),
-          ...(Platform.OS === "web" && {
-            tabBarAccessibilityLabel: "Patch editing section",
-            tabBarAccessibilityHint: "Navigate to patch editing interface",
-          }),
-        }}
-      />
-      <RootTab.Screen
-        name="LibraryPatchList"
-        component={LibraryPatchListScreen}
-        options={{
-          title: "Library",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="library" size={24} color={color} />
-          ),
-          ...(Platform.OS === "web" && {
-            tabBarAccessibilityLabel: "Patch library",
-            tabBarAccessibilityHint: "Browse and manage saved patches",
-          }),
-        }}
-      />
-      <RootTab.Screen
-        name="System"
-        component={SystemScreen}
-        options={{
-          title: "System",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-outline" size={24} color={color} />
-          ),
-          ...(Platform.OS === "web" && {
-            tabBarAccessibilityLabel: "System settings",
-            tabBarAccessibilityHint: "Configure global system parameters",
-          }),
-        }}
-      />
+      {userOptions.visibleTabs.patch && (
+        <RootTab.Screen
+          name="PatchDrawer"
+          component={PatchSectionWithTopNavigation}
+          options={{
+            headerShown: false,
+            title: "Patch",
+            tabBarIcon: ({ color }) => (
+              <Entypo name="sound-mix" size={24} color={color} />
+            ),
+            ...(Platform.OS === "web" && {
+              tabBarAccessibilityLabel: "Patch editing section",
+              tabBarAccessibilityHint: "Navigate to patch editing interface",
+            }),
+          }}
+        />
+      )}
+      {userOptions.visibleTabs.library && (
+        <RootTab.Screen
+          name="LibraryPatchList"
+          component={LibraryPatchListScreen}
+          options={{
+            title: "Library",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="library" size={24} color={color} />
+            ),
+            ...(Platform.OS === "web" && {
+              tabBarAccessibilityLabel: "Patch library",
+              tabBarAccessibilityHint: "Browse and manage saved patches",
+            }),
+          }}
+        />
+      )}
+      {userOptions.visibleTabs.system && (
+        <RootTab.Screen
+          name="System"
+          component={SystemScreen}
+          options={{
+            title: "System",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="settings-outline" size={24} color={color} />
+            ),
+            ...(Platform.OS === "web" && {
+              tabBarAccessibilityLabel: "System settings",
+              tabBarAccessibilityHint: "Configure global system parameters",
+            }),
+          }}
+        />
+      )}
       <RootTab.Screen
         name="SetupStack"
         component={SetupStackNavigator}
         options={{
           headerShown: false,
-          title: "Setup",
+          title: "Settings",
           tabBarIcon: ({ color }) => (
             <Ionicons name="settings" size={24} color={color} />
           ),
           ...(Platform.OS === "web" && {
-            tabBarAccessibilityLabel: "Application setup",
+            tabBarAccessibilityLabel: "Application settings",
             tabBarAccessibilityHint:
               "Configure application settings and preferences",
           }),

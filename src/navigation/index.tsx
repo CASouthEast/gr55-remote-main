@@ -72,7 +72,7 @@ export type PatchAssignsTabParamList = {
 };
 
 export type SetupStackParamList = {
-  IoSetup: object;
+  Settings: object;
   BluetoothSettings: object;
 };
 

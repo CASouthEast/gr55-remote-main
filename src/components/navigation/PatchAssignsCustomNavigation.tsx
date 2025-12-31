@@ -224,7 +224,7 @@ function Assign8Wrapper() {
   return <PatchAssignScreen assignKey="Assign8" />;
 }
 
-const tabs: {
+export const patchAssignsTabs: {
   key: keyof PatchAssignsTabParamList;
   title: string;
   component: React.ComponentType<any>;
@@ -315,7 +315,8 @@ export function PatchAssignsCustomNavigation(): JSX.Element {
   }
 
   const ActiveComponent =
-    tabs.find((tab) => tab.key === activeTab)?.component || Assign1Wrapper;
+    patchAssignsTabs.find((tab) => tab.key === activeTab)?.component ||
+    Assign1Wrapper;
 
   return (
     <View style={styles.container}>
@@ -326,7 +327,7 @@ export function PatchAssignsCustomNavigation(): JSX.Element {
           { backgroundColor: theme.colors.assigns.tabBarBackground },
         ]}
       >
-        {tabs.map((tab) => {
+        {patchAssignsTabs.map((tab) => {
           const isAssigned = getAssignedState(tab.title);
           return (
             <TouchableOpacity

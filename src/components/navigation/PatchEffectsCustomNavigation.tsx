@@ -136,7 +136,7 @@ function PatchEffectsEQWrapper() {
   return <PatchEffectsEQScreen {...mockProps} />;
 }
 
-const tabs: {
+export const patchEffectsTabs: {
   key: keyof PatchEffectsTabParamList;
   title: string;
   component: React.ComponentType<any>;
@@ -156,14 +156,14 @@ export function PatchEffectsCustomNavigation(): JSX.Element {
     useState<keyof PatchEffectsTabParamList>("Struct");
 
   const ActiveComponent =
-    tabs.find((tab) => tab.key === activeTab)?.component ||
+    patchEffectsTabs.find((tab) => tab.key === activeTab)?.component ||
     PatchEffectsStructureWrapper;
 
   return (
     <View style={styles.container}>
       {/* Custom Tab Bar */}
       <View style={styles.tabBar}>
-        {tabs.map((tab) => (
+        {patchEffectsTabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[styles.tab, activeTab === tab.key && styles.activeTab]}

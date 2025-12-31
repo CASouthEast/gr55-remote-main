@@ -56,9 +56,10 @@ function useStateWithStoredDefault<T extends Serializable>(
     [setStoredValue]
   );
   let effectiveValue = value;
-  if (value == null && storedValue != null) {
+  if (effectiveValue == null && storedValue != null) {
     effectiveValue = storedValue;
-  } else if (storageReadStatus === "rejected" && defaultIfNotStored != null) {
+  }
+  if (effectiveValue == null && defaultIfNotStored != null) {
     effectiveValue = defaultIfNotStored;
   }
   return [effectiveValue, setValue, storageReadStatus] as const;

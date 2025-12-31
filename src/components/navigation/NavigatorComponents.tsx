@@ -5,18 +5,18 @@ import {
   BluetoothSettingsScreen,
   canShowBluetoothSettings,
 } from "../../screens/BluetoothSettingsScreen";
-import { IoSetupScreen } from "../../screens/IoSetupScreen";
+import { SettingsScreen } from "../../screens/SettingsScreen";
 import { SetupStackParamList } from "../navigation";
 
 const SetupStack = createNativeStackNavigator<SetupStackParamList>();
 
 export function SetupStackNavigator() {
   return (
-    <SetupStack.Navigator initialRouteName="IoSetup" id="SetupStack">
+    <SetupStack.Navigator initialRouteName="Settings" id="SetupStack">
       <SetupStack.Screen
-        name="IoSetup"
-        component={IoSetupScreen}
-        options={{ title: "Setup" }}
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: "Settings" }}
       />
       {canShowBluetoothSettings ? (
         <SetupStack.Screen
