@@ -1,37 +1,45 @@
 import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useCallback, useContext } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { ThemeVariantProvider, useThemedColors } from "../../components/Theme";
+import { ThemedText as Text } from "../../components/ThemedText";
+import { Section } from "../../components/fields/Section";
 import { PatchEffectsTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSegmentedSwitch } from "../../components/remote-fields/RemoteFieldSegmentedSwitch";
 import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSlider";
 import { RemoteFieldSwitch } from "../../components/remote-fields/RemoteFieldSwitch";
 import { RemoteFieldSwitchedSection } from "../../components/remote-fields/RemoteFieldSwitchedSection";
+import { ThemedCard } from "../../components/ui/ThemedCard";
 import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../hooks/useRemoteField";
 import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/RolandGR55AddressMap";
 import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
-export function PatchEffectsModScreen({
+export function PatchEffectsModScreen(
+  props: MaterialTopTabScreenProps<PatchEffectsTabParamList, "Mod">
+) {
+  return (
+    <ThemeVariantProvider variant="orange">
+      <PatchEffectsModScreenContent {...props} />
+    </ThemeVariantProvider>
+  );
+}
+
+function PatchEffectsModScreenContent({
   navigation,
+  route,
 }: MaterialTopTabScreenProps<PatchEffectsTabParamList, "Mod">) {
   const { reloadData } = useContext(PATCH);
+  const colors = useThemedColors();
 
   const [modType, setModType] = useRemoteField(
     PATCH,
     GR55.temporaryPatch.ampModNs.modType
   );
-
-  // modSwitch is controlled by RemoteFieldSwitch inside the switched section
 
   // Get the appropriate level field based on the current effect type
   const getCurrentLevelField = useCallback(() => {
@@ -72,7 +80,6 @@ export function PatchEffectsModScreen({
   const handleModTypeChange = useCallback(
     (value: typeof modType) => {
       setModType(value);
-      // TODO: Reset mod control min/max fields to appropriate values based on mod type
     },
     [setModType]
   );
@@ -386,20 +393,31 @@ export function PatchEffectsModScreen({
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={reloadData} />
       }
-      style={safeAreaStyle}
+      style={[safeAreaStyle, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
     >
-      <View style={styles.card}>
+      <ThemedCard>
         {/* Header with title, effect type badge, and switch */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.title}>MOD</Text>
-            <View style={styles.effectTypeBadge}>
-              <Text style={styles.effectTypeText}>{modType}</Text>
+            <View
+              style={[
+                styles.effectTypeBadge,
+                { backgroundColor: colors.badgeBackground },
+              ]}
+            >
+              <Text
+                style={[styles.effectTypeText, { color: colors.badgeText }]}
+              >
+                {modType}
+              </Text>
             </View>
           </View>
           <View style={styles.headerRight}>
-            <Text style={styles.switchLabel}>ON</Text>
+            <Text style={[styles.switchLabel, { color: colors.badgeText }]}>
+              ON
+            </Text>
             <RemoteFieldSwitch
               page={PATCH}
               field={GR55.temporaryPatch.ampModNs.modSwitch}
@@ -408,60 +426,82 @@ export function PatchEffectsModScreen({
         </View>
 
         {/* Level section with slider and numeric input */}
-        <View style={styles.section}>
+        <Section heading="Level" noBorder>
           <View style={styles.levelHeader}>
-            <Text style={styles.fieldLabel}>Level</Text>
             <View style={styles.levelValueContainer}>
-              <Text style={styles.levelInput}>
+              <Text
+                style={[
+                  styles.levelInput,
+                  {
+                    backgroundColor: colors.badgeBackground,
+                    color: colors.badgeText,
+                    borderColor: colors.accent,
+                  },
+                ]}
+              >
                 {typeof modLevel === "number"
                   ? String(modLevel)
                   : String(modLevel ?? "")}
               </Text>
-              <TouchableOpacity style={styles.resetButton}>
-                <Text style={styles.resetButtonText}>↻</Text>
+              <TouchableOpacity
+                style={[
+                  styles.resetButton,
+                  {
+                    backgroundColor: colors.badgeBackground,
+                    borderColor: colors.accent,
+                  },
+                ]}
+              >
+                <Text
+                  style={[styles.resetButtonText, { color: colors.badgeText }]}
+                >
+                  ↻
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
           <RemoteFieldSlider page={PATCH} field={getCurrentLevelField()} />
-        </View>
+        </Section>
 
         {/* Effect Type Picker */}
-        <View style={styles.section}>
-          <Text style={styles.fieldLabel}>Effect Type</Text>
+        <Section heading="Effect Type" noBorder>
           <RemoteFieldPicker
             page={PATCH}
             field={GR55.temporaryPatch.ampModNs.modType}
             value={modType}
             onValueChange={handleModTypeChange}
           />
-        </View>
+        </Section>
 
         {/* Parameters section - dynamic based on effect type */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Parameters</Text>
+        <Section heading="Parameters">
           {renderEffectParameters(modType)}
-        </View>
+        </Section>
 
         {/* Pan control */}
-        <View style={styles.section}>
-          <View style={styles.levelHeader}>
-            <Text style={styles.fieldLabel}>Pan</Text>
-            <Text style={styles.parameterValue}>50</Text>
-          </View>
+        <Section heading="Pan" noBorder>
           <RemoteFieldSlider
             page={PATCH}
             field={GR55.temporaryPatch.ampModNs.modPan}
           />
-        </View>
+        </Section>
 
         {/* Reset to Original button */}
-        <TouchableOpacity style={styles.resetToOriginalButton}>
-          <Text style={styles.resetToOriginalText}>↻ Reset to Original</Text>
+        <TouchableOpacity
+          style={[
+            styles.resetToOriginalButton,
+            { backgroundColor: colors.badgeBackground },
+          ]}
+        >
+          <Text
+            style={[styles.resetToOriginalText, { color: colors.badgeText }]}
+          >
+            ↻ Reset to Original
+          </Text>
         </TouchableOpacity>
 
         {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Section heading="Quick Actions" noBorder>
           <View style={styles.quickActionsContainer}>
             <TouchableOpacity style={styles.copyButton}>
               <Text style={styles.copyButtonText}>📋 Copy</Text>
@@ -492,43 +532,45 @@ export function PatchEffectsModScreen({
               </TouchableOpacity>
             ))}
           </View>
-        </View>
-      </View>
+        </Section>
+      </ThemedCard>
 
       {/* Noise Suppressor section */}
       <RemoteFieldSwitchedSection
         page={PATCH}
         field={GR55.temporaryPatch.ampModNs.nsSwitch}
       >
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Noise Suppressor</Text>
-          <RemoteFieldSlider
-            page={PATCH}
-            field={GR55.temporaryPatch.ampModNs.nsThreshold}
-          />
-          <RemoteFieldSlider
-            page={PATCH}
-            field={GR55.temporaryPatch.ampModNs.nsReleaseTime}
-          />
-        </View>
+        <ThemedCard>
+          <Section heading="Noise Suppressor" noBorder>
+            <RemoteFieldSlider
+              page={PATCH}
+              field={GR55.temporaryPatch.ampModNs.nsThreshold}
+            />
+            <RemoteFieldSlider
+              page={PATCH}
+              field={GR55.temporaryPatch.ampModNs.nsReleaseTime}
+            />
+          </Section>
+        </ThemedCard>
       </RemoteFieldSwitchedSection>
 
       {/* Send Levels */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Send Levels</Text>
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.modDelaySendLevel}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.modReverbSendLevel}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={GR55.temporaryPatch.ampModNs.modChorusSendLevel}
-        />
-      </View>
+      <ThemedCard>
+        <Section heading="Send Levels" noBorder>
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.modDelaySendLevel}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.modReverbSendLevel}
+          />
+          <RemoteFieldSlider
+            page={PATCH}
+            field={GR55.temporaryPatch.ampModNs.modChorusSendLevel}
+          />
+        </Section>
+      </ThemedCard>
     </PopoverAwareScrollView>
   );
 }
@@ -581,32 +623,11 @@ function WahSection() {
     </>
   );
 }
+
 const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     alignItems: "center",
-  },
-  card: {
-    borderRadius: 16,
-    backgroundColor: "#fff",
-    padding: 20,
-    marginBottom: 16,
-    elevation: 4,
-    ...Platform.select({
-      web: {
-        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
-      },
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {},
-      default: {},
-    }),
-    maxWidth: 600,
-    width: "100%",
   },
   header: {
     flexDirection: "row",
@@ -625,13 +646,11 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   effectTypeBadge: {
-    backgroundColor: "#FFF5EB",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
   effectTypeText: {
-    color: "#FF8A00",
     fontSize: 12,
     fontWeight: "600",
   },
@@ -646,21 +665,11 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 12,
-    color: "#FF8A00",
     fontWeight: "600",
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 12,
   },
   levelHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 8,
   },
@@ -670,41 +679,24 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   levelInput: {
-    backgroundColor: "#FFF5EB",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
     textAlign: "center",
     fontSize: 14,
     fontWeight: "600",
-    color: "#FF8A00",
     minWidth: 50,
     borderWidth: 1,
-    borderColor: "#FF8A00",
   },
   resetButton: {
-    backgroundColor: "#FFF5EB",
     borderRadius: 6,
     padding: 6,
     borderWidth: 1,
-    borderColor: "#FF8A00",
   },
   resetButtonText: {
     fontSize: 16,
-    color: "#FF8A00",
-  },
-  fieldLabel: {
-    fontSize: 14,
-    color: "#666",
-    fontWeight: "500",
-  },
-  parameterValue: {
-    fontSize: 14,
-    color: "#FF8A00",
-    fontWeight: "600",
   },
   resetToOriginalButton: {
-    backgroundColor: "#FFF5EB",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -712,7 +704,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetToOriginalText: {
-    color: "#FF8A00",
     fontSize: 14,
     fontWeight: "600",
   },

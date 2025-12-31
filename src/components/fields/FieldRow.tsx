@@ -15,6 +15,7 @@ import {
 import { useAnimation } from "react-native-animation-hooks";
 
 import { FieldStyles } from "./FieldStyles";
+import { useThemedColors } from "../Theme";
 import { AnimatedThemedText } from "../ThemedText";
 
 export const FieldRow = function FieldRow({
@@ -90,7 +91,8 @@ export const FieldRow = function FieldRow({
     duration: isPressed ? 0 : 300,
     useNativeDriver: true,
   });
-  const { colors } = useTheme();
+  const { colors: baseColors } = useTheme();
+  const colors = useThemedColors();
   return (
     <FieldRowContext.Provider value={fieldRowContext}>
       {inline ? (
@@ -102,7 +104,7 @@ export const FieldRow = function FieldRow({
           ref={viewRef}
           style={[
             FieldStyles.fieldRow,
-            { borderBottomColor: colors.border },
+            { borderBottomColor: colors.accent + "33" }, // 20% opacity accent
             isAssigned && FieldStyles.fieldRowAssigned,
           ]}
         >
@@ -116,6 +118,7 @@ export const FieldRow = function FieldRow({
             <AnimatedThemedText
               style={[
                 FieldStyles.fieldDescription,
+                { color: colors.mutedText },
                 isAssigned && FieldStyles.fieldDescriptionAssigned,
                 { opacity: touchOpacity },
               ]}

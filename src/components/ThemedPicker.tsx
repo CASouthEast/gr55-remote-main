@@ -1,7 +1,7 @@
-import { useTheme } from "@react-navigation/native";
 import { forwardRef } from "react";
 
 import { Picker } from "./Picker/Picker";
+import { useThemedColors } from "./Theme";
 
 export const ThemedPicker = forwardRef(function ThemedPicker<T>(
   {
@@ -11,15 +11,21 @@ export const ThemedPicker = forwardRef(function ThemedPicker<T>(
   }: React.ComponentPropsWithoutRef<typeof Picker<T>>,
   ref: React.ForwardedRef<Picker<T>>
 ) {
-  const { colors } = useTheme();
+  const colors = useThemedColors();
   return (
     <Picker
       itemStyle={[{ color: colors.text }, itemStyle]}
       style={[
-        { color: colors.text, backgroundColor: colors.background },
+        {
+          color: colors.accent,
+          backgroundColor: colors.badgeBackground,
+          borderColor: colors.accent,
+          borderWidth: 1,
+          borderRadius: 8,
+        },
         style,
       ]}
-      dropdownIconColor={colors.text}
+      dropdownIconColor={colors.accent}
       {...props}
       ref={ref}
     />

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Button } from "react-native";
 
 import { RolandRemotePatchContext as PATCH } from "../../contexts/RolandRemotePageContext";
 import { useRemoteField } from "../../hooks/useRemoteField";
@@ -17,11 +17,15 @@ import { RolandGR55AddressMapAbsolute as GR55 } from "../../lib/roland-gr55/Rola
 import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 import { PopoverAwareScrollView } from "../PopoverAwareScrollView";
 import { RefreshControl } from "../RefreshControl";
+import { ThemeVariantProvider, useThemedColors } from "../Theme";
+import { ThemedText as Text } from "../ThemedText";
+import { Section } from "../fields/Section";
 import { PatchMasterPedalGkCtlTabParamList } from "../navigation";
 import { RemoteFieldDynamic } from "../remote-fields/RemoteFieldDynamic";
 import { RemoteFieldPicker } from "../remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../remote-fields/RemoteFieldSlider";
 import { RemoteFieldSwitch } from "../remote-fields/RemoteFieldSwitch";
+import { ThemedCard } from "../ui/ThemedCard";
 
 // Helper functions from original file
 function useModControlField(minOrMaxField: FieldReference<NumericField>) {
@@ -119,14 +123,17 @@ function useModControlField(minOrMaxField: FieldReference<NumericField>) {
 // Button config screen component
 function ButtonConfigScreen({
   button,
+  title,
 }: {
   button:
     | typeof GR55.temporaryPatch.common.ctl
     | typeof GR55.temporaryPatch.common.expSw
     | typeof GR55.temporaryPatch.common.gkS1
     | typeof GR55.temporaryPatch.common.gkS2;
+  title: string;
 }) {
   const { reloadData } = useContext(PATCH);
+  const colors = useThemedColors();
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
   const [function_, setFunction] = useRemoteField(PATCH, button.function);
 
@@ -135,41 +142,57 @@ function ButtonConfigScreen({
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={reloadData} />
       }
-      style={[styles.container]}
-      contentContainerStyle={safeAreaStyle}
+      style={[safeAreaStyle, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
     >
-      {"status" in button && (
-        <RemoteFieldSwitch page={PATCH} field={button.status} />
-      )}
-      <RemoteFieldPicker
-        page={PATCH}
-        field={button.function}
-        value={function_}
-        onValueChange={setFunction}
-      />
-      {"holdType" in button && function_ === "HOLD" && (
-        <>
-          <RemoteFieldPicker page={PATCH} field={button.holdType} />
-          <RemoteFieldPicker page={PATCH} field={button.holdSwitchMode} />
-          <RemoteFieldSwitch page={PATCH} field={button.holdPcmTone1} />
-          <RemoteFieldSwitch page={PATCH} field={button.holdPcmTone2} />
-        </>
-      )}
-      {function_ === "TONE SW" && (
-        <>
-          <RemoteFieldSwitch page={PATCH} field={button.offPcmTone1Switch} />
-          <RemoteFieldSwitch page={PATCH} field={button.offPcmTone2Switch} />
-          <RemoteFieldSwitch
+      <ThemedCard>
+        <Section heading={title} noBorder>
+          {"status" in button && (
+            <RemoteFieldSwitch page={PATCH} field={button.status} />
+          )}
+          <RemoteFieldPicker
             page={PATCH}
-            field={button.offModelingToneSwitch}
+            field={button.function}
+            value={function_}
+            onValueChange={setFunction}
           />
-          <RemoteFieldSwitch page={PATCH} field={button.offNormalPuSwitch} />
-          <RemoteFieldSwitch page={PATCH} field={button.onPcmTone1Switch} />
-          <RemoteFieldSwitch page={PATCH} field={button.onPcmTone2Switch} />
-          <RemoteFieldSwitch page={PATCH} field={button.onModelingToneSwitch} />
-          <RemoteFieldSwitch page={PATCH} field={button.onNormalPuSwitch} />
-        </>
-      )}
+          {"holdType" in button && function_ === "HOLD" && (
+            <>
+              <RemoteFieldPicker page={PATCH} field={button.holdType} />
+              <RemoteFieldPicker page={PATCH} field={button.holdSwitchMode} />
+              <RemoteFieldSwitch page={PATCH} field={button.holdPcmTone1} />
+              <RemoteFieldSwitch page={PATCH} field={button.holdPcmTone2} />
+            </>
+          )}
+          {function_ === "TONE SW" && (
+            <>
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={button.offPcmTone1Switch}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={button.offPcmTone2Switch}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={button.offModelingToneSwitch}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={button.offNormalPuSwitch}
+              />
+              <RemoteFieldSwitch page={PATCH} field={button.onPcmTone1Switch} />
+              <RemoteFieldSwitch page={PATCH} field={button.onPcmTone2Switch} />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={button.onModelingToneSwitch}
+              />
+              <RemoteFieldSwitch page={PATCH} field={button.onNormalPuSwitch} />
+            </>
+          )}
+        </Section>
+      </ThemedCard>
     </PopoverAwareScrollView>
   );
 }
@@ -179,6 +202,7 @@ function PedalOrKnobConfigScreen({
   pedalOrKnob,
   modControlMinField,
   modControlMaxField,
+  title,
 }: {
   pedalOrKnob:
     | typeof GR55.temporaryPatch.common.expPdlOff
@@ -186,8 +210,10 @@ function PedalOrKnobConfigScreen({
     | typeof GR55.temporaryPatch.common.gkVol;
   modControlMinField: FieldReference<NumericField>;
   modControlMaxField: FieldReference<NumericField>;
+  title: string;
 }) {
   const { reloadData } = useContext(PATCH);
+  const colors = useThemedColors();
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
   const [function_, setFunction] = useRemoteField(PATCH, pedalOrKnob.function);
 
@@ -196,110 +222,138 @@ function PedalOrKnobConfigScreen({
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={reloadData} />
       }
-      style={[styles.container]}
-      contentContainerStyle={safeAreaStyle}
+      style={[safeAreaStyle, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
     >
-      <RemoteFieldPicker
-        page={PATCH}
-        field={pedalOrKnob.function}
-        value={function_}
-        onValueChange={setFunction}
-      />
-      {function_ === "TONE VOLUME" && (
-        <>
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.volumeSwitchPCMTone1}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.volumeSwitchPCMTone2}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.volumeSwitchModelingTone}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.volumeSwitchNormalPU}
-          />
-        </>
-      )}
-      {function_ === "PITCH BEND" && (
-        <>
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.bendRange} />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.bendSwitchPCMTone1}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.bendSwitchPCMTone2}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.bendSwitchModelingTone}
-          />
-        </>
-      )}
-      {function_ === "MODULATION" && (
-        <>
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.modulationMin} />
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.modulationMax} />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.modulationSwitchPCMTone1}
-          />
-          <RemoteFieldSwitch
-            page={PATCH}
-            field={pedalOrKnob.modulationSwitchPCMTone2}
-          />
-        </>
-      )}
-      {function_ === "CROSS FADER" && (
-        <>
+      <ThemedCard>
+        <Section heading={title} noBorder>
           <RemoteFieldPicker
             page={PATCH}
-            field={pedalOrKnob.xfadePolarityPCMTone1}
+            field={pedalOrKnob.function}
+            value={function_}
+            onValueChange={setFunction}
           />
-          <RemoteFieldPicker
-            page={PATCH}
-            field={pedalOrKnob.xfadePolarityPCMTone2}
-          />
-          <RemoteFieldPicker
-            page={PATCH}
-            field={pedalOrKnob.xfadePolarityModelingTone}
-          />
-          <RemoteFieldPicker
-            page={PATCH}
-            field={pedalOrKnob.xfadePolarityNormalPU}
-          />
-        </>
-      )}
-      {function_ === "DELAY LEVEL" && (
-        <>
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.delayLevelMin} />
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.delayLevelMax} />
-        </>
-      )}
-      {function_ === "REVERB LEVEL" && (
-        <>
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.reverbLevelMin} />
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.reverbLevelMax} />
-        </>
-      )}
-      {function_ === "CHORUS LEVEL" && (
-        <>
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.chorusLevelMin} />
-          <RemoteFieldSlider page={PATCH} field={pedalOrKnob.chorusLevelMax} />
-        </>
-      )}
-      {function_ === "MOD CONTROL" && (
-        <ModControlSection
-          modControlMinField={modControlMinField}
-          modControlMaxField={modControlMaxField}
-        />
-      )}
+          {function_ === "TONE VOLUME" && (
+            <>
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.volumeSwitchPCMTone1}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.volumeSwitchPCMTone2}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.volumeSwitchModelingTone}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.volumeSwitchNormalPU}
+              />
+            </>
+          )}
+          {function_ === "PITCH BEND" && (
+            <>
+              <RemoteFieldSlider page={PATCH} field={pedalOrKnob.bendRange} />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.bendSwitchPCMTone1}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.bendSwitchPCMTone2}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.bendSwitchModelingTone}
+              />
+            </>
+          )}
+          {function_ === "MODULATION" && (
+            <>
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.modulationMin}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.modulationMax}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.modulationSwitchPCMTone1}
+              />
+              <RemoteFieldSwitch
+                page={PATCH}
+                field={pedalOrKnob.modulationSwitchPCMTone2}
+              />
+            </>
+          )}
+          {function_ === "CROSS FADER" && (
+            <>
+              <RemoteFieldPicker
+                page={PATCH}
+                field={pedalOrKnob.xfadePolarityPCMTone1}
+              />
+              <RemoteFieldPicker
+                page={PATCH}
+                field={pedalOrKnob.xfadePolarityPCMTone2}
+              />
+              <RemoteFieldPicker
+                page={PATCH}
+                field={pedalOrKnob.xfadePolarityModelingTone}
+              />
+              <RemoteFieldPicker
+                page={PATCH}
+                field={pedalOrKnob.xfadePolarityNormalPU}
+              />
+            </>
+          )}
+          {function_ === "DELAY LEVEL" && (
+            <>
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.delayLevelMin}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.delayLevelMax}
+              />
+            </>
+          )}
+          {function_ === "REVERB LEVEL" && (
+            <>
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.reverbLevelMin}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.reverbLevelMax}
+              />
+            </>
+          )}
+          {function_ === "CHORUS LEVEL" && (
+            <>
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.chorusLevelMin}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={pedalOrKnob.chorusLevelMax}
+              />
+            </>
+          )}
+          {function_ === "MOD CONTROL" && (
+            <ModControlSection
+              modControlMinField={modControlMinField}
+              modControlMaxField={modControlMaxField}
+            />
+          )}
+        </Section>
+      </ThemedCard>
     </PopoverAwareScrollView>
   );
 }
@@ -342,7 +396,9 @@ function ModControlSection({
 
 // Individual screen wrappers
 function CtlWrapper() {
-  return <ButtonConfigScreen button={GR55.temporaryPatch.common.ctl} />;
+  return (
+    <ButtonConfigScreen button={GR55.temporaryPatch.common.ctl} title="Ctl" />
+  );
 }
 
 function ExpWrapper() {
@@ -351,6 +407,7 @@ function ExpWrapper() {
       pedalOrKnob={GR55.temporaryPatch.common.expPdlOff}
       modControlMinField={GR55.temporaryPatch.common.expPdlOffModControlMin}
       modControlMaxField={GR55.temporaryPatch.common.expPdlOffModControlMax}
+      title="Exp"
     />
   );
 }
@@ -361,20 +418,36 @@ function ExpOnWrapper() {
       pedalOrKnob={GR55.temporaryPatch.common.expPdlOn}
       modControlMinField={GR55.temporaryPatch.common.expPdlOnModControlMin}
       modControlMaxField={GR55.temporaryPatch.common.expPdlOnModControlMax}
+      title="Exp On"
     />
   );
 }
 
 function ExpSwWrapper() {
-  return <ButtonConfigScreen button={GR55.temporaryPatch.common.expSw} />;
+  return (
+    <ButtonConfigScreen
+      button={GR55.temporaryPatch.common.expSw}
+      title="Exp Sw"
+    />
+  );
 }
 
 function GkS1Wrapper() {
-  return <ButtonConfigScreen button={GR55.temporaryPatch.common.gkS1} />;
+  return (
+    <ButtonConfigScreen
+      button={GR55.temporaryPatch.common.gkS1}
+      title="GK S1"
+    />
+  );
 }
 
 function GkS2Wrapper() {
-  return <ButtonConfigScreen button={GR55.temporaryPatch.common.gkS2} />;
+  return (
+    <ButtonConfigScreen
+      button={GR55.temporaryPatch.common.gkS2}
+      title="GK S2"
+    />
+  );
 }
 
 function GkVolWrapper() {
@@ -383,6 +456,7 @@ function GkVolWrapper() {
       pedalOrKnob={GR55.temporaryPatch.common.gkVol}
       modControlMinField={GR55.temporaryPatch.common.gkVolModControlMin}
       modControlMaxField={GR55.temporaryPatch.common.gkVolModControlMax}
+      title="GK Vol"
     />
   );
 }
@@ -402,27 +476,46 @@ export const patchMasterPedalGkCtlTabs: {
 ];
 
 export function PatchMasterPedalGkCtlCustomNavigation(): JSX.Element {
+  return (
+    <ThemeVariantProvider variant="neutral">
+      <PatchMasterPedalGkCtlCustomNavigationContent />
+    </ThemeVariantProvider>
+  );
+}
+
+function PatchMasterPedalGkCtlCustomNavigationContent(): JSX.Element {
   const [activeTab, setActiveTab] =
     useState<keyof PatchMasterPedalGkCtlTabParamList>("Ctl");
+  const colors = useThemedColors();
 
   const ActiveComponent =
     patchMasterPedalGkCtlTabs.find((tab) => tab.key === activeTab)?.component ||
     CtlWrapper;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Custom Tab Bar */}
-      <View style={styles.tabBar}>
+      <View
+        style={[styles.tabBar, { borderBottomColor: colors.accent + "33" }]}
+      >
         {patchMasterPedalGkCtlTabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            style={[styles.tab, activeTab === tab.key && styles.activeTab]}
+            style={[
+              styles.tab,
+              activeTab === tab.key && {
+                backgroundColor: colors.accent + "11",
+              },
+            ]}
             onPress={() => setActiveTab(tab.key)}
           >
             <Text
               style={[
                 styles.tabText,
-                activeTab === tab.key && styles.activeTabText,
+                activeTab === tab.key && {
+                  color: colors.accent,
+                  fontWeight: "bold",
+                },
               ]}
             >
               {tab.title}
@@ -432,7 +525,7 @@ export function PatchMasterPedalGkCtlCustomNavigation(): JSX.Element {
       </View>
 
       {/* Active Tab Indicator */}
-      <View style={styles.indicator} />
+      <View style={[styles.indicator, { backgroundColor: colors.accent }]} />
 
       {/* Screen Content */}
       <View style={styles.content}>
@@ -445,13 +538,10 @@ export function PatchMasterPedalGkCtlCustomNavigation(): JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
   },
   tabBar: {
     flexDirection: "row",
-    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
     height: 50,
   },
   tab: {
@@ -459,10 +549,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 12,
-    backgroundColor: "#ffffff",
-  },
-  activeTab: {
-    backgroundColor: "#f0f0f0",
   },
   tabText: {
     fontSize: 14,
@@ -470,17 +556,15 @@ const styles = StyleSheet.create({
     color: "#666666",
     textAlign: "center",
   },
-  activeTabText: {
-    color: "#007AFF",
-    fontWeight: "bold",
-  },
   indicator: {
     height: 3,
-    backgroundColor: "#007AFF",
     width: "100%",
   },
   content: {
     flex: 1,
-    backgroundColor: "#ffffff",
+  },
+  scrollContent: {
+    padding: 16,
+    alignItems: "center",
   },
 });

@@ -5,15 +5,14 @@ import { Button } from "@rneui/themed";
 import { useCallback, useContext, useEffect } from "react";
 import { Platform, StyleSheet, Switch, View } from "react-native";
 
-import {
-  BluetoothSettingsScreen,
-  canShowBluetoothSettings,
-} from "./BluetoothSettingsScreen";
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
+import { ThemeVariantProvider, useThemedColors } from "../components/Theme";
 import { ThemedPicker as Picker } from "../components/ThemedPicker";
-import { ThemedText as Text } from "../components/ThemedText";
 import { useUserOptions } from "../components/UserOptions";
+import { FieldRow } from "../components/fields/FieldRow";
+import { Section } from "../components/fields/Section";
 import { SetupStackParamList } from "../components/navigation";
+import { ThemedCard } from "../components/ui/ThemedCard";
 import { RolandIoSetupContext } from "../lib/RolandIoSetup";
 import { MidiIoSetupContext } from "../services/MidiIo";
 import { useMainScrollViewSafeAreaStyle } from "../utils/SafeAreaUtils";
@@ -33,7 +32,7 @@ export function SettingsScreen({
   const rolandIoSetupContext = useContext(RolandIoSetupContext);
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
   const [userOptions, setUserOptions] = useUserOptions();
-  const theme = useTheme();
+  const baseTheme = useTheme();
 
   const setEnableExperimentalFeatures = useCallback(
     (enableExperimentalFeatures: boolean) =>
@@ -70,159 +69,194 @@ export function SettingsScreen({
             <MaterialCommunityIcons
               name="bluetooth"
               size={24}
-              color={tintColor ?? theme.colors.primary}
+              color={tintColor ?? baseTheme.colors.primary}
             />
           </Button>
         ),
       });
     }
-  }, [navigation, theme.colors.primary]);
+  }, [navigation, baseTheme.colors.primary]);
+
+  return (
+    <ThemeVariantProvider variant="neutral">
+      <SettingsScreenContent
+        navigation={navigation}
+        inputs={inputs}
+        outputs={outputs}
+        currentInputId={currentInputId}
+        setCurrentInputId={setCurrentInputId}
+        currentOutputId={currentOutputId}
+        setCurrentOutputId={setCurrentOutputId}
+        rolandIoSetupContext={rolandIoSetupContext}
+        userOptions={userOptions}
+        toggleTabVisibility={toggleTabVisibility}
+        setWebTabBarPosition={setWebTabBarPosition}
+        setEnableExperimentalFeatures={setEnableExperimentalFeatures}
+        safeAreaStyle={safeAreaStyle}
+      />
+    </ThemeVariantProvider>
+  );
+}
+
+const canShowBluetoothSettings =
+  Platform.OS === "ios" || Platform.OS === "android";
+
+function SettingsScreenContent({
+  inputs,
+  outputs,
+  currentInputId,
+  setCurrentInputId,
+  currentOutputId,
+  setCurrentOutputId,
+  rolandIoSetupContext,
+  userOptions,
+  toggleTabVisibility,
+  setWebTabBarPosition,
+  setEnableExperimentalFeatures,
+  safeAreaStyle,
+}: any) {
+  const colors = useThemedColors();
 
   return (
     <PopoverAwareScrollView
-      style={styles.container}
-      contentContainerStyle={safeAreaStyle}
+      style={[safeAreaStyle, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
     >
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Navigation</Text>
-        <View style={styles.row}>
-          <Text>Show Patch Tab</Text>
-          <Switch
-            value={userOptions.visibleTabs.patch}
-            onValueChange={() => toggleTabVisibility("patch")}
-          />
-        </View>
-        <View style={styles.row}>
-          <Text>Show Library Tab</Text>
-          <Switch
-            value={userOptions.visibleTabs.library}
-            onValueChange={() => toggleTabVisibility("library")}
-          />
-        </View>
-        <View style={styles.row}>
-          <Text>Show System Tab</Text>
-          <Switch
-            value={userOptions.visibleTabs.system}
-            onValueChange={() => toggleTabVisibility("system")}
-          />
-        </View>
-      </View>
+      <View style={styles.cardWrapper}>
+        <ThemedCard>
+          <Section heading="Navigation">
+            <FieldRow description="Show Patch Tab">
+              <Switch
+                value={userOptions.visibleTabs.patch}
+                onValueChange={() => toggleTabVisibility("patch")}
+              />
+            </FieldRow>
+            <FieldRow description="Show Library Tab">
+              <Switch
+                value={userOptions.visibleTabs.library}
+                onValueChange={() => toggleTabVisibility("library")}
+              />
+            </FieldRow>
+            <FieldRow description="Show System Tab">
+              <Switch
+                value={userOptions.visibleTabs.system}
+                onValueChange={() => toggleTabVisibility("system")}
+              />
+            </FieldRow>
+          </Section>
+        </ThemedCard>
 
-      {Platform.OS === "web" && (
-        <View style={styles.section}>
-          <Text style={styles.sectionHeader}>Appearance (Web)</Text>
-          <View style={styles.row}>
-            <Text>Menu Position</Text>
-            <Picker
-              selectedValue={userOptions.webTabBarPosition}
-              onValueChange={(val) =>
-                setWebTabBarPosition(val as "top" | "bottom")
-              }
-            >
-              <Picker.Item label="Top" value="top" />
-              <Picker.Item label="Bottom" value="bottom" />
-            </Picker>
-          </View>
-        </View>
-      )}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>MIDI Connections</Text>
-        {inputs && outputs && (
-          <>
-            <Text style={styles.label}>Input</Text>
-            <Picker
-              onValueChange={setCurrentInputId}
-              selectedValue={currentInputId}
-            >
-              {[...inputs.entries()].map(([key, input]) => (
-                <Picker.Item label={input.name} key={key} value={key} />
-              ))}
-            </Picker>
-            <Text style={styles.label}>Output</Text>
-            <Picker
-              onValueChange={setCurrentOutputId}
-              selectedValue={currentOutputId}
-            >
-              {[...outputs.entries()].map(([key, output]) => (
-                <Picker.Item label={output.name} key={key} value={key} />
-              ))}
-            </Picker>
-          </>
+        {Platform.OS === "web" && (
+          <ThemedCard>
+            <Section heading="Appearance (Web)">
+              <FieldRow description="Menu Position">
+                <Picker
+                  selectedValue={userOptions.webTabBarPosition}
+                  onValueChange={(val) =>
+                    setWebTabBarPosition(val as "top" | "bottom")
+                  }
+                >
+                  <Picker.Item label="Top" value="top" />
+                  <Picker.Item label="Bottom" value="bottom" />
+                </Picker>
+              </FieldRow>
+            </Section>
+          </ThemedCard>
         )}
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Device</Text>
-        <Text style={styles.label}>Connected devices</Text>
-        <Picker
-          onValueChange={rolandIoSetupContext.setSelectedDeviceKey}
-          selectedValue={rolandIoSetupContext.selectedDeviceKey}
-        >
-          {[...rolandIoSetupContext.connectedDevices.entries()].map(
-            ([key, device]) => {
-              const deviceIdHexTag =
-                "[0x" +
-                device.identity.deviceId.toString(16).padStart(2, "0") +
-                "]";
+        <ThemedCard>
+          <Section heading="MIDI Connections">
+            {inputs && outputs && (
+              <>
+                <FieldRow description="Input">
+                  <Picker
+                    onValueChange={setCurrentInputId}
+                    selectedValue={currentInputId}
+                  >
+                    {[...inputs.entries()].map(
+                      ([key, input]: [string, any]) => (
+                        <Picker.Item label={input.name} key={key} value={key} />
+                      )
+                    )}
+                  </Picker>
+                </FieldRow>
+                <FieldRow description="Output">
+                  <Picker
+                    onValueChange={setCurrentOutputId}
+                    selectedValue={currentOutputId}
+                  >
+                    {[...outputs.entries()].map(
+                      ([key, output]: [string, any]) => (
+                        <Picker.Item
+                          label={output.name}
+                          key={key}
+                          value={key}
+                        />
+                      )
+                    )}
+                  </Picker>
+                </FieldRow>
+              </>
+            )}
+          </Section>
+        </ThemedCard>
 
-              return (
-                <Picker.Item
-                  label={deviceIdHexTag + " " + device.description}
-                  key={key}
-                  value={key}
-                />
-              );
-            }
-          )}
-        </Picker>
-      </View>
+        <ThemedCard>
+          <Section heading="Device">
+            <FieldRow description="Connected devices">
+              <Picker
+                onValueChange={rolandIoSetupContext.setSelectedDeviceKey}
+                selectedValue={rolandIoSetupContext.selectedDeviceKey}
+              >
+                {[...rolandIoSetupContext.connectedDevices.entries()].map(
+                  ([key, device]: [string, any]) => {
+                    const deviceIdHexTag =
+                      "[0x" +
+                      device.identity.deviceId.toString(16).padStart(2, "0") +
+                      "]";
 
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Advanced</Text>
-        <View style={styles.row}>
-          <Text>Include fake GR-55</Text>
-          <Switch
-            onValueChange={rolandIoSetupContext.setIncludeFakeDevice}
-            value={rolandIoSetupContext.includeFakeDevice}
-          />
-        </View>
-        <View style={styles.row}>
-          <Text>Enable experimental options 🧪</Text>
-          <Switch
-            onValueChange={setEnableExperimentalFeatures}
-            value={userOptions.enableExperimentalFeatures}
-          />
-        </View>
+                    return (
+                      <Picker.Item
+                        label={deviceIdHexTag + " " + device.description}
+                        key={key}
+                        value={key}
+                      />
+                    );
+                  }
+                )}
+              </Picker>
+            </FieldRow>
+          </Section>
+        </ThemedCard>
+
+        <ThemedCard>
+          <Section heading="Advanced">
+            <FieldRow description="Include fake GR-55">
+              <Switch
+                onValueChange={rolandIoSetupContext.setIncludeFakeDevice}
+                value={rolandIoSetupContext.includeFakeDevice}
+              />
+            </FieldRow>
+            <FieldRow description="Enable experimental options 🧪">
+              <Switch
+                onValueChange={setEnableExperimentalFeatures}
+                value={userOptions.enableExperimentalFeatures}
+              />
+            </FieldRow>
+          </Section>
+        </ThemedCard>
       </View>
     </PopoverAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-  },
-  section: {
-    marginBottom: 24,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 8,
-    padding: 12,
-  },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-    opacity: 0.8,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  scrollContent: {
+    padding: 16,
     alignItems: "center",
-    paddingVertical: 8,
   },
-  label: {
-    marginBottom: 4,
-    marginTop: 8,
+  cardWrapper: {
+    width: "100%",
+    maxWidth: 600,
   },
 });

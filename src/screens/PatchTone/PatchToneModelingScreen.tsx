@@ -1,10 +1,12 @@
 import { MaterialTopTabScreenProps } from "@react-navigation/material-top-tabs";
 import { useContext } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { PopoverAwareScrollView } from "../../components/PopoverAwareScrollView";
 import { RefreshControl } from "../../components/RefreshControl";
+import { ThemeVariantProvider, useThemedColors } from "../../components/Theme";
 import { FieldPlaceholder } from "../../components/fields/FieldPlaceholder";
+import { Section } from "../../components/fields/Section";
 import { PatchToneTabParamList } from "../../components/navigation";
 import { RemoteFieldPicker } from "../../components/remote-fields/RemoteFieldPicker";
 import { RemoteFieldSegmentedPicker } from "../../components/remote-fields/RemoteFieldSegmentedPicker";
@@ -13,6 +15,7 @@ import { RemoteFieldSlider } from "../../components/remote-fields/RemoteFieldSli
 import { RemoteFieldSwitch } from "../../components/remote-fields/RemoteFieldSwitch";
 import { RemoteFieldSwitchedSection } from "../../components/remote-fields/RemoteFieldSwitchedSection";
 import { RemoteFieldWaveShapePicker } from "../../components/remote-fields/RemoteFieldWaveShapePicker";
+import { ThemedCard } from "../../components/ui/ThemedCard";
 import {
   RolandRemoteSystemContext as SYSTEM,
   RolandRemotePatchContext as PATCH,
@@ -24,7 +27,17 @@ import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 
 const { modelingTone } = GR55.temporaryPatch;
 
-export function PatchToneModelingScreen({
+export function PatchToneModelingScreen(
+  props: MaterialTopTabScreenProps<PatchToneTabParamList, "Modeling">
+) {
+  return (
+    <ThemeVariantProvider variant="neutral">
+      <PatchToneModelingScreenContent {...props} />
+    </ThemeVariantProvider>
+  );
+}
+
+function PatchToneModelingScreenContent({
   navigation,
 }: MaterialTopTabScreenProps<PatchToneTabParamList, "Modeling">) {
   const [guitarBassSelect] = useRemoteField(
@@ -33,6 +46,7 @@ export function PatchToneModelingScreen({
   );
 
   const { reloadData } = useContext(PATCH);
+  const colors = useThemedColors();
 
   const [toneCategory_guitar, setToneCategory_guitar] = useRemoteField(
     PATCH,
@@ -115,194 +129,219 @@ export function PatchToneModelingScreen({
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={reloadData} />
       }
-      style={[styles.container]}
-      contentContainerStyle={safeAreaStyle}
+      style={[safeAreaStyle, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
     >
       <RemoteFieldSwitchedSection page={PATCH} field={modelingTone.muteSwitch}>
-        {guitarBassSelect === "GUITAR" && (
-          <>
-            <RemoteFieldSegmentedPicker
-              page={PATCH}
-              field={modelingTone.toneCategory_guitar}
-              value={toneCategory_guitar}
-              onValueChange={setToneCategory_guitar}
-            />
-            {toneCategory_guitar === "E.GTR" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberEGtr_guitar}
-                value={toneNumberEGtr_guitar}
-                onValueChange={setToneNumberEGtr_guitar}
-              />
+        <ThemedCard>
+          <Section heading="Tone" noBorder>
+            {guitarBassSelect === "GUITAR" && (
+              <>
+                <RemoteFieldSegmentedPicker
+                  page={PATCH}
+                  field={modelingTone.toneCategory_guitar}
+                  value={toneCategory_guitar}
+                  onValueChange={setToneCategory_guitar}
+                />
+                {toneCategory_guitar === "E.GTR" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberEGtr_guitar}
+                    value={toneNumberEGtr_guitar}
+                    onValueChange={setToneNumberEGtr_guitar}
+                  />
+                )}
+                {toneCategory_guitar === "AC" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberAc_guitar}
+                    value={toneNumberAc_guitar}
+                    onValueChange={setToneNumberAc_guitar}
+                  />
+                )}
+                {toneCategory_guitar === "E.BASS" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberEBass_guitar}
+                    value={toneNumberEBass_guitar}
+                    onValueChange={setToneNumberEBass_guitar}
+                  />
+                )}
+                {toneCategory_guitar === "SYNTH" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberSynth_guitar}
+                    value={toneNumberSynth_guitar}
+                    onValueChange={setToneNumberSynth_guitar}
+                  />
+                )}
+              </>
             )}
-            {toneCategory_guitar === "AC" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberAc_guitar}
-                value={toneNumberAc_guitar}
-                onValueChange={setToneNumberAc_guitar}
-              />
+            {guitarBassSelect === "BASS" && (
+              <>
+                <RemoteFieldSegmentedPicker
+                  page={PATCH}
+                  field={modelingTone.toneCategory_bass}
+                  value={toneCategory_bass}
+                  onValueChange={setToneCategory_bass}
+                />
+                {toneCategory_bass === "E.BASS" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberEBass_bass}
+                    value={toneNumberEBass_bass}
+                    onValueChange={setToneNumberEBass_bass}
+                  />
+                )}
+                {toneCategory_bass === "SYNTH" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberSynth_bass}
+                    value={toneNumberSynth_bass}
+                    onValueChange={setToneNumberSynth_bass}
+                  />
+                )}
+                {toneCategory_bass === "E.GTR" && (
+                  <RemoteFieldPicker
+                    page={PATCH}
+                    field={modelingTone.toneNumberEGtr_bass}
+                    value={toneNumberEGtr_bass}
+                    onValueChange={setToneNumberEGtr_bass}
+                  />
+                )}
+              </>
             )}
-            {toneCategory_guitar === "E.BASS" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberEBass_guitar}
-                value={toneNumberEBass_guitar}
-                onValueChange={setToneNumberEBass_guitar}
-              />
-            )}
-            {toneCategory_guitar === "SYNTH" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberSynth_guitar}
-                value={toneNumberSynth_guitar}
-                onValueChange={setToneNumberSynth_guitar}
-              />
-            )}
-          </>
-        )}
-        {guitarBassSelect === "BASS" && (
-          <>
-            <RemoteFieldSegmentedPicker
-              page={PATCH}
-              field={modelingTone.toneCategory_bass}
-              value={toneCategory_bass}
-              onValueChange={setToneCategory_bass}
-            />
-            {toneCategory_bass === "E.BASS" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberEBass_bass}
-                value={toneNumberEBass_bass}
-                onValueChange={setToneNumberEBass_bass}
-              />
-            )}
-            {toneCategory_bass === "SYNTH" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberSynth_bass}
-                value={toneNumberSynth_bass}
-                onValueChange={setToneNumberSynth_bass}
-              />
-            )}
-            {toneCategory_bass === "E.GTR" && (
-              <RemoteFieldPicker
-                page={PATCH}
-                field={modelingTone.toneNumberEGtr_bass}
-                value={toneNumberEGtr_bass}
-                onValueChange={setToneNumberEGtr_bass}
-              />
-            )}
-          </>
-        )}
-        <RemoteFieldSlider page={PATCH} field={modelingTone.level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.level} />
+          </Section>
+        </ThemedCard>
 
-        <PatchToneModelingDetails
-          guitarBassSelect={guitarBassSelect}
-          toneCategory_guitar={toneCategory_guitar}
-          toneNumberEGtr_guitar={toneNumberEGtr_guitar}
-          toneNumberAc_guitar={toneNumberAc_guitar}
-          toneNumberEBass_guitar={toneNumberEBass_guitar}
-          toneNumberSynth_guitar={toneNumberSynth_guitar}
-          toneCategory_bass={toneCategory_bass}
-          toneNumberEBass_bass={toneNumberEBass_bass}
-          toneNumberEGtr_bass={toneNumberEGtr_bass}
-          toneNumberSynth_bass={toneNumberSynth_bass}
-        />
+        <ThemedCard>
+          <Section heading="Tone Details" noBorder>
+            <PatchToneModelingDetails
+              guitarBassSelect={guitarBassSelect}
+              toneCategory_guitar={toneCategory_guitar}
+              toneNumberEGtr_guitar={toneNumberEGtr_guitar}
+              toneNumberAc_guitar={toneNumberAc_guitar}
+              toneNumberEBass_guitar={toneNumberEBass_guitar}
+              toneNumberSynth_guitar={toneNumberSynth_guitar}
+              toneCategory_bass={toneCategory_bass}
+              toneNumberEBass_bass={toneNumberEBass_bass}
+              toneNumberEGtr_bass={toneNumberEGtr_bass}
+              toneNumberSynth_bass={toneNumberSynth_bass}
+            />
+          </Section>
+        </ThemedCard>
 
-        {/* TODO: different string controls for guitar/bass mode? */}
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string1Level} />
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string2Level} />
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string3Level} />
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string4Level} />
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string5Level} />
-        <RemoteFieldSlider page={PATCH} field={modelingTone.string6Level} />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={modelingTone.pitchShiftString1}
-          value={pitchShiftString1}
-          onValueChange={setPitchShiftString1}
-        />
-        <RemoteFieldSlider
-          page={PATCH}
-          field={modelingTone.pitchShiftFineString1}
-          value={pitchShiftFineString1}
-          onValueChange={setPitchShiftFineString1}
-        />
+        <ThemedCard>
+          <Section heading="String Levels & Pitch" noBorder>
+            {/* TODO: different string controls for guitar/bass mode? */}
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string1Level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string2Level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string3Level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string4Level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string5Level} />
+            <RemoteFieldSlider page={PATCH} field={modelingTone.string6Level} />
+            <RemoteFieldSlider
+              page={PATCH}
+              field={modelingTone.pitchShiftString1}
+              value={pitchShiftString1}
+              onValueChange={setPitchShiftString1}
+            />
+            <RemoteFieldSlider
+              page={PATCH}
+              field={modelingTone.pitchShiftFineString1}
+              value={pitchShiftFineString1}
+              onValueChange={setPitchShiftFineString1}
+            />
+          </Section>
+        </ThemedCard>
+
         {hide12StringControls ? (
-          <>
+          <ThemedCard>
             <FieldPlaceholder>
               12-String mode not available with the current settings
             </FieldPlaceholder>
-          </>
+          </ThemedCard>
         ) : (
-          <>
-            <RemoteFieldSwitchedSection
-              page={PATCH}
-              field={modelingTone.twelveStrSwitch}
-            >
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrDirectLevel}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString1}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString1}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString2}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString2}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString3}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString3}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString4}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString4}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString5}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString5}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrShiftString6}
-              />
-              <RemoteFieldSlider
-                page={PATCH}
-                field={modelingTone.twelveStrFineString6}
-              />
-            </RemoteFieldSwitchedSection>
-          </>
+          <RemoteFieldSwitchedSection
+            page={PATCH}
+            field={modelingTone.twelveStrSwitch}
+          >
+            <ThemedCard>
+              <Section heading="12-String Settings" noBorder>
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrDirectLevel}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString1}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString1}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString2}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString2}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString3}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString3}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString4}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString4}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString5}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString5}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrShiftString6}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.twelveStrFineString6}
+                />
+              </Section>
+            </ThemedCard>
+          </RemoteFieldSwitchedSection>
         )}
         {!hideNoiseSuppressorControls && (
           <RemoteFieldSwitchedSection
             page={PATCH}
             field={modelingTone.nsSwitch}
           >
-            <RemoteFieldSlider page={PATCH} field={modelingTone.nsThreshold} />
-            <RemoteFieldSlider page={PATCH} field={modelingTone.nsRelease} />
+            <ThemedCard>
+              <Section heading="Noise Suppressor" noBorder>
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.nsThreshold}
+                />
+                <RemoteFieldSlider
+                  page={PATCH}
+                  field={modelingTone.nsRelease}
+                />
+              </Section>
+            </ThemedCard>
           </RemoteFieldSwitchedSection>
         )}
       </RemoteFieldSwitchedSection>
@@ -1035,6 +1074,10 @@ function PatchToneModelingDetails({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    padding: 16,
+  },
+  scrollContent: {
+    padding: 16,
+    alignItems: "center",
   },
 });

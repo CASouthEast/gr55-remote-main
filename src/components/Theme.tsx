@@ -27,6 +27,20 @@ export interface NavigationColors {
   tabBar: NavigationTabBarColors;
 }
 
+export type ThemeVariantName = "orange" | "teal" | "lavender" | "neutral";
+
+export interface ThemeVariantColors {
+  background: string;
+  accent: string;
+  text: string;
+  mutedText: string;
+  cardBackground: string;
+  badgeBackground: string;
+  badgeText: string;
+  sliderTrackMax: string;
+  sliderTrackMin: string;
+}
+
 export interface ThemeColors {
   assigns: {
     background: string;
@@ -46,6 +60,7 @@ export interface ThemeColors {
     labelTextShadow: string;
     labelTextBackground: string;
   };
+  variants: Record<ThemeVariantName, ThemeVariantColors>;
 }
 
 export interface AppTheme {
@@ -84,11 +99,58 @@ export const DefaultTheme: AppTheme = {
       labelTextShadow: "rgb(227, 227, 228)",
       labelTextBackground: "transparent",
     },
+    variants: {
+      orange: {
+        background: "#FFF5EB",
+        accent: "#FF8A00",
+        text: "#333",
+        mutedText: "#666",
+        cardBackground: "#fff",
+        badgeBackground: "#FFF5EB",
+        badgeText: "#FF8A00",
+        sliderTrackMax: "rgba(255, 138, 0, 0.1)",
+        sliderTrackMin: "#FF8A00",
+      },
+      teal: {
+        background: "#E6F7F8",
+        accent: "#00A3A3",
+        text: "#333",
+        mutedText: "#666",
+        cardBackground: "#fff",
+        badgeBackground: "#E6F7F8",
+        badgeText: "#00A3A3",
+        sliderTrackMax: "rgba(0, 163, 163, 0.1)",
+        sliderTrackMin: "#00A3A3",
+      },
+      lavender: {
+        background: "#F3EFFF",
+        accent: "#7E57C2",
+        text: "#333",
+        mutedText: "#666",
+        cardBackground: "#fff",
+        badgeBackground: "#F3EFFF",
+        badgeText: "#7E57C2",
+        sliderTrackMax: "rgba(126, 87, 194, 0.1)",
+        sliderTrackMin: "#7E57C2",
+      },
+      neutral: {
+        background: "#F5F7FA",
+        accent: "#4A90E2",
+        text: "#333",
+        mutedText: "#666",
+        cardBackground: "#fff",
+        badgeBackground: "#F5F7FA",
+        badgeText: "#4A90E2",
+        sliderTrackMax: "rgba(74, 144, 226, 0.1)",
+        sliderTrackMin: "#4A90E2",
+      },
+    },
   },
 };
 
 export const DarkTheme: AppTheme = {
   colors: {
+    ...DefaultTheme.colors,
     assigns: {
       // 10/11ths of the way from cornflowerblue to #010101
       background: "#0A0E16",
@@ -118,6 +180,52 @@ export const DarkTheme: AppTheme = {
       labelText: "white",
       labelTextShadow: "black",
       labelTextBackground: "transparent",
+    },
+    variants: {
+      orange: {
+        background: "#1A140F",
+        accent: "#FF8A00",
+        text: "#EEE",
+        mutedText: "#AAA",
+        cardBackground: "#241F1A",
+        badgeBackground: "#2D261F",
+        badgeText: "#FF8A00",
+        sliderTrackMax: "rgba(255, 138, 0, 0.2)",
+        sliderTrackMin: "#FF8A00",
+      },
+      teal: {
+        background: "#0F1A1A",
+        accent: "#00A3A3",
+        text: "#EEE",
+        mutedText: "#AAA",
+        cardBackground: "#1A2424",
+        badgeBackground: "#1F2D2D",
+        badgeText: "#00A3A3",
+        sliderTrackMax: "rgba(0, 163, 163, 0.2)",
+        sliderTrackMin: "#00A3A3",
+      },
+      lavender: {
+        background: "#140F1A",
+        accent: "#9575CD",
+        text: "#EEE",
+        mutedText: "#AAA",
+        cardBackground: "#1F1A24",
+        badgeBackground: "#261F2D",
+        badgeText: "#9575CD",
+        sliderTrackMax: "rgba(149, 117, 205, 0.2)",
+        sliderTrackMin: "#9575CD",
+      },
+      neutral: {
+        background: "#121417",
+        accent: "#4A90E2",
+        text: "#EEE",
+        mutedText: "#AAA",
+        cardBackground: "#1C1F24",
+        badgeBackground: "#25282D",
+        badgeText: "#4A90E2",
+        sliderTrackMax: "rgba(74, 144, 226, 0.2)",
+        sliderTrackMin: "#4A90E2",
+      },
     },
   },
 };
@@ -182,9 +290,34 @@ const paperThemeLight = {
 };
 
 const ThemeContext = createContext<AppTheme>(DefaultTheme);
+const ThemeVariantContext = createContext<ThemeVariantName>("neutral");
 
 export function useTheme(): AppTheme {
   return useContext(ThemeContext);
+}
+
+export function useThemeVariant(): ThemeVariantName {
+  return useContext(ThemeVariantContext);
+}
+
+export function useThemedColors(): ThemeVariantColors {
+  const theme = useTheme();
+  const variant = useThemeVariant();
+  return theme.colors.variants[variant];
+}
+
+export function ThemeVariantProvider({
+  variant,
+  children,
+}: {
+  variant: ThemeVariantName;
+  children: React.ReactNode;
+}) {
+  return (
+    <ThemeVariantContext.Provider value={variant}>
+      {children}
+    </ThemeVariantContext.Provider>
+  );
 }
 
 export function ThemeProvider({ children }: { children?: React.ReactNode }) {

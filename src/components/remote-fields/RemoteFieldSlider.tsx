@@ -7,7 +7,7 @@ import { useMaybeControlledRemoteField } from "../../hooks/useRemoteField";
 import { FieldReference, NumericField } from "../../lib/RolandAddressMap";
 import { PendingTextPlaceholder } from "../PendingContentPlaceholders";
 import { Slider } from "../Slider";
-import { useTheme } from "../Theme";
+import { useTheme, useThemedColors } from "../Theme";
 import { ThemedText as Text } from "../ThemedText";
 
 export function RemoteFieldSlider({
@@ -106,6 +106,7 @@ function SliderControl({
   // TODO: Show assigned state when all controls can reliably handle long press etc
 
   const theme = useTheme();
+  const themedColors = useThemedColors();
 
   return (
     <View style={styles.sliderContainer}>
@@ -122,12 +123,12 @@ function SliderControl({
         minimumTrackTintColor={
           isPending
             ? theme.colors.pendingTextPlaceholder
-            : theme.colors.slider.trackMinimum
+            : themedColors.sliderTrackMin
         }
         maximumTrackTintColor={
           isPending
             ? theme.colors.pendingTextPlaceholder
-            : theme.colors.slider.trackMaximum
+            : themedColors.sliderTrackMax
         }
         disabled={isPending}
       />
@@ -139,7 +140,7 @@ function SliderControl({
             style={[
               styles.labelText,
               {
-                color: theme.colors.slider.labelText,
+                color: themedColors.accent,
                 backgroundColor: theme.colors.slider.labelTextBackground,
               },
               Platform.select({

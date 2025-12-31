@@ -1,23 +1,29 @@
-import { useTheme } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
+import { useThemedColors } from "../Theme";
 import { ThemedText as Text } from "../ThemedText";
 
 export function Section({
   heading,
   children,
+  noBorder,
 }: {
   heading: string;
   children: React.ReactNode;
+  noBorder?: boolean;
 }) {
-  const theme = useTheme();
+  const colors = useThemedColors();
   return (
     <View style={styles.section}>
       <Text
         style={[
           styles.sectionHeading,
-          { borderBottomColor: theme.colors.border },
+          {
+            color: colors.text,
+            borderBottomColor: colors.accent,
+          },
+          noBorder && { borderBottomWidth: 0, paddingBottom: 0 },
         ]}
       >
         {heading}
