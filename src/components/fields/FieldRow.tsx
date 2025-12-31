@@ -89,7 +89,7 @@ export const FieldRow = function FieldRow({
     initialValue: isPressed ? 0.25 : 1,
     toValue: isPressed ? 0.25 : 1,
     duration: isPressed ? 0 : 300,
-    useNativeDriver: true,
+    useNativeDriver: Platform.OS !== "web",
   });
   const { colors: baseColors } = useTheme();
   const colors = useThemedColors();

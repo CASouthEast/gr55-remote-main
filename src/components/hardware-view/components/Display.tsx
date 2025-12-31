@@ -745,15 +745,16 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 10,
-    pointerEvents: "none",
     ...Platform.select({
       web: {
         boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.5)",
+        pointerEvents: "none" as any,
       },
       default: {
         // Visual approximation for React Native
         borderWidth: 2,
         borderColor: "rgba(0, 0, 0, 0.2)",
+        pointerEvents: "none" as any,
       },
     }),
   },

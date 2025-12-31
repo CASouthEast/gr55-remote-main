@@ -185,7 +185,6 @@ export function GR55Controller({
               StyleSheet.absoluteFill,
               styles.neonOutline,
               { opacity: glowAnim, pointerEvents: "none" },
-              { collapsable: Platform.OS === "web" ? undefined : false } as any,
             ]}
           >
             <Svg height="100%" width="100%">
@@ -201,9 +200,6 @@ export function GR55Controller({
                 strokeWidth="3"
                 strokeDasharray="150, 1950"
                 strokeDashoffset={outlineOffset}
-                {...({
-                  collapsable: Platform.OS === "web" ? undefined : false,
-                } as any)}
               />
             </Svg>
             <View style={styles.outlineBorder} />

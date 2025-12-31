@@ -25,7 +25,7 @@ export function RemoteFieldSwitchedSection({
     initialValue: isPending ? 0.5 : isDisabled ? 0.5 : 0,
     toValue: isPending ? 0.5 : isDisabled ? 0.5 : 0,
     duration: 150,
-    useNativeDriver: true,
+    useNativeDriver: Platform.OS !== "web",
   });
   const { backgroundColor } = useContextualStyle();
   return (

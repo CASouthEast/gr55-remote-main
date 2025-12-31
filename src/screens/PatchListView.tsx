@@ -279,7 +279,7 @@ const PatchItem = memo(function PatchItem({
     initialValue: isPressed ? 0.25 : 1,
     toValue: isPressed ? 0.25 : 1,
     duration: isPressed ? 0 : 300,
-    useNativeDriver: true,
+    useNativeDriver: Platform.OS !== "web",
   });
   const pressFeedbackStyle = useMemo(
     () => Platform.select({ ios: { opacity: touchOpacity } }),
