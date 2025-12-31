@@ -9,6 +9,7 @@ import { PatchEffectsDelayScreen } from "../../screens/PatchEffects/PatchEffects
 import { PatchEffectsEQScreen } from "../../screens/PatchEffects/PatchEffectsEQScreen";
 import { PatchEffectsMFXScreen } from "../../screens/PatchEffects/PatchEffectsMFXScreen";
 import { PatchEffectsModScreen } from "../../screens/PatchEffects/PatchEffectsModScreen";
+import { PatchEffectsNSScreen } from "../../screens/PatchEffects/PatchEffectsNSScreen";
 import { PatchEffectsReverbScreen } from "../../screens/PatchEffects/PatchEffectsReverbScreen";
 import { PatchEffectsStructureScreen } from "../../screens/PatchEffects/PatchEffectsStructureScreen";
 import { PatchEffectsTabParamList } from "../navigation";
@@ -33,6 +34,22 @@ function PatchEffectsAmpWrapper() {
     };
 
   return <PatchEffectsAmpScreen {...mockProps} />;
+}
+
+function PatchEffectsNSWrapper() {
+  const navigation = useNavigation();
+
+  const mockProps: MaterialTopTabScreenProps<PatchEffectsTabParamList, "NS"> = {
+    navigation: navigation as any,
+    route: {
+      key: "NS-" + Date.now(),
+      name: "NS",
+      params: {},
+      path: undefined,
+    },
+  };
+
+  return <PatchEffectsNSScreen {...mockProps} />;
 }
 
 function PatchEffectsModWrapper() {
@@ -141,14 +158,19 @@ export const patchEffectsTabs: {
   title: string;
   component: React.ComponentType<any>;
 }[] = [
-  { key: "Struct", title: "STRUCT", component: PatchEffectsStructureWrapper },
-  { key: "Amp", title: "Amp", component: PatchEffectsAmpWrapper },
-  { key: "Mod", title: "Mod", component: PatchEffectsModWrapper },
-  { key: "MFX", title: "MFX", component: PatchEffectsMFXWrapper },
-  { key: "DLY", title: "DLY", component: PatchEffectsDelayWrapper },
-  { key: "REV", title: "REV", component: PatchEffectsReverbWrapper },
-  { key: "CHO", title: "CHO", component: PatchEffectsChorusWrapper },
-  { key: "EQ", title: "EQ", component: PatchEffectsEQWrapper },
+  {
+    key: "Struct",
+    title: "Structure",
+    component: PatchEffectsStructureWrapper,
+  },
+  { key: "Amp", title: "Pre-amplifier", component: PatchEffectsAmpWrapper },
+  { key: "NS", title: "Noise Suppressor", component: PatchEffectsNSWrapper },
+  { key: "Mod", title: "Modifier Effects", component: PatchEffectsModWrapper },
+  { key: "MFX", title: "Multi Effects", component: PatchEffectsMFXWrapper },
+  { key: "CHO", title: "Chorus", component: PatchEffectsChorusWrapper },
+  { key: "DLY", title: "Delay", component: PatchEffectsDelayWrapper },
+  { key: "REV", title: "Reverb", component: PatchEffectsReverbWrapper },
+  { key: "EQ", title: "Equalizer", component: PatchEffectsEQWrapper },
 ];
 
 export function PatchEffectsCustomNavigation(): JSX.Element {

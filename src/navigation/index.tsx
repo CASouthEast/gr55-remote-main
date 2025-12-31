@@ -35,11 +35,12 @@ export type PatchTabParamList = {
 export type PatchEffectsTabParamList = {
   Struct: object;
   Amp: object;
+  NS: object;
   Mod: object;
   MFX: object;
+  CHO: object;
   DLY: object;
   REV: object;
-  CHO: object;
   EQ: object;
 };
 

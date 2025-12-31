@@ -259,6 +259,10 @@ const invertedMuteField = new BooleanField("UNMUTE", "MUTE", {
   invertedForDisplay: true,
 });
 
+const invertedBooleanField = new BooleanField("ON", "OFF", {
+  invertedForDisplay: true,
+});
+
 const velocityCurveField = // TODO: Graphical representation, maybe name each curve?
   enumField(["FIX", "1", "2", "3", "4", "5", "6", "7", "TONE"] as const);
 
@@ -3765,7 +3769,11 @@ export const PatchStruct = {
       "(Reserved)",
       new ReservedField()
     ),
-    modSwitch: new FieldDefinition(pack7(0x0015), "MOD Switch", booleanField),
+    modSwitch: new FieldDefinition(
+      pack7(0x0015),
+      "MOD Switch",
+      invertedBooleanField
+    ),
     modType: new FieldDefinition(
       pack7(0x0016),
       "MOD Type",

@@ -15,7 +15,9 @@ import { PendingTextPlaceholder } from "../components/PendingContentPlaceholders
 import { PopoverAwareScrollView } from "../components/PopoverAwareScrollView";
 import { usePopovers } from "../components/Popovers";
 import { RefreshControl } from "../components/RefreshControl";
+import { ThemeVariantProvider, useThemedColors } from "../components/Theme";
 import { ThemedText as Text } from "../components/ThemedText";
+import { Section } from "../components/fields/Section";
 import {
   GlobalNavigationProp,
   PatchStackParamList,
@@ -23,6 +25,7 @@ import {
 } from "../components/navigation";
 import { RemoteFieldSlider } from "../components/remote-fields/RemoteFieldSlider";
 import { RemoteFieldSwitch } from "../components/remote-fields/RemoteFieldSwitch";
+import { ThemedCard } from "../components/ui/ThemedCard";
 import {
   RolandRemotePatchContext as PATCH,
   RolandRemoteSystemContext as SYSTEM,
@@ -119,176 +122,216 @@ export function PatchMainScreen({
   }
 
   return (
-    <PopoverAwareScrollView
-      refreshControl={
-        // TODO: Connect this to the actual refresh state
-        // TODO: Refactor to avoid duplication with all the other screens
-        <RefreshControl refreshing={false} onRefresh={reloadData} />
-      }
-      style={[styles.container]}
-      contentContainerStyle={safeAreaStyle}
-    >
-      <PopStackToTopOnTabPress />
-      <RemoteFieldSlider
-        page={PATCH}
-        field={GR55.temporaryPatch.common.patchLevel}
-      />
-      <SectionWithHeading heading="Tone">
-        <ToneSummaryView
-          label="PCM1"
-          muteField={GR55.temporaryPatch.patchPCMTone1.muteSwitch}
-          levelLabel={
-            <FieldLevelLabel
+    <ThemeVariantProvider variant="teal">
+      <PopoverAwareScrollView
+        refreshControl={
+          // TODO: Connect this to the actual refresh state
+          // TODO: Refactor to avoid duplication with all the other screens
+          <RefreshControl refreshing={false} onRefresh={reloadData} />
+        }
+        style={[styles.container]}
+        contentContainerStyle={safeAreaStyle}
+      >
+        <PopStackToTopOnTabPress />
+
+        <ThemedCard>
+          <Section heading="Patch" noBorder>
+            <RemoteFieldSlider
               page={PATCH}
-              field={GR55.temporaryPatch.patchPCMTone1.partLevel}
+              field={GR55.temporaryPatch.common.patchLevel}
             />
-          }
-          toneLabel={<PCMToneLabel tone={GR55.temporaryPatch.patchPCMTone1} />}
-          onPress={() => navigation.navigate("PatchTone", { screen: "PCM1" })}
-        />
-        <ToneSummaryView
-          label="PCM2"
-          muteField={GR55.temporaryPatch.patchPCMTone2.muteSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.patchPCMTone2.partLevel}
+          </Section>
+        </ThemedCard>
+
+        <ThemedCard>
+          <Section heading="Tone" noBorder>
+            <ToneSummaryView
+              label="PCM1"
+              muteField={GR55.temporaryPatch.patchPCMTone1.muteSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.patchPCMTone1.partLevel}
+                />
+              }
+              toneLabel={
+                <PCMToneLabel tone={GR55.temporaryPatch.patchPCMTone1} />
+              }
+              onPress={() =>
+                navigation.navigate("PatchTone", { screen: "PCM1" })
+              }
             />
-          }
-          toneLabel={<PCMToneLabel tone={GR55.temporaryPatch.patchPCMTone2} />}
-          onPress={() => navigation.navigate("PatchTone", { screen: "PCM2" })}
-        />
-        <ToneSummaryView
-          label="MODEL"
-          muteField={GR55.temporaryPatch.modelingTone.muteSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.modelingTone.level}
+            <ToneSummaryView
+              label="PCM2"
+              muteField={GR55.temporaryPatch.patchPCMTone2.muteSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.patchPCMTone2.partLevel}
+                />
+              }
+              toneLabel={
+                <PCMToneLabel tone={GR55.temporaryPatch.patchPCMTone2} />
+              }
+              onPress={() =>
+                navigation.navigate("PatchTone", { screen: "PCM2" })
+              }
             />
-          }
-          toneLabel={<ModelToneLabel />}
-          onPress={() =>
-            navigation.navigate("PatchTone", { screen: "Modeling" })
-          }
-        />
-        <ToneSummaryView
-          label="NORMAL PICKUP"
-          muteField={GR55.temporaryPatch.common.normalPuMute}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.common.normalPuLevel}
+            <ToneSummaryView
+              label="MODEL"
+              muteField={GR55.temporaryPatch.modelingTone.muteSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.modelingTone.level}
+                />
+              }
+              toneLabel={<ModelToneLabel />}
+              onPress={() =>
+                navigation.navigate("PatchTone", { screen: "Modeling" })
+              }
             />
-          }
-          toneLabel={undefined}
-          onPress={() => navigation.navigate("PatchTone", { screen: "Normal" })}
-        />
-      </SectionWithHeading>
-      <SectionWithHeading heading="Effect">
-        <ToneSummaryView
-          label="AMP"
-          muteField={GR55.temporaryPatch.ampModNs.ampSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.ampModNs.ampLevel}
+            <ToneSummaryView
+              label="NORMAL PICKUP"
+              muteField={GR55.temporaryPatch.common.normalPuMute}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.common.normalPuLevel}
+                />
+              }
+              toneLabel={undefined}
+              onPress={() =>
+                navigation.navigate("PatchTone", { screen: "Normal" })
+              }
             />
-          }
-          toneLabel={
-            <FieldLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.ampModNs.ampType}
+          </Section>
+        </ThemedCard>
+
+        <ThemedCard>
+          <Section heading="Effect" noBorder>
+            <ToneSummaryView
+              label="AMP"
+              muteField={GR55.temporaryPatch.ampModNs.ampSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.ampModNs.ampLevel}
+                />
+              }
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.ampModNs.ampType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "Amp" })
+              }
             />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "Amp" })}
-        />
-        <ToneSummaryView
-          label="MOD"
-          muteField={GR55.temporaryPatch.ampModNs.modSwitch}
-          levelLabel={<ModLevelLabel />}
-          toneLabel={
-            <FieldLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.ampModNs.modType}
+            <ToneSummaryView
+              label="MOD"
+              muteField={GR55.temporaryPatch.ampModNs.modSwitch}
+              levelLabel={<ModLevelLabel />}
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.ampModNs.modType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "Mod" })
+              }
             />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "Mod" })}
-        />
-        <ToneSummaryView
-          label="MFX"
-          muteField={GR55.temporaryPatch.mfx.mfxSwitch}
-          levelLabel={<MFXLevelLabel />}
-          toneLabel={
-            <FieldLabel page={PATCH} field={GR55.temporaryPatch.mfx.mfxType} />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "MFX" })}
-        />
-        <ToneSummaryView
-          label="DELAY"
-          muteField={GR55.temporaryPatch.sendsAndEq.delaySwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.delayEffectLevel}
+            <ToneSummaryView
+              label="MFX"
+              muteField={GR55.temporaryPatch.mfx.mfxSwitch}
+              levelLabel={<MFXLevelLabel />}
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.mfx.mfxType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "MFX" })
+              }
             />
-          }
-          toneLabel={
-            <FieldLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.delayType}
+            <ToneSummaryView
+              label="DELAY"
+              muteField={GR55.temporaryPatch.sendsAndEq.delaySwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.delayEffectLevel}
+                />
+              }
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.delayType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "DLY" })
+              }
             />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "DLY" })}
-        />
-        <ToneSummaryView
-          label="REVERB"
-          muteField={GR55.temporaryPatch.sendsAndEq.reverbSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.reverbEffectLevel}
+            <ToneSummaryView
+              label="REVERB"
+              muteField={GR55.temporaryPatch.sendsAndEq.reverbSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.reverbEffectLevel}
+                />
+              }
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.reverbType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "REV" })
+              }
             />
-          }
-          toneLabel={
-            <FieldLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.reverbType}
+            <ToneSummaryView
+              label="CHORUS"
+              muteField={GR55.temporaryPatch.sendsAndEq.chorusSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.chorusEffectLevel}
+                />
+              }
+              toneLabel={
+                <FieldLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.chorusType}
+                />
+              }
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "CHO" })
+              }
             />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "REV" })}
-        />
-        <ToneSummaryView
-          label="CHORUS"
-          muteField={GR55.temporaryPatch.sendsAndEq.chorusSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.chorusEffectLevel}
+            <ToneSummaryView
+              label="EQ"
+              muteField={GR55.temporaryPatch.sendsAndEq.eqSwitch}
+              levelLabel={
+                <FieldLevelLabel
+                  page={PATCH}
+                  field={GR55.temporaryPatch.sendsAndEq.eqLevel}
+                />
+              }
+              toneLabel={undefined}
+              onPress={() =>
+                navigation.navigate("PatchEffects", { screen: "EQ" })
+              }
             />
-          }
-          toneLabel={
-            <FieldLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.chorusType}
-            />
-          }
-          onPress={() => navigation.navigate("PatchEffects", { screen: "CHO" })}
-        />
-        <ToneSummaryView
-          label="EQ"
-          muteField={GR55.temporaryPatch.sendsAndEq.eqSwitch}
-          levelLabel={
-            <FieldLevelLabel
-              page={PATCH}
-              field={GR55.temporaryPatch.sendsAndEq.eqLevel}
-            />
-          }
-          toneLabel={undefined}
-          onPress={() => navigation.navigate("PatchEffects", { screen: "EQ" })}
-        />
-      </SectionWithHeading>
-    </PopoverAwareScrollView>
+          </Section>
+        </ThemedCard>
+      </PopoverAwareScrollView>
+    </ThemeVariantProvider>
   );
 }
 
@@ -545,16 +588,13 @@ function ToneSummaryView({
   toneLabel: React.ReactNode;
   onPress: () => void;
 }) {
-  const theme = useNavigationTheme();
   return (
     <Pressable android_ripple={{ color: "lightgray" }} onPress={onPress}>
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border,
-          paddingTop: 16,
+          paddingVertical: 12,
           alignItems: "center",
         }}
       >
@@ -584,70 +624,7 @@ function ToneSummaryView({
   );
 }
 
-function SectionWithHeading({
-  children,
-  heading,
-  onPress,
-}: {
-  children?: React.ReactNode;
-  heading: React.ReactNode;
-  onPress?: () => void;
-}) {
-  const theme = useNavigationTheme();
-  return (
-    <View style={styles.sectionWithHeading}>
-      {onPress ? (
-        <HeadingLink onPress={onPress} heading={heading} />
-      ) : (
-        <Text
-          style={[
-            { borderBottomColor: theme.colors.border },
-            styles.sectionHeading,
-          ]}
-        >
-          {heading}
-        </Text>
-      )}
-      {children}
-    </View>
-  );
-}
-
-function HeadingLink({
-  onPress,
-  heading,
-}: {
-  onPress?: () => void;
-  heading: React.ReactNode;
-}) {
-  const theme = useNavigationTheme();
-  return (
-    <Pressable android_ripple={{ color: "lightgray" }} onPress={onPress}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border,
-          paddingTop: 16,
-          alignItems: "center",
-        }}
-      >
-        <Text style={styles.sectionHeading}>{heading}</Text>
-        <FontAwesome name="chevron-right" />
-      </View>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  sectionWithHeading: {
-    marginBottom: 16,
-  },
-  sectionHeading: {
-    fontWeight: "bold",
-    borderBottomWidth: 1,
-  },
   container: {
     padding: 8,
   },

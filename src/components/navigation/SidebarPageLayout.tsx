@@ -229,6 +229,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     ...(Platform.OS === "web" && {
       flexDirection: "row", // Sidebar layout on web
+      backgroundColor: "#f0f2f5", // Light background for floating effect
+      padding: 16,
     }),
   },
   tabBar: {
@@ -242,9 +244,12 @@ const styles = StyleSheet.create({
       height: "100%",
       width: 200,
       borderBottomWidth: 0,
-      borderRightWidth: 1,
-      borderRightColor: "#e0e0e0",
-      boxShadow: "none",
+      borderRightWidth: 0,
+      backgroundColor: "#ffffff",
+      borderRadius: 16,
+      marginRight: 16,
+      paddingVertical: 12,
+      boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
     }),
   },
   tab: {
@@ -283,8 +288,11 @@ const styles = StyleSheet.create({
       : {},
   activeTab: {
     ...(Platform.OS === "web" && {
-      borderRightWidth: 3,
+      borderRightWidth: 4,
       borderRightColor: "#007AFF", // Indicator on the right for sidebar
+      backgroundColor: "rgba(0, 122, 255, 0.05)",
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
     }),
   },
   tabText: {
@@ -347,5 +355,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     backgroundColor: "#ffffff",
+    ...(Platform.OS === "web" && {
+      borderRadius: 16,
+      overflow: "hidden",
+      boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+    }),
   },
 });

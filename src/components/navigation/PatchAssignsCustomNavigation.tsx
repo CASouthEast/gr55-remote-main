@@ -16,13 +16,15 @@ import { ContextualStyleProvider } from "../../styles/ContextualStyle";
 import { useMainScrollViewSafeAreaStyle } from "../../utils/SafeAreaUtils";
 import { PopoverAwareScrollView } from "../PopoverAwareScrollView";
 import { RefreshControl } from "../RefreshControl";
-import { useTheme } from "../Theme";
+import { ThemeVariantProvider, useThemedColors, useTheme } from "../Theme";
+import { Section } from "../fields/Section";
 import { PatchAssignsTabParamList } from "../navigation";
 import { RemoteFieldDynamic } from "../remote-fields/RemoteFieldDynamic";
 import { RemoteFieldPicker } from "../remote-fields/RemoteFieldPicker";
 import { RemoteFieldSlider } from "../remote-fields/RemoteFieldSlider";
 import { RemoteFieldSwitchedSection } from "../remote-fields/RemoteFieldSwitchedSection";
 import { RemoteFieldWaveShapePicker } from "../remote-fields/RemoteFieldWaveShapePicker";
+import { ThemedCard } from "../ui/ThemedCard";
 
 const assignsByRouteName = {
   Assign1: GR55.temporaryPatch.common.assign1,
@@ -43,29 +45,22 @@ function PatchAssignScreen({
 }) {
   const { reloadData } = useContext(PATCH);
   const safeAreaStyle = useMainScrollViewSafeAreaStyle();
-  const theme = useTheme();
+  const colors = useThemedColors();
   const assignsMap = useAssignsMap()!;
   const assign = assignsByRouteName[assignKey];
 
   return (
-    <PopoverAwareScrollView
-      refreshControl={
-        <RefreshControl refreshing={false} onRefresh={reloadData} />
-      }
-      style={[
-        { backgroundColor: theme.colors.assigns.background },
-        styles.container,
-      ]}
-      contentContainerStyle={safeAreaStyle}
-    >
-      <ContextualStyleProvider
-        value={{
-          backgroundColor: theme.colors.assigns.background,
-        }}
+    <ThemeVariantProvider variant="neutral">
+      <PopoverAwareScrollView
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={reloadData} />
+        }
+        style={[{ backgroundColor: colors.background }, styles.container]}
+        contentContainerStyle={safeAreaStyle}
       >
         <AssignSection assignsMap={assignsMap} assign={assign} />
-      </ContextualStyleProvider>
-    </PopoverAwareScrollView>
+      </PopoverAwareScrollView>
+    </ThemeVariantProvider>
   );
 }
 
@@ -136,58 +131,66 @@ function AssignSection({
   );
 
   return (
-    <>
-      <RemoteFieldSwitchedSection
-        page={PATCH}
-        field={assign.switch}
-        key={assign.address}
-      >
-        <RemoteFieldPicker
+    <ThemedCard style={styles.card}>
+      <Section heading="Assignment" noBorder>
+        <RemoteFieldSwitchedSection
           page={PATCH}
-          field={targetField}
-          value={target}
-          onValueChange={handleTargetChange}
-        />
-        <RemoteFieldDynamic
-          page={PATCH}
-          field={targetMinField}
-          key={target + "min"}
-        />
-        <RemoteFieldDynamic
-          page={PATCH}
-          field={targetMaxField}
-          key={target + "max"}
-        />
-        <RemoteFieldPicker
-          page={PATCH}
-          field={assign.source}
-          value={source}
-          onValueChange={setSource}
-        />
-        <RemoteFieldPicker page={PATCH} field={assign.sourceMode} />
-        <RemoteFieldSlider page={PATCH} field={assign.activeRangeLo} />
-        <RemoteFieldSlider page={PATCH} field={assign.activeRangeHi} />
-        {source === "INT PDL" && (
-          <>
-            <RemoteFieldPicker
-              page={PATCH}
-              field={assign.internalPedalTrigger}
-            />
-            <RemoteFieldSlider page={PATCH} field={assign.internalPedalTime} />
-            <RemoteFieldPicker page={PATCH} field={assign.internalPedalCurve} />
-          </>
-        )}
-        {source === "WAVE PDL" && (
-          <>
-            <RemoteFieldSlider page={PATCH} field={assign.wavePedalRate} />
-            <RemoteFieldWaveShapePicker
-              page={PATCH}
-              field={assign.wavePedalForm}
-            />
-          </>
-        )}
-      </RemoteFieldSwitchedSection>
-    </>
+          field={assign.switch}
+          key={assign.address}
+        >
+          <RemoteFieldPicker
+            page={PATCH}
+            field={targetField}
+            value={target}
+            onValueChange={handleTargetChange}
+          />
+          <RemoteFieldDynamic
+            page={PATCH}
+            field={targetMinField}
+            key={target + "min"}
+          />
+          <RemoteFieldDynamic
+            page={PATCH}
+            field={targetMaxField}
+            key={target + "max"}
+          />
+          <RemoteFieldPicker
+            page={PATCH}
+            field={assign.source}
+            value={source}
+            onValueChange={setSource}
+          />
+          <RemoteFieldPicker page={PATCH} field={assign.sourceMode} />
+          <RemoteFieldSlider page={PATCH} field={assign.activeRangeLo} />
+          <RemoteFieldSlider page={PATCH} field={assign.activeRangeHi} />
+          {source === "INT PDL" && (
+            <>
+              <RemoteFieldPicker
+                page={PATCH}
+                field={assign.internalPedalTrigger}
+              />
+              <RemoteFieldSlider
+                page={PATCH}
+                field={assign.internalPedalTime}
+              />
+              <RemoteFieldPicker
+                page={PATCH}
+                field={assign.internalPedalCurve}
+              />
+            </>
+          )}
+          {source === "WAVE PDL" && (
+            <>
+              <RemoteFieldSlider page={PATCH} field={assign.wavePedalRate} />
+              <RemoteFieldWaveShapePicker
+                page={PATCH}
+                field={assign.wavePedalForm}
+              />
+            </>
+          )}
+        </RemoteFieldSwitchedSection>
+      </Section>
+    </ThemedCard>
   );
 }
 
@@ -404,5 +407,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     backgroundColor: "#ffffff",
+  },
+  card: {
+    marginTop: 16,
+    marginHorizontal: 16,
+    marginBottom: 0,
   },
 });

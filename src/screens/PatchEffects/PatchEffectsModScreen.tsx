@@ -535,25 +535,6 @@ function PatchEffectsModScreenContent({
         </Section>
       </ThemedCard>
 
-      {/* Noise Suppressor section */}
-      <RemoteFieldSwitchedSection
-        page={PATCH}
-        field={GR55.temporaryPatch.ampModNs.nsSwitch}
-      >
-        <ThemedCard>
-          <Section heading="Noise Suppressor" noBorder>
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.ampModNs.nsThreshold}
-            />
-            <RemoteFieldSlider
-              page={PATCH}
-              field={GR55.temporaryPatch.ampModNs.nsReleaseTime}
-            />
-          </Section>
-        </ThemedCard>
-      </RemoteFieldSwitchedSection>
-
       {/* Send Levels */}
       <ThemedCard>
         <Section heading="Send Levels" noBorder>
