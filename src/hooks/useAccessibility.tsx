@@ -16,6 +16,7 @@ export interface AccessibilityProps {
   "aria-selected"?: boolean;
   "aria-disabled"?: boolean;
   "aria-expanded"?: boolean;
+  "aria-hidden"?: boolean;
   role?: string;
 }
 
