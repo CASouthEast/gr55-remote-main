@@ -93,9 +93,8 @@ function useRolandIoSetupImpl() {
       }
       connectedDevicesRef.current.set(deviceKey, deviceDescriptor);
       setConnectedDevicesSnapshot(new Map(connectedDevicesRef.current));
-      setSelectedDeviceKey(
-        (currentSelectedKey) => currentSelectedKey ?? deviceKey
-      );
+      // Do not auto-select the first detected device; selection must be explicit.
+      setSelectedDeviceKey((currentSelectedKey) => currentSelectedKey);
     };
 
     const handleMidiMessage = (event: MIDIMessageEvent) => {

@@ -4252,29 +4252,29 @@ const systemCtlFunctions = enumField([
 
 const systemGkTypeGuitar = enumField([
   "GK-3",
-  "GK-3A",
   "GK-2A",
-  "GK-2B",
-  "GK-2C",
-  "GK-2D",
-  "GK-2E",
-  "GK-2F",
+  "PIEZO",
+  "PIEZO R",
+  "PIEZO F",
+  "PIEZO G",
+  "PIEZO L",
+  "PIEZO M",
 ] as const);
 
 const systemGkTypeBass = enumField([
   "GK-3B",
-  "GK-3A",
-  "GK-2A",
   "GK-2B",
-  "GK-2C",
-  "GK-2D",
-  "GK-2E",
-  "GK-2F",
+  "PIEZO",
+  "PIEZO R",
+  "PIEZO F",
+  "PIEZO G",
+  "PIEZO L",
+  "PIEZO M",
 ] as const);
 
 const systemScaleGuitar = enumField([
-  "Les P",
-  "Strat",
+  "LP",
+  "ST",
   "Tele",
   "Jazz",
   "335",
@@ -4380,32 +4380,50 @@ const SystemCommonStruct = {
   guitarToMidiCtlPdlCc: new FieldDefinition(
     pack7(0x0c),
     "Guitar to MIDI CTL PDL CC#",
-    new UByteField(0, 63) // TODO: Format OFF/1-31/64-95
+    new UByteField(0, 63, {
+      format: (val) =>
+        val === 0 ? "OFF" : val <= 31 ? `${val}` : `${val + 32}`,
+    })
   ),
   guitarToMidiExpPdlCc: new FieldDefinition(
     pack7(0x0d),
     "Guitar to MIDI EXP PDL CC#",
-    new UByteField(0, 63)
+    new UByteField(0, 63, {
+      format: (val) =>
+        val === 0 ? "OFF" : val <= 31 ? `${val}` : `${val + 32}`,
+    })
   ),
   guitarToMidiExpPdlBendRange: new FieldDefinition(
     pack7(0x0e),
     "Guitar to MIDI EXP pedal BendRange",
-    new UByteField(0, 48, { encodedOffset: 24 })
+    new UByteField(0, 48, {
+      encodedOffset: 24,
+      format: (val) => (val > 0 ? `+${val}` : `${val}`),
+    })
   ),
   guitarToMidiGkVolCc: new FieldDefinition(
     pack7(0x0f),
     "Guitar to MIDI GK VOL CC#",
-    new UByteField(0, 63)
+    new UByteField(0, 63, {
+      format: (val) =>
+        val === 0 ? "OFF" : val <= 31 ? `${val}` : `${val + 32}`,
+    })
   ),
   guitarToMidiGkS1Cc: new FieldDefinition(
     pack7(0x10),
     "Guitar to MIDI GK S1 CC#",
-    new UByteField(0, 63)
+    new UByteField(0, 63, {
+      format: (val) =>
+        val === 0 ? "OFF" : val <= 31 ? `${val}` : `${val + 32}`,
+    })
   ),
   guitarToMidiGkS2Cc: new FieldDefinition(
     pack7(0x11),
     "Guitar to MIDI GK S2 CC#",
-    new UByteField(0, 63)
+    new UByteField(0, 63, {
+      format: (val) =>
+        val === 0 ? "OFF" : val <= 31 ? `${val}` : `${val + 32}`,
+    })
   ),
   rxMapSelect: new FieldDefinition(
     pack7(0x12),
@@ -4456,6 +4474,8 @@ const SystemCommonStruct = {
   ),
 };
 
+const systemXFadePolarity = enumField(["OFF", "TOE", "HEEL"] as const);
+
 const SystemCtlStruct = {
   ctlFunction: new FieldDefinition(
     pack7(0x00),
@@ -4465,7 +4485,7 @@ const SystemCtlStruct = {
   ctlHoldType: new FieldDefinition(
     pack7(0x01),
     "CTL Hold Type",
-    new UByteField(0, 3)
+    new UByteField(0, 3, { format: (val) => `${val + 1}` })
   ),
   ctlHoldSwitchMode: new FieldDefinition(
     pack7(0x02),
@@ -4523,108 +4543,629 @@ const SystemCtlStruct = {
     booleanField
   ),
 
-  expFunction: new FieldDefinition(
+  expOffFunction: new FieldDefinition(
     pack7(0x0d),
-    "EXP Function",
+    "EXP OFF Function",
     systemExpPdlFunctions
   ),
-  // TODO: Add remaining EXP properties
+  expOffPcm1VolSwitch: new FieldDefinition(
+    pack7(0x0e),
+    "EXP OFF PCM1 Vol Swap",
+    booleanField
+  ),
+  expOffPcm2VolSwitch: new FieldDefinition(
+    pack7(0x0f),
+    "EXP OFF PCM2 Vol Swap",
+    booleanField
+  ),
+  expOffModelVolSwitch: new FieldDefinition(
+    pack7(0x10),
+    "EXP OFF Model Vol Swap",
+    booleanField
+  ),
+  expOffNormalVolSwitch: new FieldDefinition(
+    pack7(0x11),
+    "EXP OFF Normal Vol Swap",
+    booleanField
+  ),
+  expOffBendRange: new FieldDefinition(
+    pack7(0x12),
+    "EXP OFF Bend Range",
+    new UByteField(-12, 12, { encodedOffset: 24 })
+  ),
+  expOffPcm1BendSwitch: new FieldDefinition(
+    pack7(0x13),
+    "EXP OFF PCM1 Bend Switch",
+    booleanField
+  ),
+  expOffPcm2BendSwitch: new FieldDefinition(
+    pack7(0x14),
+    "EXP OFF PCM2 Bend Switch",
+    booleanField
+  ),
+  expOffModelBendSwitch: new FieldDefinition(
+    pack7(0x15),
+    "EXP OFF Model Bend Switch",
+    booleanField
+  ),
+  expOffModMin: new FieldDefinition(
+    pack7(0x16),
+    "EXP OFF Mod Min",
+    new UByteField(0, 127)
+  ),
+  expOffModMax: new FieldDefinition(
+    pack7(0x17),
+    "EXP OFF Mod Max",
+    new UByteField(0, 127)
+  ),
+  expOffPcm1ModSwitch: new FieldDefinition(
+    pack7(0x18),
+    "EXP OFF PCM1 Mod Switch",
+    booleanField
+  ),
+  expOffPcm2ModSwitch: new FieldDefinition(
+    pack7(0x19),
+    "EXP OFF PCM2 Mod Switch",
+    booleanField
+  ),
+  expOffPcm1XFadePolarity: new FieldDefinition(
+    pack7(0x1a),
+    "EXP OFF PCM1 XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOffPcm2XFadePolarity: new FieldDefinition(
+    pack7(0x1b),
+    "EXP OFF PCM2 XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOffModelXFadePolarity: new FieldDefinition(
+    pack7(0x1c),
+    "EXP OFF Model XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOffNormalXFadePolarity: new FieldDefinition(
+    pack7(0x1d),
+    "EXP OFF Normal XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOffDelayLevelMin: new FieldDefinition(
+    pack7(0x1e),
+    "EXP OFF Delay Level Min",
+    new UByteField(0, 127)
+  ),
+  expOffDelayLevelMax: new FieldDefinition(
+    pack7(0x1f),
+    "EXP OFF Delay Level Max",
+    new UByteField(0, 127)
+  ),
+  expOffReverbLevelMin: new FieldDefinition(
+    pack7(0x20),
+    "EXP OFF Reverb Level Min",
+    new UByteField(0, 127)
+  ),
+  expOffReverbLevelMax: new FieldDefinition(
+    pack7(0x21),
+    "EXP OFF Reverb Level Max",
+    new UByteField(0, 127)
+  ),
+  expOffChorusLevelMin: new FieldDefinition(
+    pack7(0x22),
+    "EXP OFF Chorus Level Min",
+    new UByteField(0, 127)
+  ),
+  expOffChorusLevelMax: new FieldDefinition(
+    pack7(0x23),
+    "EXP OFF Chorus Level Max",
+    new UByteField(0, 127)
+  ),
 
-  // Shortcuts for GK S1/S2 Function which are simple enough to add
+  expOnFunction: new FieldDefinition(
+    pack7(0x24),
+    "EXP ON Function",
+    systemExpPdlFunctions
+  ),
+  expOnPcm1VolSwitch: new FieldDefinition(
+    pack7(0x25),
+    "EXP ON PCM1 Vol Swap",
+    booleanField
+  ),
+  expOnPcm2VolSwitch: new FieldDefinition(
+    pack7(0x26),
+    "EXP ON PCM2 Vol Swap",
+    booleanField
+  ),
+  expOnModelVolSwitch: new FieldDefinition(
+    pack7(0x27),
+    "EXP ON Model Vol Swap",
+    booleanField
+  ),
+  expOnNormalVolSwitch: new FieldDefinition(
+    pack7(0x28),
+    "EXP ON Normal Vol Swap",
+    booleanField
+  ),
+  expOnBendRange: new FieldDefinition(
+    pack7(0x29),
+    "EXP ON Bend Range",
+    new UByteField(-12, 12, { encodedOffset: 24 })
+  ),
+  expOnPcm1BendSwitch: new FieldDefinition(
+    pack7(0x2a),
+    "EXP ON PCM1 Bend Switch",
+    booleanField
+  ),
+  expOnPcm2BendSwitch: new FieldDefinition(
+    pack7(0x2b),
+    "EXP ON PCM2 Bend Switch",
+    booleanField
+  ),
+  expOnModelBendSwitch: new FieldDefinition(
+    pack7(0x2c),
+    "EXP ON Model Bend Switch",
+    booleanField
+  ),
+  expOnModMin: new FieldDefinition(
+    pack7(0x2d),
+    "EXP ON Mod Min",
+    new UByteField(0, 127)
+  ),
+  expOnModMax: new FieldDefinition(
+    pack7(0x2e),
+    "EXP ON Mod Max",
+    new UByteField(0, 127)
+  ),
+  expOnPcm1ModSwitch: new FieldDefinition(
+    pack7(0x2f),
+    "EXP ON PCM1 Mod Switch",
+    booleanField
+  ),
+  expOnPcm2ModSwitch: new FieldDefinition(
+    pack7(0x30),
+    "EXP ON PCM2 Mod Switch",
+    booleanField
+  ),
+  expOnPcm1XFadePolarity: new FieldDefinition(
+    pack7(0x31),
+    "EXP ON PCM1 XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOnPcm2XFadePolarity: new FieldDefinition(
+    pack7(0x32),
+    "EXP ON PCM2 XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOnModelXFadePolarity: new FieldDefinition(
+    pack7(0x33),
+    "EXP ON Model XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOnNormalXFadePolarity: new FieldDefinition(
+    pack7(0x34),
+    "EXP ON Normal XFade Polarity",
+    systemXFadePolarity
+  ),
+  expOnDelayLevelMin: new FieldDefinition(
+    pack7(0x35),
+    "EXP ON Delay Level Min",
+    new UByteField(0, 127)
+  ),
+  expOnDelayLevelMax: new FieldDefinition(
+    pack7(0x36),
+    "EXP ON Delay Level Max",
+    new UByteField(0, 127)
+  ),
+  expOnReverbLevelMin: new FieldDefinition(
+    pack7(0x37),
+    "EXP ON Reverb Level Min",
+    new UByteField(0, 127)
+  ),
+  expOnReverbLevelMax: new FieldDefinition(
+    pack7(0x38),
+    "EXP ON Reverb Level Max",
+    new UByteField(0, 127)
+  ),
+  expOnChorusLevelMin: new FieldDefinition(
+    pack7(0x39),
+    "EXP ON Chorus Level Min",
+    new UByteField(0, 127)
+  ),
+  expOnChorusLevelMax: new FieldDefinition(
+    pack7(0x3a),
+    "EXP ON Chorus Level Max",
+    new UByteField(0, 127)
+  ),
+
+  expSwFunction: new FieldDefinition(
+    pack7(0x3b),
+    "EXP SW Function",
+    systemExpSwFunctions
+  ),
+  expSwMode: new FieldDefinition(
+    pack7(0x3c),
+    "EXP SW Mode",
+    enumField(["LATCH", "MOMENT"] as const)
+  ),
+  expSwOffPcm1: new FieldDefinition(
+    pack7(0x3d),
+    "EXP SW OFF PCM1",
+    booleanField
+  ),
+  expSwOffPcm2: new FieldDefinition(
+    pack7(0x3e),
+    "EXP SW OFF PCM2",
+    booleanField
+  ),
+  expSwOffModel: new FieldDefinition(
+    pack7(0x3f),
+    "EXP SW OFF Model",
+    booleanField
+  ),
+  expSwOffNormal: new FieldDefinition(
+    pack7(0x40),
+    "EXP SW OFF Normal",
+    booleanField
+  ),
+  expSwOnPcm1: new FieldDefinition(pack7(0x41), "EXP SW ON PCM1", booleanField),
+  expSwOnPcm2: new FieldDefinition(pack7(0x42), "EXP SW ON PCM2", booleanField),
+  expSwOnModel: new FieldDefinition(
+    pack7(0x43),
+    "EXP SW ON Model",
+    booleanField
+  ),
+  expSwOnNormal: new FieldDefinition(
+    pack7(0x44),
+    "EXP SW ON Normal",
+    booleanField
+  ),
+  loopRecPlayLevel: new FieldDefinition(
+    pack7(0x45),
+    "Loop Rec/Play Level",
+    new UByteField(0, 100)
+  ),
+  loopDubLevel: new FieldDefinition(
+    pack7(0x46),
+    "Loop Dub Level",
+    new UByteField(0, 100)
+  ),
+  loopStopLevel: new FieldDefinition(
+    pack7(0x47),
+    "Loop Stop Level",
+    new UByteField(0, 100)
+  ),
+
+  gkVolFunction: new FieldDefinition(
+    pack7(0x48),
+    "GK VOL Function",
+    systemExpPdlFunctions
+  ),
+  gkVolPcm1VolSwitch: new FieldDefinition(
+    pack7(0x49),
+    "GK VOL PCM1 Vol Switch",
+    booleanField
+  ),
+  gkVolPcm2VolSwitch: new FieldDefinition(
+    pack7(0x4a),
+    "GK VOL PCM2 Vol Switch",
+    booleanField
+  ),
+  gkVolModelVolSwitch: new FieldDefinition(
+    pack7(0x4b),
+    "GK VOL Model Vol Switch",
+    booleanField
+  ),
+  gkVolNormalVolSwitch: new FieldDefinition(
+    pack7(0x4c),
+    "GK VOL Normal Vol Switch",
+    booleanField
+  ),
+  gkVolBendRange: new FieldDefinition(
+    pack7(0x4d),
+    "GK VOL Bend Range",
+    new UByteField(-12, 12, { encodedOffset: 24 })
+  ),
+  gkVolPcm1BendSwitch: new FieldDefinition(
+    pack7(0x4e),
+    "GK VOL PCM1 Bend Switch",
+    booleanField
+  ),
+  gkVolPcm2BendSwitch: new FieldDefinition(
+    pack7(0x4f),
+    "GK VOL PCM2 Bend Switch",
+    booleanField
+  ),
+  gkVolModelBendSwitch: new FieldDefinition(
+    pack7(0x50),
+    "GK VOL Model Bend Switch",
+    booleanField
+  ),
+  gkVolModMin: new FieldDefinition(
+    pack7(0x51),
+    "GK VOL Mod Min",
+    new UByteField(0, 127)
+  ),
+  gkVolModMax: new FieldDefinition(
+    pack7(0x52),
+    "GK VOL Mod Max",
+    new UByteField(0, 127)
+  ),
+  gkVolPcm1ModSwitch: new FieldDefinition(
+    pack7(0x53),
+    "GK VOL PCM1 Mod Switch",
+    booleanField
+  ),
+  gkVolPcm2ModSwitch: new FieldDefinition(
+    pack7(0x54),
+    "GK VOL PCM2 Mod Switch",
+    booleanField
+  ),
+  gkVolPcm1XFadePolarity: new FieldDefinition(
+    pack7(0x55),
+    "GK VOL PCM1 XFade Polarity",
+    systemXFadePolarity
+  ),
+  gkVolPcm2XFadePolarity: new FieldDefinition(
+    pack7(0x56),
+    "GK VOL PCM2 XFade Polarity",
+    systemXFadePolarity
+  ),
+  gkVolModelXFadePolarity: new FieldDefinition(
+    pack7(0x57),
+    "GK VOL Model XFade Polarity",
+    systemXFadePolarity
+  ),
+  gkVolNormalXFadePolarity: new FieldDefinition(
+    pack7(0x58),
+    "GK VOL Normal XFade Polarity",
+    systemXFadePolarity
+  ),
+  gkVolDelayLevelMin: new FieldDefinition(
+    pack7(0x59),
+    "GK VOL Delay Level Min",
+    new UByteField(0, 127)
+  ),
+  gkVolDelayLevelMax: new FieldDefinition(
+    pack7(0x5a),
+    "GK VOL Delay Level Max",
+    new UByteField(0, 127)
+  ),
+  gkVolReverbLevelMin: new FieldDefinition(
+    pack7(0x5b),
+    "GK VOL Reverb Level Min",
+    new UByteField(0, 127)
+  ),
+  gkVolReverbLevelMax: new FieldDefinition(
+    pack7(0x5c),
+    "GK VOL Reverb Level Max",
+    new UByteField(0, 127)
+  ),
+  gkVolChorusLevelMin: new FieldDefinition(
+    pack7(0x5d),
+    "GK VOL Chorus Level Min",
+    new UByteField(0, 127)
+  ),
+  gkVolChorusLevelMax: new FieldDefinition(
+    pack7(0x5e),
+    "GK VOL Chorus Level Max",
+    new UByteField(0, 127)
+  ),
+
   gkS1Function: new FieldDefinition(
     pack7(0x5f),
     "GK S1 Function",
     systemExpSwFunctions
   ),
+  gkS1Mode: new FieldDefinition(
+    pack7(0x60),
+    "GK S1 Mode",
+    enumField(["LATCH", "MOMENT"] as const)
+  ),
+  gkS1OffPcm1: new FieldDefinition(pack7(0x61), "GK S1 OFF PCM1", booleanField),
+  gkS1OffPcm2: new FieldDefinition(pack7(0x62), "GK S1 OFF PCM2", booleanField),
+  gkS1OffModel: new FieldDefinition(
+    pack7(0x63),
+    "GK S1 OFF Model",
+    booleanField
+  ),
+  gkS1OffNormal: new FieldDefinition(
+    pack7(0x64),
+    "GK S1 OFF Normal",
+    booleanField
+  ),
+  gkS1OnPcm1: new FieldDefinition(pack7(0x65), "GK S1 ON PCM1", booleanField),
+  gkS1OnPcm2: new FieldDefinition(pack7(0x66), "GK S1 ON PCM2", booleanField),
+  gkS1OnModel: new FieldDefinition(pack7(0x67), "GK S1 ON Model", booleanField),
+  gkS1OnNormal: new FieldDefinition(
+    pack7(0x68),
+    "GK S1 ON Normal",
+    booleanField
+  ),
+
   gkS2Function: new FieldDefinition(
     pack7(0x6c),
     "GK S2 Function",
     systemExpSwFunctions
+  ),
+  gkS2Mode: new FieldDefinition(
+    pack7(0x6d),
+    "GK S2 Mode",
+    enumField(["LATCH", "MOMENT"] as const)
+  ),
+  gkS2OffPcm1: new FieldDefinition(pack7(0x6e), "GK S2 OFF PCM1", booleanField),
+  gkS2OffPcm2: new FieldDefinition(pack7(0x6f), "GK S2 OFF PCM2", booleanField),
+  gkS2OffModel: new FieldDefinition(
+    pack7(0x70),
+    "GK S2 OFF Model",
+    booleanField
+  ),
+  gkS2OffNormal: new FieldDefinition(
+    pack7(0x71),
+    "GK S2 OFF Normal",
+    booleanField
+  ),
+  gkS2OnPcm1: new FieldDefinition(pack7(0x72), "GK S2 ON PCM1", booleanField),
+  gkS2OnPcm2: new FieldDefinition(pack7(0x73), "GK S2 ON PCM2", booleanField),
+  gkS2OnModel: new FieldDefinition(pack7(0x74), "GK S2 ON Model", booleanField),
+  gkS2OnNormal: new FieldDefinition(
+    pack7(0x75),
+    "GK S2 ON Normal",
+    booleanField
+  ),
+
+  expOffModControlMin: new FieldDefinition(
+    pack7(0x79),
+    "EXP OFF Mod Control Min",
+    new UByteField(0, 127)
+  ),
+  expOffModControlMax: new FieldDefinition(
+    pack7(0x7a),
+    "EXP OFF Mod Control Max",
+    new UByteField(0, 127)
+  ),
+  expOnModControlMin: new FieldDefinition(
+    pack7(0x7b),
+    "EXP ON Mod Control Min",
+    new UByteField(0, 127)
+  ),
+  expOnModControlMax: new FieldDefinition(
+    pack7(0x7c),
+    "EXP ON Mod Control Max",
+    new UByteField(0, 127)
+  ),
+  gkVolModControlMin: new FieldDefinition(
+    pack7(0x7d),
+    "GK VOL Mod Control Min",
+    new UByteField(0, 127)
+  ),
+  gkVolModControlMax: new FieldDefinition(
+    pack7(0x7e),
+    "GK VOL Mod Control Max",
+    new UByteField(0, 127)
   ),
 };
 
 const SystemGkGuitarStruct = {
   name: new FieldDefinition(pack7(0x00), "Name", new AsciiStringField(8)),
   puType: new FieldDefinition(pack7(0x08), "PU Type", systemGkTypeGuitar),
-  scale: new FieldDefinition(pack7(0x09), "Scale", systemScaleGuitar),
-  puPhase: new FieldDefinition(pack7(0x0a), "PU Phase", systemPuPhase),
+  scale: new FieldDefinition(pack7(0x09), "Scale", new USplit8Field(500, 660)),
+  puPhase: new FieldDefinition(pack7(0x0b), "PU Phase", systemPuPhase),
   puDirection: new FieldDefinition(
-    pack7(0x0b),
+    pack7(0x0c),
     "PU Direction",
     systemPuDirection
   ),
-  s1s2Pos: new FieldDefinition(pack7(0x0c), "S1/S2 Position", systemS1S2Pos),
+  s1s2Pos: new FieldDefinition(pack7(0x0d), "S1/S2 Position", systemS1S2Pos),
+  normalPuGain: new FieldDefinition(
+    pack7(0x0e),
+    "Normal PU Gain",
+    new UByteField(-20, 20, { encodedOffset: 20, format: (val) => `${val} dB` })
+  ),
+  piezoLow: new FieldDefinition(
+    pack7(0x0f),
+    "Piezo Low",
+    new UByteField(0, 20)
+  ),
+  piezoHigh: new FieldDefinition(
+    pack7(0x10),
+    "Piezo High",
+    new UByteField(0, 20)
+  ),
   // String Distance
   string1Dist: new FieldDefinition(
-    pack7(0x0d),
+    pack7(0x11),
     "String 1 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string2Dist: new FieldDefinition(
-    pack7(0x0e),
+    pack7(0x12),
     "String 2 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string3Dist: new FieldDefinition(
-    pack7(0x0f),
+    pack7(0x13),
     "String 3 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string4Dist: new FieldDefinition(
-    pack7(0x10),
+    pack7(0x14),
     "String 4 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string5Dist: new FieldDefinition(
-    pack7(0x11),
+    pack7(0x15),
     "String 5 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string6Dist: new FieldDefinition(
-    pack7(0x12),
+    pack7(0x16),
     "String 6 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   // String Sens
   string1Sens: new FieldDefinition(
-    pack7(0x13),
+    pack7(0x17),
     "String 1 Sens",
     new UByteField(0, 100)
   ),
   string2Sens: new FieldDefinition(
-    pack7(0x14),
+    pack7(0x18),
     "String 2 Sens",
     new UByteField(0, 100)
   ),
   string3Sens: new FieldDefinition(
-    pack7(0x15),
+    pack7(0x19),
     "String 3 Sens",
     new UByteField(0, 100)
   ),
   string4Sens: new FieldDefinition(
-    pack7(0x16),
+    pack7(0x1a),
     "String 4 Sens",
     new UByteField(0, 100)
   ),
   string5Sens: new FieldDefinition(
-    pack7(0x17),
+    pack7(0x1b),
     "String 5 Sens",
     new UByteField(0, 100)
   ),
   string6Sens: new FieldDefinition(
-    pack7(0x18),
+    pack7(0x1c),
     "String 6 Sens",
     new UByteField(0, 100)
   ),
-
-  normalPuGain: new FieldDefinition(
+  // Velocity
+  velocityDynamics: new FieldDefinition(
+    pack7(0x1d),
+    "Velocity Dynamics",
+    new UByteField(0, 4)
+  ),
+  velocityLowCut: new FieldDefinition(
+    pack7(0x1e),
+    "Velocity Low Cut",
+    new UByteField(0, 10)
+  ),
+  pcmVelocitySens: new FieldDefinition(
     pack7(0x1f),
-    "Normal PU Gain",
-    new UByteField(-20, 20, { encodedOffset: 20, format: (val) => `${val} dB` })
+    "PCM Velocity Sens",
+    new UByteField(0, 5)
+  ),
+  // Nuance
+  nuanceDynamics: new FieldDefinition(
+    pack7(0x20),
+    "Nuance Dynamics",
+    new UByteField(0, 10)
+  ),
+  nuanceTrim: new FieldDefinition(
+    pack7(0x21),
+    "Nuance Trim",
+    new UByteField(0, 10)
+  ),
+  // Down Tuning
+  downTuning: new FieldDefinition(
+    pack7(0x22),
+    "Down Tuning",
+    new UByteField(0, 5)
   ),
 };
 
-// Simplified Bass Struct just for scaffolding
 const SystemGkBassStruct = {
   name: new FieldDefinition(pack7(0x00), "Name", new AsciiStringField(8)),
   puType: new FieldDefinition(pack7(0x08), "PU Type", systemGkTypeBass),
@@ -4641,32 +5182,32 @@ const SystemGkBassStruct = {
   string1Dist: new FieldDefinition(
     pack7(0x0e),
     "String 1 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string2Dist: new FieldDefinition(
     pack7(0x0f),
     "String 2 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string3Dist: new FieldDefinition(
     pack7(0x10),
     "String 3 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string4Dist: new FieldDefinition(
     pack7(0x11),
     "String 4 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string5Dist: new FieldDefinition(
     pack7(0x12),
     "String 5 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   string6Dist: new FieldDefinition(
     pack7(0x13),
     "String 6 Distance",
-    new UByteField(0, 100)
+    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
   ),
   // String Sens
   string1Sens: new FieldDefinition(
@@ -4710,10 +5251,54 @@ const SystemGkBassStruct = {
 const SystemStruct = {
   common: new StructDefinition(pack7(0x000000), "Common", SystemCommonStruct),
   ctl: new StructDefinition(pack7(0x000200), "CTL/Assign", SystemCtlStruct),
-  // Defaulting to only mapping Set 1 for now to avoid code bloat, can add 2-10 later
   gkSet1: new StructDefinition(
     pack7(0x000400),
     "GK Set 1",
+    SystemGkGuitarStruct
+  ),
+  gkSet2: new StructDefinition(
+    pack7(0x000500),
+    "GK Set 2",
+    SystemGkGuitarStruct
+  ),
+  gkSet3: new StructDefinition(
+    pack7(0x000600),
+    "GK Set 3",
+    SystemGkGuitarStruct
+  ),
+  gkSet4: new StructDefinition(
+    pack7(0x000700),
+    "GK Set 4",
+    SystemGkGuitarStruct
+  ),
+  gkSet5: new StructDefinition(
+    pack7(0x000800),
+    "GK Set 5",
+    SystemGkGuitarStruct
+  ),
+  gkSet6: new StructDefinition(
+    pack7(0x000900),
+    "GK Set 6",
+    SystemGkGuitarStruct
+  ),
+  gkSet7: new StructDefinition(
+    pack7(0x000a00),
+    "GK Set 7",
+    SystemGkGuitarStruct
+  ),
+  gkSet8: new StructDefinition(
+    pack7(0x000b00),
+    "GK Set 8",
+    SystemGkGuitarStruct
+  ),
+  gkSet9: new StructDefinition(
+    pack7(0x000c00),
+    "GK Set 9",
+    SystemGkGuitarStruct
+  ),
+  gkSet10: new StructDefinition(
+    pack7(0x000d00),
+    "GK Set 10",
     SystemGkGuitarStruct
   ),
 };

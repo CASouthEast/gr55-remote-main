@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 
-import { parse } from "./RolandAddressMap";
 import { RolandGR55SysExConfig } from "./RolandDevices";
 import { RolandIoSetupContext } from "./RolandIoSetup";
 import useCancellablePromise from "../hooks/useCancellablePromise";
@@ -46,49 +45,11 @@ export function RolandRemotePatchSelectionContainer({
   const [selectedPatch, setSelectedPatch] = useState<PatchId>();
 
   useCancellablePromise(
-    useCallback(
-      async (signal) => {
-        if (!addressMap || !requestData) {
-          return;
-        }
-        const setupData = await requestData(
-          addressMap.setup.definition,
-          addressMap.setup.address,
-          signal,
-          "read_utmost"
-        );
-
-        const [parsedBsMsb] = parse(
-          setupData[
-            addressMap.setup.address +
-              addressMap.setup.definition.$.patchBsMsb.offset
-          ],
-          addressMap.setup.definition.$.patchBsMsb,
-          0
-        );
-
-        const [parsedPc] = parse(
-          setupData[
-            addressMap.setup.address +
-              addressMap.setup.definition.$.patchPc.offset
-          ],
-          addressMap.setup.definition.$.patchPc,
-          0
-        );
-
-        const remoteSelectedPatch = {
-          bankSelectMSB: parsedBsMsb.value,
-          pc: parsedPc.value,
-        };
-        setSelectedPatch((localSelection) => {
-          if (localSelection) {
-            return localSelection;
-          }
-          return remoteSelectedPatch;
-        });
-      },
-      [addressMap, requestData]
-    )
+    useCallback(async () => {
+      // Suppress the initial setup fetch to avoid sending an extra RQ1 (0x01) request.
+      // The required setup bytes are included in the System bulk response.
+      // Intentionally empty - setup data is provided by System bulk response
+    }, [selectedDevice, addressMap, requestData])
   );
 
   useEffect(() => {

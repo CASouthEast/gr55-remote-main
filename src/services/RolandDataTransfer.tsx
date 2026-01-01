@@ -18,6 +18,7 @@ import {
   AtomReference,
   fetchAndTokenize,
   RawDataBag,
+  StructDefinition,
 } from "../lib/RolandAddressMap";
 import { RolandGR55SysExConfig } from "../lib/RolandDevices";
 import { RolandIoSetupContext } from "../lib/RolandIoSetup";
@@ -30,6 +31,7 @@ import {
   GAP_BETWEEN_MESSAGES_MS,
   unpack7,
   makeRawDataRequestMessage,
+  pack7,
 } from "../lib/RolandSysExProtocol";
 
 type PendingFetch = {
@@ -187,14 +189,21 @@ function useRolandDataTransferImpl() {
           reject(new Error("Data request timed out"));
         }, 5000);
         try {
-          myOutputPort.send(
-            makeDataRequestMessage(
-              sysExConfig,
-              deviceId ?? ALL_DEVICES,
-              address,
-              length
-            )
+          const message = makeDataRequestMessage(
+            sysExConfig,
+            deviceId ?? ALL_DEVICES,
+            address,
+            length
           );
+          if (enableExperimentalFeatures) {
+            console.log(
+              "📤 SysEx Request:",
+              message
+                .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
+                .join(" ")
+            );
+          }
+          myOutputPort.send(message);
         } catch (e) {
           pendingFetches.current.delete(thisFetch);
           throw e;
@@ -358,6 +367,191 @@ function useRolandDataTransferImpl() {
       return result;
     }
 
+    // GR-55 System data uses a special bulk retrieval pattern:
+    // Send ONE request to address 0x01000000 with args [01, 01, 00, 00]
+    // Receive THIRTEEN responses at different addresses (Setup + System Common + CTL + 10 GK Sets)
+    async function requestSystemBulk(
+      signal?: AbortSignal,
+      queueID: string = "read_utmost"
+    ): Promise<RawDataBag> {
+      console.log("� SYSBULK: Starting requestSystemBulk");
+
+      // Define all expected response addresses based on traffic log
+      const SYSTEM_BULK_RESPONSE_ADDRESSES = [
+        pack7(0x01000000), // Setup (will be present but not used for System)
+        pack7(0x02000000), // System Common
+        pack7(0x02000200), // System CTL
+        pack7(0x02000400), // GK Set 1
+        pack7(0x02000500), // GK Set 2
+        pack7(0x02000600), // GK Set 3
+        pack7(0x02000700), // GK Set 4
+        pack7(0x02000800), // GK Set 5
+        pack7(0x02000900), // GK Set 6
+        pack7(0x02000a00), // GK Set 7
+        pack7(0x02000b00), // GK Set 8
+        pack7(0x02000c00), // GK Set 9
+        pack7(0x02000d00), // GK Set 10
+      ];
+
+      // Send request to address 0x01000000 with args [01, 01, 00, 00]
+      const responseMap = await requestNonDataCommand(
+        pack7(0x01000000),
+        [0x01, 0x01, 0x00, 0x00],
+        SYSTEM_BULK_RESPONSE_ADDRESSES,
+        signal,
+        queueID
+      );
+
+      console.log(
+        `� SYSBULK: Received ${Object.keys(responseMap).length} responses`
+      );
+      const addresses = Object.keys(responseMap).map(
+        (k) => `0x${unpack7(Number(k)).toString(16)}`
+      );
+      console.log(`🟦 SYSBULK: Response addresses:`, addresses);
+      console.log(
+        `🟦 SYSBULK: responseMap type:`,
+        typeof responseMap,
+        responseMap instanceof Map
+      );
+      console.log(
+        `🟦 SYSBULK: Object.entries length:`,
+        Object.entries(responseMap).length
+      );
+
+      // Map each response to structure offsets and tokenize
+      // The System structure is at base 0x02000000, with sub-structures at specific offsets
+      const result: RawDataBag = {};
+      const systemBase = pack7(0x02000000);
+      const systemStruct = sysExConfig.addressMap!.system!.definition.$; // Get the actual struct fields
+
+      console.log(
+        `� SYSBULK: Starting to process ${
+          Object.keys(responseMap).length
+        } responses...`
+      );
+
+      // Map each response to its offset relative to the System base address
+      for (const [address, data] of Object.entries(responseMap)) {
+        const addr = Number(address);
+        console.log(
+          `🟦 SYSBULK: Processing response at 0x${unpack7(addr).toString(
+            16
+          )}, data length: ${data.length} bytes`
+        );
+
+        if (addr === pack7(0x01000000)) {
+          // Skip Setup data - not part of System structure
+          console.log(`🟦 SYSBULK: Skipping Setup data`);
+          continue;
+        }
+
+        // Find which sub-structure this response belongs to (common, ctl, gkSet1-10)
+        // by matching the address against each sub-structure's base address
+        let subDef: StructDefinition<any> | null = null;
+        let subBaseAddr = addr;
+
+        console.log(
+          `🟦 SYSBULK: Looking for match for address 0x${unpack7(addr).toString(
+            16
+          )}, systemBase=0x${unpack7(systemBase).toString(16)}`
+        );
+        console.log(
+          `🟦 SYSBULK: systemStruct keys:`,
+          Object.keys(systemStruct)
+        );
+
+        try {
+          for (const [key, value] of Object.entries(systemStruct)) {
+            if (value instanceof StructDefinition) {
+              const subAddr = pack7(
+                unpack7(systemBase) + unpack7(value.offset)
+              );
+              console.log(
+                `🟦 SYSBULK:     ${key}: offset=0x${unpack7(
+                  value.offset
+                ).toString(16)}, subAddr=0x${unpack7(subAddr).toString(
+                  16
+                )}, addr===subAddr: ${addr === subAddr}`
+              );
+              if (addr === subAddr) {
+                subDef = value;
+                subBaseAddr = subAddr;
+                console.log(
+                  `🟦 SYSBULK: ✅ Matched to sub-structure: ${key} (${value.description})`
+                );
+                break;
+              }
+            }
+          }
+        } catch (matchError) {
+          console.error(`🟦 SYSBULK: ❌ Error during matching:`, matchError);
+        }
+
+        console.log(
+          `🟦 SYSBULK: After matching: subDef=${
+            subDef ? subDef.description : "NULL"
+          }`
+        );
+
+        if (!subDef) {
+          console.warn(
+            `🟦 SYSBULK: ⚠️ No sub-structure definition found for address 0x${unpack7(
+              addr
+            ).toString(16)}`
+          );
+          continue;
+        }
+
+        // Tokenize this specific sub-structure's data blob
+        console.log(
+          `🟦 SYSBULK: Tokenizing ${subDef.description} at 0x${unpack7(
+            addr
+          ).toString(16)} with ${data.length} bytes`
+        );
+
+        try {
+          const tokenizedData = await fetchAndTokenize(
+            subDef.definition,
+            subBaseAddr,
+            async (def, baseAddr) => {
+              return { [addr]: data };
+            }
+          );
+
+          const tokenKeys = Object.keys(tokenizedData).slice(0, 10);
+          console.log(
+            `🟦 SYSBULK: ✅ Tokenized into ${
+              Object.keys(tokenizedData).length
+            } fields. First 10 keys:`,
+            tokenKeys.map((k) => `0x${unpack7(Number(k)).toString(16)}`)
+          );
+
+          // Merge tokenized data into result
+          Object.assign(result, tokenizedData);
+        } catch (error) {
+          console.error(
+            `🟦 SYSBULK: ❌ Error tokenizing ${subDef.description}:`,
+            error
+          );
+        }
+      }
+
+      const totalKeys = Object.keys(result).length;
+      console.log(
+        `🟦 SYSBULK: 🎯 Returning ${totalKeys} field addresses total`
+      );
+      if (totalKeys > 0) {
+        const sampleKeys = Object.keys(result).slice(0, 5);
+        console.log(
+          `Sample keys:`,
+          sampleKeys.map((k) => `0x${unpack7(Number(k)).toString(16)}`)
+        );
+      }
+
+      return result;
+    }
+
     function setField<T extends FieldDefinition<any>>(
       field: AtomReference<T>,
       newValue: Uint8Array | ReturnType<T["type"]["decode"]>,
@@ -402,6 +596,7 @@ function useRolandDataTransferImpl() {
     return {
       requestData,
       requestNonDataCommand,
+      requestSystemBulk,
       setField,
       registerQueueAsPriority,
       unregisterQueueAsPriority,
@@ -467,6 +662,9 @@ export const RolandDataTransferContext = createContext<{
         signal?: AbortSignal,
         queueID?: string
       ) => Promise<RawDataBag>);
+  requestSystemBulk:
+    | undefined
+    | ((signal?: AbortSignal, queueID?: string) => Promise<RawDataBag>);
   setField:
     | undefined
     | (<T extends FieldDefinition<any>>(
@@ -479,6 +677,7 @@ export const RolandDataTransferContext = createContext<{
 }>({
   requestData: undefined,
   requestNonDataCommand: undefined,
+  requestSystemBulk: undefined,
   setField: undefined,
   registerQueueAsPriority: () => {},
   unregisterQueueAsPriority: () => {},

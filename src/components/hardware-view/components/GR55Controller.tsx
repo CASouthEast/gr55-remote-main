@@ -95,7 +95,7 @@ export function GR55Controller({
         useNativeDriver: false, // SVG props often don't support native driver
       })
     ).start();
-  }, []);
+  }, [shimmerAnim, glowAnim, outlineAnim]);
 
   // Interpolations for Animated.View transforms/props
   const shimmerTranslateX = shimmerAnim.interpolate({

@@ -38,6 +38,15 @@ function useRemoteFieldImpl<T>(
       return valueBytes;
     }
     valueBytes = pageData?.[field.address];
+    if (!valueBytes && field.address > 10000 && field.address < 12000) {
+      console.log(
+        `🔍 Field lookup: field.address=${
+          field.address
+        }, found=${!!valueBytes}, pageDataKeys=${Object.keys(
+          pageData || {}
+        ).slice(0, 5)}`
+      );
+    }
     if (valueBytes) {
       return valueBytes;
     }

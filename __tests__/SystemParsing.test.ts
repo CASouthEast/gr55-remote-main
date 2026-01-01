@@ -1,7 +1,4 @@
-import {
-  RolandGR55AddressMap,
-  RolandGR55AddressMapAbsolute,
-} from "../src/lib/roland-gr55/RolandGR55AddressMap";
+import { RolandGR55AddressMapAbsolute } from "../src/lib/roland-gr55/RolandGR55AddressMap";
 
 describe("System Address Map", () => {
   test("System base address is correct", () => {
@@ -26,6 +23,7 @@ describe("System Address Map", () => {
     expect(RolandGR55AddressMapAbsolute.system.common).toBeDefined();
     expect(RolandGR55AddressMapAbsolute.system.ctl).toBeDefined();
     expect(RolandGR55AddressMapAbsolute.system.gkSet1).toBeDefined();
+    expect(RolandGR55AddressMapAbsolute.system.gkSet10).toBeDefined();
   });
 
   test("System Common fields exist", () => {
@@ -33,17 +31,28 @@ describe("System Address Map", () => {
     expect(common.gkSetSelect).toBeDefined();
     expect(common.outputSelect).toBeDefined();
     expect(common.tunerPitch).toBeDefined();
+    expect(common.guitarToMidiGkVolCc).toBeDefined();
+    expect(common.guitarToMidiGkS1Cc).toBeDefined();
+    expect(common.guitarToMidiGkS2Cc).toBeDefined();
   });
 
   test("System CTL fields exist", () => {
     const ctl = RolandGR55AddressMapAbsolute.system.ctl;
     expect(ctl.ctlFunction).toBeDefined();
-    expect(ctl.expFunction).toBeDefined();
+    expect(ctl.expOffFunction).toBeDefined();
+    expect(ctl.expOnFunction).toBeDefined();
+    expect(ctl.expSwFunction).toBeDefined();
+    expect(ctl.gkVolFunction).toBeDefined();
+    expect(ctl.gkS1Function).toBeDefined();
+    expect(ctl.gkS2Function).toBeDefined();
+    expect(ctl.expOffModControlMin).toBeDefined();
   });
 
   test("System GK fields exist", () => {
     const gk = RolandGR55AddressMapAbsolute.system.gkSet1;
     expect(gk.puType).toBeDefined();
     expect(gk.normalPuGain).toBeDefined();
+    expect(gk.string1Dist).toBeDefined();
+    expect(gk.string1Sens).toBeDefined();
   });
 });
