@@ -37,16 +37,30 @@ export function useRolandRemoteSystemState() {
         if (!addressMap?.system) {
           return Promise.reject(new Error("No address map available"));
         }
-        const remoteData = await requestSystemBulk(signal, "read_utmost");
-        const oldLocalOverrides = localOverrides.current;
-        localOverrides.current = {};
-        for (const address of Object.keys(oldLocalOverrides)) {
-          subscriptions.current!.emit(
-            address,
-            remoteData[address as unknown as number]
+
+        try {
+          const remoteData = await requestSystemBulk(signal, "read_utmost");
+          console.log(
+            "✅ useRolandRemoteSystemState: Got remote data with",
+            Object.keys(remoteData).length,
+            "fields"
           );
+          const oldLocalOverrides = localOverrides.current;
+          localOverrides.current = {};
+          for (const address of Object.keys(oldLocalOverrides)) {
+            subscriptions.current!.emit(
+              address,
+              remoteData[address as unknown as number]
+            );
+          }
+          return remoteData;
+        } catch (error) {
+          console.error(
+            "❌ useRolandRemoteSystemState: Error loading System data:",
+            error
+          );
+          throw error;
         }
-        return remoteData;
       },
       [selectedDeviceKey, invalidationCount, requestSystemBulk, addressMap]
     )

@@ -195,14 +195,6 @@ function useRolandDataTransferImpl() {
             address,
             length
           );
-          if (enableExperimentalFeatures) {
-            console.log(
-              "📤 SysEx Request:",
-              message
-                .map((b) => b.toString(16).padStart(2, "0").toUpperCase())
-                .join(" ")
-            );
-          }
           myOutputPort.send(message);
         } catch (e) {
           pendingFetches.current.delete(thisFetch);
@@ -253,25 +245,7 @@ function useRolandDataTransferImpl() {
         didError = true;
         throw e;
       } finally {
-        if (enableExperimentalFeatures) {
-          // Performance logging is an "experimental feature", until we possibly split it out into its own option
-          console.log(
-            "🧪 " +
-              `${signal?.aborted ? "(ABORTED) " : ""}${
-                didError && !signal?.aborted ? "(ERROR) " : ""
-              }[${queueID}] Request for ${definition.description} (0x${unpack7(
-                baseAddress
-              )
-                .toString(16)
-                .padStart(8, "0")}) queued for ${Math.round(
-                totalQueueTime
-              )}ms, fetched in ${Math.round(
-                totalFetchTime
-              )}ms, delayed for ${Math.round(
-                totalDelayTime
-              )}ms (${atomCount} atoms in ${chunkCount} chunk(s))`
-          );
-        }
+        // Performance logging removed - use profiler tools instead
       }
     }
 
@@ -291,7 +265,7 @@ function useRolandDataTransferImpl() {
       queueID: string = "write_utmost"
     ): Promise<RawDataBag> {
       const result: RawDataBag = {};
-      let receivedResponseCount = 0;
+      const receivedResponseCount = 0;
       const responsePromises = responseAddresses.map((responseAddress) =>
         new Promise<Uint8Array>((resolve, reject) => {
           const thisFetch: PendingFetch = {
@@ -311,21 +285,6 @@ function useRolandDataTransferImpl() {
           }, 5000);
         }).then((valueBytes) => {
           result[responseAddress] = valueBytes;
-          if (enableExperimentalFeatures) {
-            // Logging is an "experimental feature", until we possibly split it out into its own option
-            ++receivedResponseCount;
-            console.log(
-              `🧪 Received response at 0x${unpack7(responseAddress)
-                .toString(16)
-                .padStart(8, "0")} (${receivedResponseCount} of ${
-                responseAddresses.length
-              }) for command at 0x${unpack7(address)
-                .toString(16)
-                .padStart(8, "0")}: ${Array.from(valueBytes)
-                .map((x) => x.toString(16).padStart(2, "0"))
-                .join(" ")}`
-            );
-          }
         })
       );
 
@@ -348,19 +307,7 @@ function useRolandDataTransferImpl() {
           await Promise.all(responsePromises);
           await delay(GAP_BETWEEN_MESSAGES_MS);
         } finally {
-          if (enableExperimentalFeatures) {
-            // Logging is an "experimental feature", until we possibly split it out into its own option
-            console.log(
-              "🧪 " +
-                `${
-                  signal?.aborted ? "(ABORTED) " : ""
-                }[${queueID}] Command at (0x${unpack7(address)
-                  .toString(16)
-                  .padStart(8, "0")}) queued for ${Math.round(
-                  totalQueueTime
-                )}ms`
-            );
-          }
+          // Queue timing removed
         }
       }, queueID);
 
@@ -391,6 +338,8 @@ function useRolandDataTransferImpl() {
       signal?: AbortSignal,
       queueID: string = "read_utmost"
     ): Promise<RawDataBag> {
+      console.log("🔵 requestSystemBulk: Starting System bulk request");
+
       // 1. Send ONE request, receive 13 responses
       const responseMap = await requestNonDataCommand(
         pack7(0x01000000),
@@ -400,28 +349,92 @@ function useRolandDataTransferImpl() {
         queueID
       );
 
+      console.log(
+        `🔵 requestSystemBulk: Received ${
+          Object.keys(responseMap).length
+        } responses`
+      );
+      console.log(
+        "🔵 requestSystemBulk: Response addresses:",
+        Object.keys(responseMap).map(
+          (k) => `0x${unpack7(Number(k)).toString(16).padStart(8, "0")}`
+        )
+      );
+
+      // Log GK Set 1 data (address 0x02000400)
+      const gkSet1Addr = pack7(0x02000400);
+      const gkSet1Data = responseMap[gkSet1Addr];
+      if (gkSet1Data) {
+        console.log(
+          `🔵 requestSystemBulk: GK Set 1 data (${gkSet1Data.length} bytes):`,
+          Array.from(gkSet1Data.slice(0, 30))
+            .map((b) => `0x${b.toString(16).padStart(2, "0")}`)
+            .join(" ")
+        );
+      }
+
       // 2. Create callback that serves pre-fetched data
       const preFetchedDataProvider = async (
         address: number,
         length: number
       ): Promise<Uint8Array> => {
-        const data = responseMap[address];
-        if (!data) {
-          throw new Error(
-            `No pre-fetched data for address 0x${unpack7(address)
-              .toString(16)
-              .padStart(8, "0")}`
-          );
+        // Find which response block contains this address
+        for (const baseAddr of SYSTEM_BULK_RESPONSE_ADDRESSES) {
+          const data = responseMap[baseAddr];
+          if (!data) continue;
+
+          const baseAddrUnpacked = unpack7(baseAddr);
+          const requestedAddrUnpacked = unpack7(address);
+
+          // Check if requested address is within this block
+          if (
+            requestedAddrUnpacked >= baseAddrUnpacked &&
+            requestedAddrUnpacked < baseAddrUnpacked + data.length
+          ) {
+            const offset = requestedAddrUnpacked - baseAddrUnpacked;
+            const result = data.slice(offset, offset + length);
+            console.log(
+              `🔵 preFetchedDataProvider: Serving ${
+                result.length
+              } bytes for address 0x${requestedAddrUnpacked
+                .toString(16)
+                .padStart(8, "0")} (base 0x${baseAddrUnpacked
+                .toString(16)
+                .padStart(8, "0")} + offset ${offset})`
+            );
+            return result;
+          }
         }
-        return data;
+
+        throw new Error(
+          `No pre-fetched data for address 0x${unpack7(address)
+            .toString(16)
+            .padStart(8, "0")}`
+        );
       };
 
+      console.log("🔵 requestSystemBulk: Calling fetchAndTokenize...");
+
       // 3. Single call to fetchAndTokenize with entire System definition
-      return await fetchAndTokenize(
+      const result = await fetchAndTokenize(
         sysExConfig.addressMap!.system!.definition,
         pack7(0x02000000),
         preFetchedDataProvider
       );
+
+      console.log(
+        `🔵 requestSystemBulk: fetchAndTokenize returned ${
+          Object.keys(result).length
+        } fields`
+      );
+      console.log(
+        "🔵 requestSystemBulk: Field addresses:",
+        Object.keys(result)
+          .slice(0, 10)
+          .map((k) => `0x${unpack7(Number(k)).toString(16).padStart(8, "0")}`)
+      );
+
+      return result;
     }
 
     function setField<T extends FieldDefinition<any>>(
@@ -449,18 +462,6 @@ function useRolandDataTransferImpl() {
       );
       const lastQueueStartTimestamp = performance.now();
       scheduler.current!.enqueue(async () => {
-        if (enableExperimentalFeatures) {
-          const totalQueueTime = performance.now() - lastQueueStartTimestamp;
-          // Performance logging is an "experimental feature", until we possibly split it out into its own option
-          console.log(
-            "🧪 " +
-              `[${queueID}] Write of ${
-                field.definition.description
-              } (0x${unpack7(field.address)
-                .toString(16)
-                .padStart(8, "0")}) queued for ${Math.round(totalQueueTime)}ms`
-          );
-        }
         myOutputPort.send(data);
         await delay(GAP_BETWEEN_MESSAGES_MS);
       }, queueID);

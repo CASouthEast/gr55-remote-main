@@ -5062,43 +5062,55 @@ const SystemGkGuitarStruct = {
   piezoLow: new FieldDefinition(
     pack7(0x0f),
     "Piezo Low",
-    new UByteField(0, 20)
+    new UByteField(-10, 10, { encodedOffset: 10 })
   ),
   piezoHigh: new FieldDefinition(
     pack7(0x10),
     "Piezo High",
-    new UByteField(0, 20)
+    new UByteField(-10, 10, { encodedOffset: 10 })
   ),
   // String Distance
   string1Dist: new FieldDefinition(
     pack7(0x11),
     "String 1 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   string2Dist: new FieldDefinition(
     pack7(0x12),
     "String 2 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   string3Dist: new FieldDefinition(
     pack7(0x13),
     "String 3 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   string4Dist: new FieldDefinition(
     pack7(0x14),
     "String 4 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   string5Dist: new FieldDefinition(
     pack7(0x15),
     "String 5 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   string6Dist: new FieldDefinition(
     pack7(0x16),
     "String 6 Distance",
-    new UByteField(0, 100, { format: (val) => `${(val * 0.5).toFixed(1)} mm` })
+    new UByteField(0, 100, {
+      format: (val) => `${(val * 0.5 + 10).toFixed(1)} mm`,
+    })
   ),
   // String Sens
   string1Sens: new FieldDefinition(
@@ -5135,7 +5147,7 @@ const SystemGkGuitarStruct = {
   velocityDynamics: new FieldDefinition(
     pack7(0x1d),
     "Velocity Dynamics",
-    new UByteField(0, 4)
+    new UByteField(0, 4, { encodedOffset: -1 })
   ),
   velocityLowCut: new FieldDefinition(
     pack7(0x1e),
@@ -5145,7 +5157,7 @@ const SystemGkGuitarStruct = {
   pcmVelocitySens: new FieldDefinition(
     pack7(0x1f),
     "PCM Velocity Sens",
-    new UByteField(0, 5)
+    new UByteField(0, 10)
   ),
   // Nuance
   nuanceDynamics: new FieldDefinition(

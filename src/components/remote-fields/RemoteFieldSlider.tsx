@@ -140,7 +140,7 @@ function SliderControl({
             style={[
               styles.labelText,
               {
-                color: themedColors.accent,
+                color: theme.colors.slider.labelText,
                 backgroundColor: theme.colors.slider.labelTextBackground,
               },
               Platform.select({

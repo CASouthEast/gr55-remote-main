@@ -50,27 +50,6 @@ function useRolandIoSetupImpl() {
           identity.manufacturerId === sysExConfig.manufacturerId &&
           identity.deviceFamily === sysExConfig.familyCode &&
           identity.deviceModel === sysExConfig.modelNumber;
-        console.log(
-          `🔍 Checking against ${
-            sysExConfig.description
-          }: manufacturerId match=${
-            identity.manufacturerId === sysExConfig.manufacturerId
-          } (0x${identity.manufacturerId.toString(
-            16
-          )} vs 0x${sysExConfig.manufacturerId.toString(16)}), family match=${
-            identity.deviceFamily === sysExConfig.familyCode
-          } (0x${identity.deviceFamily
-            .toString(16)
-            .padStart(4, "0")} vs 0x${sysExConfig.familyCode
-            .toString(16)
-            .padStart(4, "0")}), model match=${
-            identity.deviceModel === sysExConfig.modelNumber
-          } (0x${identity.deviceModel
-            .toString(16)
-            .padStart(4, "0")} vs 0x${sysExConfig.modelNumber
-            .toString(16)
-            .padStart(4, "0")}) => ${matches}`
-        );
         if (matches) {
           deviceDescriptor = {
             sysExConfig,
@@ -102,26 +81,7 @@ function useRolandIoSetupImpl() {
         event.data
       );
       if (identity) {
-        console.log(
-          `🔍 Received device identity: manufacturerId=0x${identity.manufacturerId
-            .toString(16)
-            .padStart(2, "0")}, deviceFamily=0x${identity.deviceFamily
-            .toString(16)
-            .padStart(4, "0")}, deviceModel=0x${identity.deviceModel
-            .toString(16)
-            .padStart(4, "0")}, deviceId=0x${identity.deviceId
-            .toString(16)
-            .padStart(2, "0")}`
-        );
         handleIdentity(identity);
-      } else {
-        console.log(
-          `🔍 Received MIDI message but not an identity reply: ${Array.from(
-            event.data
-          )
-            .map((x) => "0x" + x.toString(16).padStart(2, "0"))
-            .join(" ")}`
-        );
       }
     };
 
@@ -144,7 +104,6 @@ function useRolandIoSetupImpl() {
     if (!inputPort || !outputPort) {
       return;
     }
-    console.log("🔍 Sending MIDI Identity Request");
     outputPort.send(RolandSysExProtocol.BROADCAST_IDENTITY_REQUEST_MESSAGE);
 
     const myInputPort = inputPort;
