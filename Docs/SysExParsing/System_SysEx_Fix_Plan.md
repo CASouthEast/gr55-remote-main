@@ -536,6 +536,278 @@ async function requestData<T extends AtomDefinition>(
 
 ---
 
-**STATUS:** PAUSED - Awaiting rewrite of `requestSystemBulk()` before any further debugging.
+## Phase 1 Extended Implementation Plan (2026-01-01)
+
+### Overview
+
+Complete rewrite of `requestSystemBulk()` following the proven patch loading pattern, with comprehensive testing before UI validation.
+
+### Implementation Steps
+
+#### Step 1: Define Response Address Constant
+
+**File:** `src/services/RolandDataTransfer.tsx`
+
+Add constant array with all 13 packed 7-bit response addresses:
+
+```typescript
+const SYSTEM_BULK_RESPONSE_ADDRESSES = [
+  pack7(0x01000000), // Setup (present but not used for System parsing)
+  pack7(0x02000000), // System Common
+  pack7(0x02000200), // System CTL
+  pack7(0x02000400), // GK Set 1
+  pack7(0x02000500), // GK Set 2
+  pack7(0x02000600), // GK Set 3
+  pack7(0x02000700), // GK Set 4
+  pack7(0x02000800), // GK Set 5
+  pack7(0x02000900), // GK Set 6
+  pack7(0x02000a00), // GK Set 7
+  pack7(0x02000b00), // GK Set 8
+  pack7(0x02000c00), // GK Set 9
+  pack7(0x02000d00), // GK Set 10
+];
+```
+
+#### Step 2: Rewrite requestSystemBulk() Function
+
+**File:** `src/services/RolandDataTransfer.tsx`
+
+Replace entire function with pattern-compliant implementation:
+
+```typescript
+async function requestSystemBulk(
+  signal?: AbortSignal,
+  queueID: string = "read_utmost"
+): Promise<RawDataBag> {
+  // 1. Send ONE request, receive 13 responses
+  const responseMap = await requestNonDataCommand(
+    pack7(0x01000000),
+    [0x01, 0x01, 0x00, 0x00],
+    SYSTEM_BULK_RESPONSE_ADDRESSES,
+    signal,
+    queueID
+  );
+
+  // 2. Create callback that serves pre-fetched data
+  const preFetchedDataProvider = async (
+    address: number,
+    length: number
+  ): Promise<Uint8Array> => {
+    const data = responseMap[address];
+    if (!data) {
+      throw new Error(
+        `No pre-fetched data for address 0x${unpack7(address)
+          .toString(16)
+          .padStart(8, "0")}`
+      );
+    }
+    return data;
+  };
+
+  // 3. Single call to fetchAndTokenize with entire System definition
+  return await fetchAndTokenize(
+    sysExConfig.addressMap!.system!.definition,
+    pack7(0x02000000),
+    preFetchedDataProvider
+  );
+}
+```
+
+**Key Changes:**
+
+- **Delete:** All manual loops, address matching, sub-structure iteration, manual tokenization
+- **Delete:** All SYSBULK console.log statements (~15+ log lines)
+- **Keep:** Single `requestNonDataCommand()` call to get bulk responses
+- **Add:** Pre-fetched data provider callback
+- **Add:** Single `fetchAndTokenize()` call with full System definition
+
+#### Step 3: Clean Up Excessive Logging
+
+**Files to clean:**
+
+- `src/services/RolandDataTransfer.tsx` - Remove excessive debug logging
+- `src/hooks/useRolandRemoteSystemState.tsx` - Remove excessive debug logging
+
+**Criteria:**
+
+- Keep only critical error logs
+- Remove all SYSBULK-prefixed logs
+- Remove redundant status logs that clutter console
+- Keep minimal performance tracking if needed for debugging
+
+#### Step 4: Create Unit Test with Traffic Log Data
+
+**File:** `__tests__/GKSet1Parsing.test.ts` (new file)
+
+Test GK Set 1 parsing using actual GR-55 MIDI response data from `Docs/SysExParsing/System_SysEx_message_interaction_model.txt`.
+
+**Test data:** GK Set 1 response (80 bytes):
+
+```
+20 20 20 20 20 20 20 20 00 0A 02 00 00 00 14 0A 0A 02 06 09 07 0B 0F 46 2B 2B 32 28 0A 02 05 05 05 05 00 20 20 20 20 20 20 20 20 00 0E 09 07 00 00 00 14 0A 0A 32 32 32 32 32 32 41 41 41 41 41 41 02 05 05 05 05 00 00 00 00 00 00 00 00 00 00 00 32 32
+```
+
+**Expected results (Guitar Mode, bytes 0-34):**
+
+| Field        | Offset | Expected Value | Raw Byte(s) | Notes                              |
+| ------------ | ------ | -------------- | ----------- | ---------------------------------- |
+| puType       | 0x08   | 0 (GK-3)       | `00`        | Enum value                         |
+| normalPuGain | 0x0e   | 0 dB           | `14`        | Value 20 = 0 dB (range -20 to +20) |
+| string1Dist  | 0x11   | 1.0 mm         | `02`        | Value × 0.5 mm                     |
+| string2Dist  | 0x12   | 3.0 mm         | `06`        | Value × 0.5 mm                     |
+| string3Dist  | 0x13   | 4.5 mm         | `09`        | Value × 0.5 mm                     |
+| string4Dist  | 0x14   | 3.5 mm         | `07`        | Value × 0.5 mm                     |
+| string5Dist  | 0x15   | 5.5 mm         | `0B`        | Value × 0.5 mm                     |
+| string6Dist  | 0x16   | 7.5 mm         | `0F`        | Value × 0.5 mm                     |
+| string1Sens  | 0x17   | 70             | `46`        | Direct value                       |
+| string2Sens  | 0x18   | 43             | `2B`        | Direct value                       |
+| string3Sens  | 0x19   | 43             | `2B`        | Direct value                       |
+| string4Sens  | 0x1a   | 50             | `32`        | Direct value                       |
+| string5Sens  | 0x1b   | 40             | `28`        | Direct value                       |
+| string6Sens  | 0x1c   | 10             | `0A`        | Direct value                       |
+
+**Test assertions:**
+
+```typescript
+describe("GK Set 1 Parsing with Real GR-55 Data", () => {
+  it("should parse puType correctly", () => {
+    expect(parsedData.puType).toBe(0); // GK-3
+  });
+
+  it("should parse normalPuGain correctly", () => {
+    expect(parsedData.normalPuGain).toBe(0); // 0 dB
+  });
+
+  it("should parse string distances correctly", () => {
+    expect(parsedData.string1Dist).toBe(1.0);
+    expect(parsedData.string2Dist).toBe(3.0);
+    expect(parsedData.string3Dist).toBe(4.5);
+    expect(parsedData.string4Dist).toBe(3.5);
+    expect(parsedData.string5Dist).toBe(5.5);
+    expect(parsedData.string6Dist).toBe(7.5);
+  });
+
+  it("should parse string sensitivities correctly", () => {
+    expect(parsedData.string1Sens).toBe(70);
+    expect(parsedData.string2Sens).toBe(43);
+    expect(parsedData.string3Sens).toBe(43);
+    expect(parsedData.string4Sens).toBe(50);
+    expect(parsedData.string5Sens).toBe(40);
+    expect(parsedData.string6Sens).toBe(10);
+  });
+});
+```
+
+#### Step 5: Run Unit Tests
+
+Execute unit test suite:
+
+```bash
+npm test GKSet1Parsing.test.ts
+```
+
+**Success criteria:**
+
+- All assertions pass
+- No parsing errors
+- Decoded values match expected hardware values exactly
+
+#### Step 6: Integration Testing with Real Hardware
+
+**Setup:**
+
+1. Connect to real GR-55 device via MIDI
+2. Load app in development mode
+3. Navigate to System screen to trigger data load
+
+**Validation points:**
+
+1. **SysEx traffic:** Only ONE request sent to `01 00 00 00` with args `01 01 00 00`
+2. **Response count:** Exactly 13 responses received
+3. **No invalid requests:** Zero requests sent to addresses starting with `02 00`
+4. **GK Set 1 data:** All fields parse correctly with real device data
+5. **No errors:** Console shows no parsing errors or timeout errors
+
+**Test procedure:**
+
+1. Clear console
+2. Trigger System data load
+3. Monitor console for SysEx request messages
+4. Verify request format matches specification
+5. Verify response count
+6. Check for any error messages
+
+#### Step 7: Verify GK Set 1 in UI
+
+**Only after Steps 5 & 6 pass:**
+
+Manual UI verification:
+
+1. Navigate to System → GK Set 1 screen
+2. Verify values display match known hardware values:
+   - PU Type shows "GK-3"
+   - Normal PU Gain shows "0 dB"
+   - String distances show correct values (1.0, 3.0, 4.5, 3.5, 5.5, 7.5 mm)
+   - String sensitivities show correct values (70, 43, 43, 50, 40, 10)
+3. Verify no console errors during display
+
+### Success Criteria
+
+#### Code Quality
+
+- [ ] `requestSystemBulk()` follows patch loading pattern exactly
+- [ ] Only ONE call to `fetchAndTokenize()`
+- [ ] No manual loops or address matching logic
+- [ ] All SYSBULK logging removed
+- [ ] Excessive debug logging cleaned up
+
+#### Unit Testing
+
+- [ ] Unit test file created with real GR-55 data
+- [ ] All test assertions pass
+- [ ] Parsing logic verified correct
+
+#### Integration Testing
+
+- [ ] Only ONE SysEx request sent: `F0 41 10 00 00 53 11 01 00 00 00 01 01 00 00 7D F7`
+- [ ] Exactly 13 responses received and processed
+- [ ] Zero invalid requests to addresses `02 00 xx xx`
+- [ ] GK Set 1 fields parse correctly with real hardware
+- [ ] No console errors or timeouts
+
+#### UI Verification
+
+- [ ] GK Set 1 screen displays correct values
+- [ ] All fields accessible and readable
+- [ ] No display errors or crashes
+
+### Test Execution Order
+
+**MANDATORY SEQUENCE:**
+
+1. ✅ Implement code changes (Steps 1-3)
+2. ✅ Run unit tests (Steps 4-5) - **MUST PASS**
+3. ✅ Run integration tests with hardware (Step 6) - **MUST PASS**
+4. ✅ Manual UI verification (Step 7) - **ONLY IF TESTS PASS**
+
+**Do NOT proceed to next step until current step passes completely.**
+
+### Out of Scope
+
+- GK Sets 2-10 display (will work automatically if Set 1 works)
+- System Common and CTL screens
+- Bass mode fields in GK Set structure
+- Parameter editing/writing to hardware
+
+### Notes
+
+- Focus exclusively on GK Set 1 Guitar Mode fields (offsets 0x00-0x22)
+- Use real hardware data for integration testing - no mocking
+- Do not proceed to UI until automated tests confirm parsing correctness
+- Bass mode fields (0x23-0x52) are out of scope for Phase 1
+
+---
+
+**STATUS:** IMPLEMENTATION IN PROGRESS - Phase 1 Extended Plan
 
 **End of Plan Document**

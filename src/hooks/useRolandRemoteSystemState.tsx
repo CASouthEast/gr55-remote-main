@@ -37,20 +37,7 @@ export function useRolandRemoteSystemState() {
         if (!addressMap?.system) {
           return Promise.reject(new Error("No address map available"));
         }
-        console.log(
-          "🔍 useRolandRemoteSystemState: Requesting System bulk data"
-        );
         const remoteData = await requestSystemBulk(signal, "read_utmost");
-        console.log(
-          "🔍 remoteData keys:",
-          Object.keys(remoteData).map((k) => `${k} (${parseInt(k, 10)})`)
-        );
-        if (remoteData[pack7(0x00000400)]) {
-          console.log(
-            "🔍 GK Set 1 data found at offset pack7(0x00000400), size:",
-            remoteData[pack7(0x00000400)].length
-          );
-        }
         const oldLocalOverrides = localOverrides.current;
         localOverrides.current = {};
         for (const address of Object.keys(oldLocalOverrides)) {
