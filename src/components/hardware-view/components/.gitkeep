@@ -1,0 +1,6 @@
+# This directory will contain the hardware view components
+# - Buttons.tsx
+# - Display.tsx  
+# - DataWheel.tsx
+# - Pedal.tsx
+# - NativeFallback.tsx

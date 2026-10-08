@@ -1,4 +1,4 @@
-import { MultiQueueScheduler } from "../MultiQueueScheduler";
+import { MultiQueueScheduler } from "../src/lib/MultiQueueScheduler";
 
 describe("MultiQueueScheduler", () => {
   test("executes tasks in the correct order based on priority", async () => {

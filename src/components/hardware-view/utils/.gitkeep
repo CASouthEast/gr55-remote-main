@@ -1,0 +1,3 @@
+# This directory will contain utility functions
+# - cn.ts (class name utility for web)
+# - constants.ts (shared constants)

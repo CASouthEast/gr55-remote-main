@@ -1,0 +1,139 @@
+import { MIDIMessageEvent } from "@motiz88/react-native-midi";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { RolandGR55SysExConfig } from "./RolandDevices";
+import { RolandIoSetupContext } from "./RolandIoSetup";
+import useCancellablePromise from "../hooks/useCancellablePromise";
+import { MidiIoContext } from "../services/MidiIo";
+import { RolandDataTransferContext } from "../services/RolandDataTransfer";
+
+export type PatchId = Readonly<{
+  bankSelectMSB: number;
+  pc: number;
+}>;
+
+const RolandRemotePatchSelectionContext = createContext<{
+  selectedPatch?: PatchId;
+  setSelectedPatch: (patch: PatchId) => void;
+}>({
+  setSelectedPatch: () => {},
+});
+
+export function RolandRemotePatchSelectionContainer({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { selectedDevice } = useContext(RolandIoSetupContext);
+  const sysExConfig = selectedDevice?.sysExConfig ?? RolandGR55SysExConfig;
+  const addressMap = sysExConfig.addressMap;
+
+  const { inputPort, outputPort } = useContext(MidiIoContext);
+
+  const nextBankSelectMSB = useRef<number>(null);
+
+  const { requestData, setField } = useContext(RolandDataTransferContext);
+
+  const [selectedPatch, setSelectedPatch] = useState<PatchId>();
+
+  useCancellablePromise(
+    useCallback(async () => {
+      // Suppress the initial setup fetch to avoid sending an extra RQ1 (0x01) request.
+      // The required setup bytes are included in the System bulk response.
+      // Intentionally empty - setup data is provided by System bulk response
+    }, [selectedDevice, addressMap, requestData])
+  );
+
+  useEffect(() => {
+    if (!inputPort) {
+      return;
+    }
+    const handleMidiMessage = ({ data }: MIDIMessageEvent) => {
+      // program change, any channel
+      if ((data[0] & 0xf0) === 0xc0 && data.length === 2) {
+        if (nextBankSelectMSB.current != null) {
+          setSelectedPatch({
+            bankSelectMSB: nextBankSelectMSB.current,
+            pc: data[1],
+          });
+        }
+      }
+      // bank select MSB, any channel
+      if ((data[0] & 0xf0) === 0xb0 && data[1] === 0x00) {
+        // only takes effect on next program change
+        nextBankSelectMSB.current = data[2];
+      }
+    };
+
+    inputPort.addEventListener("midimessage", handleMidiMessage);
+
+    return () => {
+      inputPort.removeEventListener("midimessage", handleMidiMessage as any);
+    };
+  }, [inputPort, selectedDevice, inputPort?.state]);
+
+  const setAndSendSelectedPatch = useCallback(
+    (patch: PatchId) => {
+      if (!selectedDevice || !outputPort || !setField) {
+        return;
+      }
+      setSelectedPatch(patch);
+      // Instead of a standard program change, send a SysEx write to the setup page.
+      // On the GR-55 this is better than a standard program change because it takes
+      // effect regardless of the current screen selected on the device, and bypasses
+      // the PC RX SWITCH setting (which might be set to OFF).
+      // See https://www.vguitarforums.com/smf/index.php?topic=35932.0
+      // TODO: If we ever support devices that don't expose this via SysEx, we'll need
+      // to fall back to a standard program change.
+      // TODO: Use RemotePage abstraction for setup page.
+      setField(
+        {
+          address:
+            addressMap!.setup.address +
+            addressMap!.setup.definition.$.patchBsMsb.offset,
+          definition: addressMap!.setup.definition.$.patchBsMsb,
+        },
+        patch.bankSelectMSB
+      );
+      setField(
+        {
+          address:
+            addressMap!.setup.address +
+            addressMap!.setup.definition.$.patchPc.offset,
+          definition: addressMap!.setup.definition.$.patchPc,
+        },
+        patch.pc
+      );
+    },
+    [addressMap, outputPort, selectedDevice, setField]
+  );
+  const ctx = useMemo(
+    () => ({
+      selectedPatch: selectedPatch
+        ? {
+            ...selectedPatch,
+          }
+        : undefined,
+      setSelectedPatch: setAndSendSelectedPatch,
+    }),
+    [selectedPatch, setAndSendSelectedPatch]
+  );
+
+  return (
+    <RolandRemotePatchSelectionContext.Provider value={ctx}>
+      {children}
+    </RolandRemotePatchSelectionContext.Provider>
+  );
+}
+
+export function useRolandRemotePatchSelection() {
+  return useContext(RolandRemotePatchSelectionContext);
+}

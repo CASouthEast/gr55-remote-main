@@ -1,0 +1,147 @@
+{
+  "name": "System",
+  "address_base": "00-00-00",
+  "groups": [
+    {
+      "name": "System Global",
+      "address_base": "00-01-00",
+      "parameters": [
+        {
+          "name": "LCD Contrast",
+          "address": "00",
+          "type": "range",
+          "min": 0,
+          "max": 15
+        },
+        {
+          "name": "Master Tune",
+          "address": "01",
+          "type": "range",
+          "min": 430,
+          "max": 450,
+          "display_offset": -440
+        },
+        {
+          "name": "Master Key Shift",
+          "address": "02",
+          "type": "range",
+          "min": -24,
+          "max": 24,
+          "display_offset": 0
+        },
+        {
+          "name": "Patch Level",
+          "address": "03",
+          "type": "range",
+          "min": 0,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "name": "GK Settings",
+      "address_base": "00-02-00",
+      "parameters": [
+        {
+          "name": "GK Type",
+          "address": "00",
+          "type": "options",
+          "options": [
+            { "value": 0, "name": "GK-3" },
+            { "value": 1, "name": "GK-2A" },
+            { "value": 2, "name": "PIEZO" }
+          ]
+        },
+        {
+          "name": "Scale",
+          "address": "01",
+          "type": "options",
+          "options": [
+            { "value": 0, "name": "ST" },
+            { "value": 1, "name": "LS" },
+            { "value": 2, "name": "MG" },
+            { "value": 3, "name": "JG" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MIDI Settings",
+      "address_base": "00-04-00",
+      "parameters": [
+        {
+          "name": "MIDI Channel",
+          "address": "00",
+          "type": "range",
+          "min": 1,
+          "max": 16
+        },
+        {
+          "name": "MIDI Omni Mode",
+          "address": "01",
+          "type": "toggle"
+        }
+      ]
+    },
+    {
+      "name": "Assigns",
+      "address_base": "00-08-00",
+      "groups": [
+        {
+          "name": "Assign 1",
+          "address_base": "00",
+          "parameters": [
+            { "name": "Switch", "address": "00", "type": "toggle" },
+            {
+              "name": "Target",
+              "address": "01",
+              "type": "options",
+              "options": []
+            },
+            {
+              "name": "Min",
+              "address": "02",
+              "type": "range",
+              "min": 0,
+              "max": 127
+            },
+            {
+              "name": "Max",
+              "address": "03",
+              "type": "range",
+              "min": 0,
+              "max": 127
+            }
+          ]
+        },
+        {
+          "name": "Assign 2",
+          "address_base": "10",
+          "parameters": [
+            { "name": "Switch", "address": "00", "type": "toggle" },
+            {
+              "name": "Target",
+              "address": "01",
+              "type": "options",
+              "options": []
+            },
+            {
+              "name": "Min",
+              "address": "02",
+              "type": "range",
+              "min": 0,
+              "max": 127
+            },
+            {
+              "name": "Max",
+              "address": "03",
+              "type": "range",
+              "min": 0,
+              "max": 127
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

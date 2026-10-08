@@ -2,7 +2,7 @@
 
 An experimental, unofficial patch editing app for the [Roland GR-55 guitar synthesizer](https://www.roland.com/uk/products/gr-55/).
 
-The app is written in TypeScript, and is built with React Native and Expo for the Web, Android and iOS. It uses the Web MIDI API (via https://github.com/motiz88/react-native-midi) to send and receive patch data.
+The app is written in TypeScript, and is built with React Native and Expo for the Web, Android and iOS. It uses the Web MIDI API (via https://github.com/CASouthEast/react-native-midi) to send and receive patch data.
 
 **This repo is a work in progress**. You can find links to download the app, as well as usage instructions, at https://gr55.app.
 

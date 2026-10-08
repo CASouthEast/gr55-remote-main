@@ -1,6 +1,9 @@
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { create, act, ReactTestRenderer } from "react-test-renderer";
 
+import { RolandRemotePatchContext } from "../src/contexts/RolandRemotePageContext";
+import { useRemoteField } from "../src/hooks/useRemoteField";
+import { useRolandRemotePatchState } from "../src/hooks/useRolandRemotePatchState";
 import {
   AsciiStringField,
   AtomDefinition,
@@ -12,12 +15,9 @@ import {
   StructDefinition,
   tokenize,
   UByteField,
-} from "../RolandAddressMap";
-import { RolandDataTransferContext } from "../RolandDataTransfer";
-import { RolandIoSetupContext } from "../RolandIoSetup";
-import { RolandRemotePatchContext } from "../RolandRemotePageContext";
-import { useRemoteField } from "../useRemoteField";
-import { useRolandRemotePatchState } from "../useRolandRemotePatchState";
+} from "../src/lib/RolandAddressMap";
+import { RolandIoSetupContext } from "../src/lib/RolandIoSetup";
+import { RolandDataTransferContext } from "../src/services/RolandDataTransfer";
 
 function RolandRemotePatchStateContainer({
   children,

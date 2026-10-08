@@ -1,4 +1,7 @@
-import { isValidChecksum, rolandChecksum } from "../RolandSysExProtocol";
+import {
+  isValidChecksum,
+  rolandChecksum,
+} from "../src/lib/RolandSysExProtocol";
 
 describe("Roland checksum", () => {
   test("round trip", () => {

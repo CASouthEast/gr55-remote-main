@@ -1,0 +1,11 @@
+{
+  "platforms": ["ios", "android", "web"],
+  "ios": {
+    "modules": ["MidiHardwareManagerModule"]
+  },
+  "android": {
+    "modules": [
+      "com.CASouthEast.gr55remote.midihardwaremanager.MidiHardwareManagerModule"
+    ]
+  }
+}

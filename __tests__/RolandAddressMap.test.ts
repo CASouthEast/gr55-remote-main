@@ -12,7 +12,7 @@ import {
   UByteField,
   USplit12Field,
   UWordField,
-} from "../RolandAddressMap";
+} from "../src/lib/RolandAddressMap";
 
 describe("parse", () => {
   test("parses a boolean field", () => {
