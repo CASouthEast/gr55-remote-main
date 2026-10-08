@@ -2,7 +2,7 @@
 
 An experimental, unofficial patch editing app for the [Roland GR-55 guitar synthesizer](https://www.roland.com/uk/products/gr-55/).
 
-The app is written in TypeScript, and is built with React Native and Expo for the Web, Android and iOS. It uses the Web MIDI API (via https://github.com/CASouthEast/react-native-midi) to send and receive patch data.
+The app is written in TypeScript, and is built with React Native and Expo for the Web, Android and iOS. It uses the Web MIDI API (via https://github.com/motiz88/react-native-midi) to send and receive patch data.
 
 **This repo is a work in progress**. You can find links to download the app, as well as usage instructions, at https://gr55.app.
 
@@ -27,3 +27,37 @@ Major thanks to @gumtown for building the excellent [GR-55Floorboard](https://so
 ## More info
 
 - [vguitarforums.com thread](https://www.vguitarforums.com/smf/index.php?topic=35164.0)
+
+## CaSouthEast functionality amendments
+
+Summary of the current functionality of this fork, building on the original editor above.
+
+### Navigation and layout
+
+- Rebuilt bottom tab navigation with six sections: **Connect**, **Hardware**, **Patch**, **Library**, **System** and **Settings**.
+- Connect is the landing page, where MIDI input/output ports are selected and connection status is shown. A fake GR-55 is available for testing without hardware.
+- Patch, Library and System use sidebar/top navigation layouts, and the theme has been adjusted across the app.
+
+### Hardware view
+
+- A graphical GR-55 front panel (display, data wheel, navigation cluster, buttons, pedal cluster, ports bar and sound-style panel) available for web and native.
+- The display shows the current patch, patch level, sound type, tone and effect on/off state and assigns. Effect and tone indicators are clickable and toggle the corresponding state.
+- Expression and other pedal interactions are reflected in the view, and search is available from the display.
+- A preview pane shows patch settings such as guitar out, BPM, GK settings and PCM/modeling tone details.
+- The hardware colour can be switched (for example Metallic Black or GR-55 Turquoise).
+
+### Patch editing
+
+- Patch main settings, tone (Normal, PCM and Modeling) and effects (amp, chorus, delay, EQ, MFX, mod, noise suppressor, reverb and structure).
+- Assigns, and master/pedal/GK control settings.
+- Rename, save and save-as of patches.
+
+### Library and System
+
+- A library list of patches with search and a no-results view.
+- System settings, including GK settings, read through a rewritten system SysEx parsing and bulk request implementation.
+
+### Project structure
+
+- Source reorganised under `src/` (`components`, `contexts`, `hooks`, `lib`, `navigation`, `screens`, `services`, `styles`, `utils`).
+- Updated to React 19 and Expo SDK 54.
